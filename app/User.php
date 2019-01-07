@@ -35,4 +35,39 @@ class User extends \TCG\Voyager\Models\User {
         return $this->hasOne('App\Doctor');
     }
 
+    /**
+     * Get doctor's opening hours
+     */
+    public function openingHours() {
+        return $this->hasMany('App\OpeningHour');
+    }
+
+    /**
+     * Get doctor's properties
+     */
+    public function properties() {
+        return $this->belongsToMany('App\Property');
+    }
+
+    /**
+     * Get doctor's services
+     */
+    public function services() {
+        return $this->belongsToMany('App\Service');
+    }
+
+    /**
+     * Get doctor's photos
+     */
+    public function photos() {
+        return $this->hasMany('App\Photo');
+    }
+    
+    /**
+     * Get doctor's score
+     */
+    public function scores() {
+        return $this->hasMany('App\Score');
+    }
+
 }
