@@ -6,8 +6,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends \TCG\Voyager\Models\User
-{
+class User extends \TCG\Voyager\Models\User {
+
     use Notifiable;
 
     /**
@@ -27,4 +27,12 @@ class User extends \TCG\Voyager\Models\User
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    /**
+     * Get the doctor record associated with the user.
+     */
+    public function doctor() {
+        return $this->hasOne('App\Doctor');
+    }
+
 }
