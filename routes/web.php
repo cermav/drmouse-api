@@ -15,6 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/pridat-veterinarni-ordinaci', 'DoctorController@addDoctor')->name('add-doctor');
+Route::post('/create-doctor', 'DoctorController@createDoctor')->name('create-doctor');
+
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();

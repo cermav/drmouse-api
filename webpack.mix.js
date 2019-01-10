@@ -11,5 +11,15 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
-   .sass('resources/sass/app.scss', 'public/css');
+mix.js('resources/assets/js/main.js', 'public/js')
+        .extract([
+            'jquery',
+        ])
+        .autoload({
+            jquery: ['$', 'window.jQuery', 'jQuery'],
+        })
+        .sass('resources/assets/sass/main.scss', 'public/css')
+        .copy('resources/assets/images', 'public/images')
+        .browserSync({
+            proxy: 'www.drmouse.local'
+        });
