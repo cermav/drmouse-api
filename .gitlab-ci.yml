@@ -12,7 +12,7 @@ composer:
       - echo "Building"
       - mkdir build
       - touch build/info.txt
-  artifact:
+  artifacts:
     paths:
         -build/
 
