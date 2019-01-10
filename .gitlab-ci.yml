@@ -14,7 +14,7 @@ composer:
       - touch build/info.txt
   artifacts:
     paths:
-        -build/
+      - build/
 
 test:
   stage: test
