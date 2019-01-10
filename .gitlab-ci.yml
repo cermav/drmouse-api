@@ -1,0 +1,23 @@
+stages:
+  - build
+  - test
+
+composer:
+
+  # The job's stage (build, test or deploy).
+  stage: build
+
+  # What to run on the job.
+  script:
+      - echo "Building"
+      - mkdir build
+      - touch build/info.txt
+  artifacts:
+    paths:
+      - build/
+
+test:
+  stage: test
+  script:
+    - echo "Test"
+    - test -f "build/info.txt"
