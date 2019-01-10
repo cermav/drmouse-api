@@ -46,14 +46,14 @@ class User extends \TCG\Voyager\Models\User {
      * Get doctor's properties
      */
     public function properties() {
-        return $this->belongsToMany('App\Property');
+        return $this->belongsToMany('App\Property', 'doctors_properties');
     }
 
     /**
      * Get doctor's services
      */
     public function services() {
-        return $this->belongsToMany('App\Service');
+        return $this->belongsToMany('App\Service', 'doctors_services')->withPivot('price');
     }
 
     /**

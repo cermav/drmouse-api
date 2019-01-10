@@ -12,7 +12,7 @@ class OpeningHour extends Model {
      * @var array
      */
     protected $fillable = [
-        'open_at', 'close_at', 'is_nonstop', 'is_closed', 'weekday_id', 'user_id'
+        'open_at', 'close_at', 'weekday_id', 'user_id', 'opening_hours_state_id'
     ];
     
     /**

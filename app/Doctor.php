@@ -12,11 +12,12 @@ class Doctor extends Model
      * @var array
      */
     protected $fillable = [
-        'description', 'slug', 'speaks_english',
+        'search_name', 'description', 'slug', 'speaks_english',
         'phone', 'second_phone', 'second_phone',
         'street', 'city', 'country', 'post_code', 'latitude', 'longitude', 
         'working_doctors_count', 'working_doctors_names', 'nurses_count', 'other_workers_count',
-        'gdpr_agreed', 'gdpr_agreed_date', 'gdpr_agreed_ip', 'profile_completedness'
+        'gdpr_agreed', 'gdpr_agreed_date', 'gdpr_agreed_ip', 'profile_completedness', 
+        'user_id', 'state_id'
     ];
     
     /**
