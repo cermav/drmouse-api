@@ -21,10 +21,11 @@ class CreateOpeningHoursTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')
                     ->on('users')->onDelete('cascade');
+            $table->integer('opening_hours_state_id')->unsigned();
+            $table->foreign('opening_hours_state_id')->references('id')
+                    ->on('opening_hours_states')->onDelete('cascade');
             $table->time('open_at')->nullable(true);
             $table->time('close_at')->nullable(true);
-            $table->boolean('is_nonstop')->nullable(false)->default(0);
-            $table->boolean('is_closed')->nullable(false)->default(0);
             $table->timestamps();
         });
     }

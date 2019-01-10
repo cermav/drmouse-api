@@ -15,8 +15,8 @@ class CreatePropertiesTable extends Migration
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('category_id')->unsigned();
-            $table->foreign('category_id')->references('id')
+            $table->integer('property_category_id')->unsigned();
+            $table->foreign('property_category_id')->references('id')
                     ->on('property_categories')->onDelete('cascade');
             $table->string('name', 255)->collation('utf8_general_ci')->nullable(false);
             $table->boolean('is_approved')->nullable(false)->default(0);

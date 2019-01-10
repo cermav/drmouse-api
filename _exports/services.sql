@@ -1,0 +1,18 @@
+INSERT INTO `services` (`name`, `show_on_registration`) VALUES
+('Úkon základního vyšetření', 1),
+('Základní vakcinace', 1),
+('Základní kastrace pes', 1),
+('Základní kastrace fena', 1),
+('Odčervení', 0),
+('Pitva', 0),
+('Vakcinace pes', 0),
+('Vakcinace kočka', 0),
+('Čipování', 0),
+('Čištění zubů ultrazvukem', 0),
+('Kastrace kočky laparoskopicky', 0),
+('Kastrace kocoura laparoskopicky', 0),
+('Kastrace feny laparoskopicky', 0),
+('Kastrace psa laparoskopicky', 0),
+('Preventivní péče o zvířecí seniory', 0),
+('Odstranění zubního kamene ultrazvukem', 0),
+('Kastrace kocoura laparoskopicky', 0);

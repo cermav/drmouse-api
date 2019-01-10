@@ -14,5 +14,7 @@ class DatabaseSeeder extends Seeder
          $this->call(WeekdaysTableSeeder::class);
          $this->call(PropertyCategoriesTableSeeder::class);
          $this->call(ScoreItemsTableSeeder::class);
+         $this->call(StatesTableSeeder::class);
+         $this->call(CustomRolesTableSeeder::class);
     }
 }
