@@ -6,8 +6,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends \TCG\Voyager\Models\User
-{
+class User extends \TCG\Voyager\Models\User {
+
     use Notifiable;
 
     /**
@@ -27,4 +27,47 @@ class User extends \TCG\Voyager\Models\User
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    /**
+     * Get the doctor record associated with the user.
+     */
+    public function doctor() {
+        return $this->hasOne('App\Doctor');
+    }
+
+    /**
+     * Get doctor's opening hours
+     */
+    public function openingHours() {
+        return $this->hasMany('App\OpeningHour');
+    }
+
+    /**
+     * Get doctor's properties
+     */
+    public function properties() {
+        return $this->belongsToMany('App\Property');
+    }
+
+    /**
+     * Get doctor's services
+     */
+    public function services() {
+        return $this->belongsToMany('App\Service');
+    }
+
+    /**
+     * Get doctor's photos
+     */
+    public function photos() {
+        return $this->hasMany('App\Photo');
+    }
+    
+    /**
+     * Get doctor's score
+     */
+    public function scores() {
+        return $this->hasMany('App\Score');
+    }
+
 }
