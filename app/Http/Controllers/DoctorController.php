@@ -12,8 +12,7 @@ use App\OpeningHour;
 use App\OpeningHoursState;
 use App\PropertyCategory;
 use App\Service;
-use App\Degree;
-use App\CzechName;
+use App\Http\Controllers\HelperController;
 
 class DoctorController extends Controller {
 
@@ -27,7 +26,7 @@ class DoctorController extends Controller {
 
     public function createDoctor(Request $request) {
 
-       $request->validate([
+        $request->validate([
             'name' => 'required|max:255',
             'email' => 'unique:users|required|email',
             'password' => 'required|min:6|confirmed',
@@ -42,14 +41,14 @@ class DoctorController extends Controller {
         ]);
 
         /* Create slug - if already exists, add the number at the end */
-        $slug = strtolower(str_replace(" ", "-", preg_replace("/[^A-Za-z0-9 ]/", '', $request['name'])));
+        $slug = strtolower(str_replace(" ", "-", preg_replace("/[^A-Za-z0-9 ]/", '', HelperController::replaceAccents($request['name']))));
         $existingCount = Doctor::where('slug', 'like', $slug . '%')->count();
         if ($existingCount > 0) {
             $slug = $slug . '-' . ($existingCount);
         }
-        
+
         /* Get longitude and latitude by the address */
-        $location = $this->getLatLngFromAddress(trim($request['street']) . " " . trim($request['city']) . " " . trim($request['country']) . " " . trim($request['post_code']));
+        $location = HelperController::getLatLngFromAddress(trim($request['street']) . " " . trim($request['city']) . " " . trim($request['country']) . " " . trim($request['post_code']));
 
         /* Create user */
         $user = User::create([
@@ -63,7 +62,7 @@ class DoctorController extends Controller {
         Doctor::create([
             'user_id' => $user->id,
             'state_id' => 1,
-            'search_name' => $this->parseName($request['name']),
+            'search_name' => HelperController::parseName($request['name']),
             'description' => $request['description'],
             'slug' => $slug,
             'speaks_english' => $request['speaks_english'],
@@ -98,7 +97,6 @@ class DoctorController extends Controller {
         $propertyCategories = PropertyCategory::all();
         foreach ($propertyCategories as $category) {
             foreach ($request['category_' . $category->id . '_properties'] as $property) {
-                dump($property);
                 $user->properties()->attach($property);
             }
         }
@@ -109,8 +107,8 @@ class DoctorController extends Controller {
                 $user->services()->attach($serviceId, compact('price'));
             }
         }
-        
-        
+
+
         /* Create a record in log table */
         DoctorsLog::create([
             'user_id' => $user->id,
@@ -120,37 +118,6 @@ class DoctorController extends Controller {
         ]);
 
         return redirect('/')->with('status', 'New doctor was added');
-    }
-
-    private function getLatLngFromAddress($address) {
-        $address = str_replace(" ", "+", $address);
-
-        $mapResponse = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&key=AIzaSyDSOUeQawvBZ2hCbyJFrxFRYGyjWrMKOsY");
-        $mapResponseJson = json_decode($mapResponse);
-        
-        $latitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
-        $longitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
-        return compact('latitude', 'longitude');
-    }
-    
-    private function parseName($name){
-        $lcName = strtolower($name);
-        $degrees = Degree::all();
-        foreach ($degrees as $degree){
-            $degreeName = strtolower($degree->name);
-            if (strpos($lcName, $degreeName) !== false){
-                $lcName = str_replace($degreeName, '', $lcName);
-            }
-        }
-        $simpleName = ucwords($lcName);
-        $nameParts = explode(" ", trim($simpleName));
-        $czechNames = CzechName::pluck('name')->toArray();
-        if (in_array($nameParts[0], $czechNames)){
-            $firstName = $nameParts[0];
-            unset($nameParts[0]);
-            array_push($nameParts, $firstName); 
-        }
-        return implode(" ", $nameParts);
     }
 
 }
