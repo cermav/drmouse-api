@@ -2,10 +2,13 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Database\Eloquent\Model;
 
 class Doctor extends Model
 {
+    use HasRelationships;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -25,6 +28,6 @@ class Doctor extends Model
      */
     public function user()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }
