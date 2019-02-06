@@ -1,0 +1,22 @@
+.logo{
+    display:inline-flex;
+    align-items:center;
+    .logoImg{
+        width:150px;
+        height:30px;
+        background:url('../images/logo-grey.svg') no-repeat left center / contain;
+    }
+    .logoText{
+        margin-left:1rem;
+    }
+    &.headerLogo{
+        .logoImg{
+            width:160px;
+            height:33px;
+            background-image:url('../images/logo.svg');
+        }        
+        .logoText{
+            color:$color-white;
+        }
+    }
+}

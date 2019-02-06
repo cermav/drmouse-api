@@ -20,9 +20,39 @@
 </head>
 <body>
     <div class='mainContainer'>
+        <header>
+            <div class="container headerContainer">
+                <a href="/" class="logo headerLogo"><p class="logoImg"></p><span class="logoText">veterinář s přehledem</span></a>
+                <nav class="menu">
+                    <ul>
+                        <li><a href="/">Úvod</a></li>
+                        <li><a href="/">Veterináři</a></li>
+                        <li><a href="{{route('add-doctor')}}">Přidat ordinaci</a></li>
+                        <li><a href="/">Články</a></li>
+                        <li><a href="/">O Dr. Mouseovi</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <div class="hero blueBg @yield('hero-class')">
+            <div class="container">
+                @yield('hero')                
+            </div>
+        </div>
         <main class="@yield('page-class')">
             @yield('content')
         </main>
+        <footer>
+            <div class="container">
+                <div>
+                    <a href="/" class="logo"><p class="logoImg"></p></a>                    
+                    <div class="copyright">
+                        <a href="{{route('faq')}}">Často kladené otázky</a> -
+                        <a href="{{route('contact')}}">Kontakt</a></div>
+                    <span>&copy; Dr. Mouse {{date("Y")}}</span>
+                </div>
+            </div>
+        </footer>
     </div>
 </body>
 </html>

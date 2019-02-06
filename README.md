@@ -13,4 +13,12 @@ When adding new migration or seeder, run `composer dump-autoload` before migrati
 Add helper functions to **HelperController.php**
 
 ## DB Dump
-Run php artisan iseed data_rows,data_types,menus,menu_items,permissions,permission_role,settings,translations --force
+Run `php artisan iseed data_rows,data_types,menus,menu_items,permissions,permission_role,settings,translations --force`
+
+## Frontend
+
+To run on dev `npm run dev`
+
+To run on production - minify outputs `npm run production`
+
+To wathc changes `npm run watch`

@@ -1,0 +1,37 @@
+.hero{
+    width:100%;
+    height:300px;
+    padding:90px 0 20px;
+    background-image:url('../images/bg-watermark-3.png');
+    background-repeat: repeat-x; 
+    background-position: center bottom;
+    background-size:80% auto;
+    color:$color-white;
+    .container{
+        display:flex;
+        flex-wrap:wrap;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height:100%;
+    }
+    .heroContent{
+        text-align:center;
+        .heroTitle{
+            margin-bottom:1rem;
+        }
+    }
+    &.slider{
+        background-image:url('../images/hero-watermark.png');
+        background-repeat:no-repeat;
+        height:450px;
+        .container{
+            align-items: flex-start;
+            justify-content:flex-end;
+        }
+        .heroContent{
+            width:60%;
+            text-align: left;
+        }
+    }
+}

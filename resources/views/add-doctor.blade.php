@@ -1,6 +1,13 @@
 @extends('layouts.page')
 @section('title', 'Přidat veterinární ordinaci -')
 
+@section('hero')
+<div class='heroContent'>
+    <h1>Přidat veterinární ordinaci</h1>
+    <p>TODO: ADD DESCRIPTION</p>
+</div>
+@endsection
+
 @section('content')
 <form method="POST" action="{{route('create-doctor')}}" aria-label="{{ __('New doctor') }}" novalidate="">
     @csrf

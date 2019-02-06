@@ -14,7 +14,8 @@
 Route::get('/', function () {
     return view('welcome');
 });
-
+Route::get('/faq', 'FAQController@addDoctor')->name('faq');
+Route::get('/contact', 'StaticController@showContact')->name('contact');
 Route::get('/pridat-veterinarni-ordinaci', 'DoctorController@addDoctor')->name('add-doctor');
 Route::post('/create-doctor', 'DoctorController@createDoctor')->name('create-doctor');
 
