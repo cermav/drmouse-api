@@ -546,14 +546,43 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./resources/assets/js/ajax.js":
+/*!*************************************!*\
+  !*** ./resources/assets/js/ajax.js ***!
+  \*************************************/
+/*! exports provided: getReq */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getReq", function() { return getReq; });
+var getReq = function getReq(url) {
+  console.log(url);
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }).then(function (response) {
+    return response.json();
+  });
+};
+
+/***/ }),
+
 /***/ "./resources/assets/js/main.js":
 /*!*************************************!*\
   !*** ./resources/assets/js/main.js ***!
   \*************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(__webpack_provided_window_dot_jQuery, $, Handlebars) {window.$ = __webpack_provided_window_dot_jQuery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(__webpack_provided_window_dot_jQuery, $, Handlebars) {/* harmony import */ var _ajax_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ajax.js */ "./resources/assets/js/ajax.js");
+
+window.$ = __webpack_provided_window_dot_jQuery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 window.croppie = __webpack_require__(/*! croppie */ "./node_modules/croppie/croppie.js");
 window.Handlebars = __webpack_require__(/*! handlebars */ "./node_modules/handlebars/lib/index.js");
 
@@ -567,7 +596,7 @@ var makeStickyHeader = function makeStickyHeader() {
   }
 };
 
-initCroppie = function initCroppie(width, height) {
+var initCroppie = function initCroppie(width, height) {
   var $croppieEl = $('.croppie').croppie({
     viewport: {
       width: width,
@@ -582,7 +611,7 @@ initCroppie = function initCroppie(width, height) {
   return $croppieEl;
 };
 
-updateCroppie = function updateCroppie($croppieEl, fileInput) {
+var updateCroppie = function updateCroppie($croppieEl, fileInput) {
   if (fileInput.files && fileInput.files[0]) {
     var reader = new FileReader();
 
@@ -596,7 +625,7 @@ updateCroppie = function updateCroppie($croppieEl, fileInput) {
   }
 };
 
-saveCroppie = function saveCroppie($croppieEl) {
+var saveCroppie = function saveCroppie($croppieEl) {
   if (typeof $(".cr-image").attr("src") !== "undefined") {
     $croppieEl.croppie('result', {
       type: 'canvas',
@@ -610,35 +639,112 @@ saveCroppie = function saveCroppie($croppieEl) {
   }
 };
 
-selectAvatar = function selectAvatar(url) {
+var selectAvatar = function selectAvatar(url) {
   updateAvatar(url);
   closeModal();
   $('#doc_profile_pic2').val(url);
 };
 
-updateAvatar = function updateAvatar(img) {
+var updateAvatar = function updateAvatar(img) {
   $('.avatar').css({
     'background-image': 'url(' + img + ')'
   });
 };
 
-closeModal = function closeModal() {
+var closeModal = function closeModal() {
   $(".modal").removeClass("open");
 };
 
-openModal = function openModal(modal) {
+var openModal = function openModal(modal) {
   $(".modal").removeClass("open");
   $("#" + modal).addClass("open");
 };
 
-addNewWeekdayRow = function addNewWeekdayRow($insertAfter, weekday) {
-  console.log(weekday);
+var addNewWeekdayRow = function addNewWeekdayRow($insertAfter, weekday) {
   var source = $("#weekdayRowTemplate").html();
   var template = Handlebars.compile(source);
   var rowHtml = template({
     weekday: weekday
   });
   $(rowHtml).insertAfter($insertAfter);
+};
+
+var searchProperties = function searchProperties() {
+  $(".searchProperties").on("input", function () {
+    var categoryId = $(this).data("category");
+    var $propertyInput = $(this);
+    Object(_ajax_js__WEBPACK_IMPORTED_MODULE_0__["getReq"])("/get-properties?name=" + $(this).val() + "&category_id=" + categoryId).then(function (properties) {
+      var source = $("#propertyOptionsTemplate").html();
+      var template = Handlebars.compile(source);
+      var optionsHtml = template({
+        properties: properties
+      });
+      $propertyInput.next().html(optionsHtml).slideDown();
+    });
+  });
+  $(".searchProperties").keyup(function (e) {
+    var $highlighted = $('.customOptions .highlighted'),
+        $li = $('.customOptions ul li');
+
+    if (e.keyCode === 40) {
+      $highlighted.removeClass('highlighted').next().addClass('highlighted');
+
+      if ($highlighted.next().length === 0) {
+        $li.eq(0).addClass('highlighted');
+      }
+    } else if (e.keyCode === 38) {
+      $highlighted.removeClass('highlighted').prev().addClass('highlighted');
+
+      if ($highlighted.prev().length === 0) {
+        $li.eq(-1).addClass('highlighted');
+      }
+    } else if (e.keyCode === 13) {
+      console.log("INPIY");
+
+      if ($highlighted.length === 0) {
+        addCustomOption($(this));
+      } else {
+        selectCustomOption($highlighted);
+      }
+    }
+  });
+  $(document).keyup(".customOptions li", function (e) {
+    if (e.keyCode === 13) {
+      selectCustomOption($(this));
+    }
+  });
+  $(document).on("click", ".customOptions li", function () {
+    selectCustomOption($(this));
+  });
+};
+
+var addCustomOption = function addCustomOption($option) {
+  var source = $("#propertyInputTemplate").html();
+  var template = Handlebars.compile(source);
+  var rowHtml = template({
+    id: $option.val(),
+    categoryId: $option.data("category"),
+    name: $option.val()
+  });
+  $(rowHtml).insertBefore($option.closest(".formRow"));
+  hideCustomOptions($option.next());
+};
+
+var selectCustomOption = function selectCustomOption($option) {
+  var source = $("#propertyInputTemplate").html();
+  var template = Handlebars.compile(source);
+  var rowHtml = template({
+    id: $option.data("property-id"),
+    categoryId: $option.data("category-id"),
+    name: $option.data("property-name")
+  });
+  $(rowHtml).insertBefore($option.closest(".formRow"));
+  hideCustomOptions($option.closest(".customOptions"));
+};
+
+var hideCustomOptions = function hideCustomOptions($el) {
+  $el.closest(".formRow").find("input").val("");
+  $el.slideUp(200);
 };
 
 $(document).ready(function () {
@@ -683,6 +789,14 @@ $(document).ready(function () {
     var $row = $(this).closest("div");
     $row.prev().find(".addWeekdayRow").prop('disabled', false).removeClass("invisible");
     $row.remove();
+  });
+  /* SEARCH PROERTIES AND FILL IN LIST */
+
+  searchProperties();
+  $('#doctorForm').bind('keypress keydown keyup', function (e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+    }
   });
 });
 $(window).on("resize", function () {

@@ -257,8 +257,20 @@ h1,
   background: #2898da;
 }
 
+.fullWidth {
+  width: 100%;
+}
+
 .halfWidth {
   width: 50%;
+}
+
+.mt40 {
+  margin-top: 40px;
+}
+
+.mb0 {
+  margin-bottom: 0 !important;
 }
 
 .logo {
@@ -607,6 +619,7 @@ header .menu ul li a.active {
 
 .form .formSection .formSectionContent.checkboxes {
   justify-content: center;
+  align-items: center;
 }
 
 .form .formSection .formSectionContent.checkboxes .checkboxRow {
@@ -635,7 +648,7 @@ header .menu ul li a.active {
   line-height: 2.3rem;
 }
 
-.form .formRow input,
+.form .formRow input:not([type=submit]),
 .form .formRow textarea,
 .form .formRow select {
   width: 100%;
@@ -645,14 +658,14 @@ header .menu ul li a.active {
   border: 3px solid #d5e8f0;
 }
 
-.form .formRow input:disabled,
+.form .formRow input:not([type=submit]):disabled,
 .form .formRow textarea:disabled,
 .form .formRow select:disabled {
   opacity: 0.6;
   background-color: #f4f4f4;
 }
 
-.form .formRow input.withPreValue,
+.form .formRow input:not([type=submit]).withPreValue,
 .form .formRow textarea.withPreValue,
 .form .formRow select.withPreValue {
   padding-left: 3.5rem;
@@ -674,9 +687,36 @@ header .menu ul li a.active {
   display: flex;
   align-items: center;
   left: 1rem;
-  top: 2.3rem;
+  top: calc(2.3rem + 5px);
   height: 3rem;
   color: #2898da;
+}
+
+.form .formRow .preValue.after {
+  left: auto;
+  right: 1rem;
+}
+
+.form .formRow .customOptions {
+  position: absolute;
+  display: none;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  border: 3px solid #d5e8f0;
+  border-top: 0;
+  z-index: 1;
+}
+
+.form .formRow .customOptions li {
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.form .formRow .customOptions li:hover,
+.form .formRow .customOptions li.highlighted {
+  background: #d5e8f0;
 }
 
 .form .radioRow,
@@ -721,6 +761,52 @@ header .menu ul li a.active {
   color: #fff;
   border: 2px solid #2898da;
   padding: 5px 30px 5px 20px;
+}
+
+.form .singleCheckbox label {
+  padding-left: 35px;
+  cursor: pointer;
+  color: #2898da;
+}
+
+.form .singleCheckbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  border: none;
+  margin: 0;
+}
+
+.form .singleCheckbox .checkmark {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eff4f5;
+}
+
+.form .singleCheckbox .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 9px;
+  top: 2px;
+  width: 8px;
+  height: 15px;
+  border: solid #fff;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+
+.form .singleCheckbox input:checked ~ .checkmark {
+  background-color: #2898da;
+}
+
+.form .singleCheckbox input:checked ~ .checkmark:after {
+  display: block;
 }
 
 .modal {
@@ -808,6 +894,7 @@ footer .container {
 .addDoctor .mainContainer {
   display: flex;
   justify-content: center;
+  padding-bottom: 7rem;
 }
 
 .addDoctor .mainContainer .form {

@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<form method="POST" action="{{route('create-doctor')}}" class="form" aria-label="{{ __('New doctor') }}" novalidate="">
+<form method="POST" action="{{route('create-doctor')}}" class="form" id="doctorForm" aria-label="{{ __('New doctor') }}" novalidate="">
     @csrf
     <fieldset class="formSection">
         <div class="formSectionHeader">
@@ -161,6 +161,10 @@
                 <label for="property-{{$property->id}}">{{$property->name}}</label>
             </div>
             @endforeach
+            <div class="formRow col col-3-of-12 mb0">
+                <input type="text" name="custom_property_{{$category->id}}" class="searchProperties" data-category="{{$category->id}}" autocomplete="off" />
+                <div class="customOptions"></div>
+            </div>
         </div>    
     </fieldset>
     @endif
@@ -168,52 +172,63 @@
     <fieldset class="formSection">
         <div class="formSectionHeader">
             <h3 class="title">Kolik máte zaměstnanců?</h3>
-            <p>Velikost vaší kliniky můžete přiblížit počtem zaměstnanců či si spolupracovníků.</p>
+            <p>Velikost vaší kliniky můžete přiblížit počtem zaměstnanců či si spolupracovníků. Pokud mate vice doktoru, uvedte prosim jejich jmena oddelena carkou.</p>
         </div>
-        <label for="working-doctors-count" class="formRowTitle {{ $errors->has('working_doctors_count') ? ' errorLabel' : '' }}">Doktoři:</label>
-        <input type="number" name="working_doctors_count" id="working-doctors-count" class="{{ $errors->has('working_doctors_count') ? 'error' : '' }}" value="{{ old('working_doctors_count') }}" />
-        @if ($errors->has('working_doctors_count'))
-        <label class="error">{{ $errors->first('working_doctors_count') }}</label>
-        @endif
-        <label for="nurses-count" class="formRowTitle {{ $errors->has('nurses_count') ? ' errorLabel' : '' }}">Sestry:</label>
-        <input type="number" name="nurses_count" id="nurses-count" class="{{ $errors->has('nurses_count') ? 'error' : '' }}" value="{{ old('nurses_count') }}" />
-        @if ($errors->has('nurses_count'))
-        <label class="error">{{ $errors->first('nurses_count') }}</label>
-        @endif
-        <label for="other-workers-count" class="formRowTitle {{ $errors->has('other_workers_count') ? ' errorLabel' : '' }}">Ostatní:</label>
-        <input type="number" name="other_workers_count" id="other-workers-count" class="{{ $errors->has('other_workers_count') ? 'error' : '' }}" value="{{ old('other_workers_count') }}" />
-        @if ($errors->has('other_workers_count'))
-        <label class="error">{{ $errors->first('other_workers_count') }}</label>
-        @endif
-        <p>Pokud mate vice doktoru, uvedte prosim jejich jmena oddelena carkou.</p>
-        <label for="working-doctors-names" class="formRowTitle">Jmena doktoru:</label>
-        <textarea name="working_doctors_names" id="working-doctors-names" value="{{ old('working_doctors_names') }}" ></textarea>
+        <div class="formSectionContent">
+            <div class="formRow col col-4-of-12">
+                <label for="working-doctors-count" class="formRowTitle {{ $errors->has('working_doctors_count') ? ' errorLabel' : '' }}">Doktoři:</label>
+                <input type="number" name="working_doctors_count" id="working-doctors-count" class="{{ $errors->has('working_doctors_count') ? 'error' : '' }}" value="{{ old('working_doctors_count') }}" />
+                @if ($errors->has('working_doctors_count'))
+                <label class="error">{{ $errors->first('working_doctors_count') }}</label>
+                @endif
+            </div>
+            <div class="formRow col col-4-of-12">
+                <label for="nurses-count" class="formRowTitle {{ $errors->has('nurses_count') ? ' errorLabel' : '' }}">Sestry:</label>
+                <input type="number" name="nurses_count" id="nurses-count" class="{{ $errors->has('nurses_count') ? 'error' : '' }}" value="{{ old('nurses_count') }}" />
+                @if ($errors->has('nurses_count'))
+                <label class="error">{{ $errors->first('nurses_count') }}</label>
+                @endif
+            </div>
+            <div class="formRow col col-4-of-12">
+                <label for="other-workers-count" class="formRowTitle {{ $errors->has('other_workers_count') ? ' errorLabel' : '' }}">Ostatní:</label>
+                <input type="number" name="other_workers_count" id="other-workers-count" class="{{ $errors->has('other_workers_count') ? 'error' : '' }}" value="{{ old('other_workers_count') }}" />
+                @if ($errors->has('other_workers_count'))
+                <label class="error">{{ $errors->first('other_workers_count') }}</label>
+                @endif
+            </div>    
+            <div class="formRow">                
+                <label for="working-doctors-names" class="formRowTitle">Jména doktorů:</label>
+                <textarea name="working_doctors_names" id="working-doctors-names" value="{{ old('working_doctors_names') }}" ></textarea>
+            </div>
+        </div>        
     </fieldset>
     <fieldset class="formSection">
         <div class="formSectionHeader">
             <h3 class="title">Můžete vyplnit ceny základních úkonů.</h3>
             <p>Ceny jsou pouze orientační a měly by majitele připravit na potřebný výdaj. Nižší cena neznamená vyšší kvalitu služeb.</p>
         </div>
-        @foreach ($services->where('show_on_registration', 1) as $service)
-        <div class="formRow">
-            <label for="service-price-{{$service->id}}" class="formRowTitle {{ $errors->has('service_prices[' . $service->id . ']') ? ' errorLabel' : '' }}">{{$service->name}}:</label>
-            <input type="number" name="service_prices[{{$service->id}}]" id="service-price-{{$service->id}}" class="{{ $errors->has('service_prices[' . $service->id . ']') ? 'error' : '' }}" value="{{ old('service_prices[' . $service->id . ']') }}" />
-            <span>Kč</span>
-            @if ($errors->has('service_prices[' . $service->id . ']'))
-            <label class="error">{{ $errors->first('service_prices[' . $service->id . ']') }}</label>
-            @endif
+        <div class="formSectionContent">
+            @foreach ($services->where('show_on_registration', 1) as $service)
+            <div class="formRow col col-6-of-12">
+                <label for="service-price-{{$service->id}}" class="formRowTitle {{ $errors->has('service_prices[' . $service->id . ']') ? ' errorLabel' : '' }}">{{$service->name}}:</label>
+                <input type="number" name="service_prices[{{$service->id}}]" id="service-price-{{$service->id}}" class="{{ $errors->has('service_prices[' . $service->id . ']') ? 'error' : '' }}" value="{{ old('service_prices[' . $service->id . ']') }}" />
+                <div class="preValue after">Kč</div>
+                @if ($errors->has('service_prices[' . $service->id . ']'))
+                <label class="error">{{ $errors->first('service_prices[' . $service->id . ']') }}</label>
+                @endif
+            </div>
+            @endforeach
         </div>
-        @endforeach
     </fieldset>
-    <div class='formRow'>
+    <div class='formRow singleCheckbox'>
         <label for="gdpr_agreed">
             Souhlasím se zpracováním osobních údajů  
             <input type="checkbox" name="gdpr_agreed" id="gdpr_agreed" class="">
             <span class="checkmark"></span>
         </label>
     </div>
-    <div class="formRow">
-        <input type="submit" class="submitButton" value="Save" />
+    <div class="formRow mt40">
+        <input type="submit" class="button greenButton fullWidth" value="Registrovat" />
     </div>
 </form>
 <div class="watermark"></div>
@@ -236,5 +251,7 @@
     </div>
 </div>
 @include ('templates.weekdayRow');
+@include ('templates.propertyOptions');
+@include ('templates.propertyInput');
 @endsection
 

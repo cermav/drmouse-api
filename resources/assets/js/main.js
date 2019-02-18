@@ -1,3 +1,4 @@
+import {getReq} from './ajax.js';
 window.$ = window.jQuery = require('jquery');
 window.croppie = require('croppie');
 window.Handlebars = require('handlebars');
@@ -11,7 +12,7 @@ const makeStickyHeader = () => {
     }
 };
 
-initCroppie = (width, height) => {
+const initCroppie = (width, height) => {
     const $croppieEl = $('.croppie').croppie({
         viewport: {
             width: width,
@@ -26,7 +27,7 @@ initCroppie = (width, height) => {
     return $croppieEl;
 };
 
-updateCroppie = ($croppieEl, fileInput) => {
+const updateCroppie = ($croppieEl, fileInput) => {
     if (fileInput.files && fileInput.files[0]) {
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -38,7 +39,7 @@ updateCroppie = ($croppieEl, fileInput) => {
     }
 };
 
-saveCroppie = ($croppieEl) => {
+const saveCroppie = ($croppieEl) => {
     if (typeof ($(".cr-image").attr("src")) !== "undefined") {
         $croppieEl.croppie('result', {
             type: 'canvas',
@@ -52,33 +53,93 @@ saveCroppie = ($croppieEl) => {
     }
 };
 
-selectAvatar = (url) => {
+const selectAvatar = (url) => {
     updateAvatar(url);
     closeModal();
     $('#doc_profile_pic2').val(url);
 };
 
-updateAvatar = (img) => {
+const updateAvatar = (img) => {
     $('.avatar').css({
         'background-image': 'url(' + img + ')',
     });
 };
 
-closeModal = () => {
+const closeModal = () => {
     $(".modal").removeClass("open");
 };
 
-openModal = (modal) => {
+const openModal = (modal) => {
     $(".modal").removeClass("open");
     $("#" + modal).addClass("open");
 };
 
-addNewWeekdayRow = ($insertAfter, weekday) => {
-    console.log(weekday);
+const addNewWeekdayRow = ($insertAfter, weekday) => {
     const source = $("#weekdayRowTemplate").html();
     const template = Handlebars.compile(source);
     const rowHtml = template({weekday: weekday});
     $(rowHtml).insertAfter($insertAfter);
+};
+
+const searchProperties = () => {
+    $(".searchProperties").on("input", function () {
+        const categoryId = $(this).data("category");
+        const $propertyInput = $(this);
+        getReq("/get-properties?name=" + $(this).val() + "&category_id=" + categoryId).then((properties) => {
+            const source = $("#propertyOptionsTemplate").html();
+            const template = Handlebars.compile(source);
+            const optionsHtml = template({properties: properties});
+            $propertyInput.next().html(optionsHtml).slideDown();
+        });
+
+    });
+    $(".searchProperties").keyup(function (e) {
+        const $highlighted = $('.customOptions .highlighted'), $li = $('.customOptions ul li');
+        if (e.keyCode === 40) {
+            $highlighted.removeClass('highlighted').next().addClass('highlighted');
+            if ($highlighted.next().length === 0) {
+                $li.eq(0).addClass('highlighted');
+            }
+        } else if (e.keyCode === 38) {
+            $highlighted.removeClass('highlighted').prev().addClass('highlighted');
+            if ($highlighted.prev().length === 0) {
+                $li.eq(-1).addClass('highlighted');
+            }
+        } else if (e.keyCode === 13) {
+            console.log("INPIY");
+            if ($highlighted.length === 0) {
+                addCustomOption($(this));
+            }else{
+                selectCustomOption($highlighted);
+            }
+        }
+    });
+    $(document).keyup(".customOptions li", function (e) {
+        if (e.keyCode === 13) {
+            selectCustomOption($(this));
+        }
+    });
+    $(document).on("click", ".customOptions li", function () {
+        selectCustomOption($(this));
+    });
+};
+const addCustomOption = ($option) => {
+    const source = $("#propertyInputTemplate").html();
+    const template = Handlebars.compile(source);
+    const rowHtml = template({id: $option.val(), categoryId: $option.data("category"), name: $option.val()});
+    $(rowHtml).insertBefore($option.closest(".formRow"));
+    hideCustomOptions($option.next());
+};
+const selectCustomOption = ($option) => {
+    const source = $("#propertyInputTemplate").html();
+    const template = Handlebars.compile(source);
+    const rowHtml = template({id: $option.data("property-id"), categoryId: $option.data("category-id"), name: $option.data("property-name")});
+    $(rowHtml).insertBefore($option.closest(".formRow"));
+    hideCustomOptions($option.closest(".customOptions"));
+};
+const hideCustomOptions = ($el) => {
+    $el.closest(".formRow").find("input").val("");
+    $el.slideUp(200);
 };
 
 $(document).ready(function () {
@@ -119,11 +180,21 @@ $(document).ready(function () {
         $(this).prop('disabled', true).addClass("invisible");
         addNewWeekdayRow($insertAfter, $insertAfter.data("weekday"));
     });
-    $(document).on("click", ".removeWeekdayRow", function(){
+    $(document).on("click", ".removeWeekdayRow", function () {
         const $row = $(this).closest("div");
         $row.prev().find(".addWeekdayRow").prop('disabled', false).removeClass("invisible");
         $row.remove();
     });
+
+    /* SEARCH PROERTIES AND FILL IN LIST */
+    searchProperties();
+
+    $('#doctorForm').bind('keypress keydown keyup', function (e) {
+        if (e.keyCode === 13) {
+            e.preventDefault();
+        }
+    });
+
 });
 $(window).on("resize", function () {
     console.log("RESIZE");
