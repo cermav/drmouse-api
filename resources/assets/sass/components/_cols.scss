@@ -1,0 +1,15 @@
+@mixin create-cols($span, $total) {
+    &.col-#{$span}-of-#{$total} {
+        width: (($span/$total)*100% - 1%) !important;
+    }
+}
+
+.col {
+    @include create-cols(1, 12);  
+    @include create-cols(2, 12);  
+    @include create-cols(3, 12);
+    @include create-cols(4, 12);
+    @include create-cols(6, 12);  
+    @include create-cols(8, 12);  
+    @include create-cols(12, 12);  
+}

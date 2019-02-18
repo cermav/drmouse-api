@@ -1,5 +1,6 @@
 @extends('layouts.page')
 @section('title', 'Dr Mouse – veterinář s přehledem')
+@section('page-class', 'home')
 @section('hero-class', 'slider')
 
 @section ('hero')

@@ -5,6 +5,11 @@ header{
     left:0;
     display:flex;
     padding:35px 0;
+    z-index:2;
+    &.sticky{
+        background:#33aade;
+        box-shadow: 1px 3px 5px #377fa0;
+    }
     .headerContainer{
         display:flex;
         justify-content:space-between;

@@ -1,0 +1,32 @@
+.addDoctor{
+    background:$color-blue;
+    .mainContainer{
+        display:flex;
+        justify-content:center;
+        .form{
+            width:80%;
+            .doctorDescription{
+                float:left;
+                width:100%;
+                .formRow{
+                    float:right;
+                    width: calc(95% - #{$avatarSize});
+
+                    &.avatarRow{
+                        float:left;
+                        width: $avatarSize;
+                    }
+                }
+            }
+        }
+        .watermark{
+            position:fixed;
+            bottom:0;
+            left:0;
+            width:100%;
+            height: 600px;
+            background:url('../images/bg-watermark.png') no-repeat center bottom;
+            z-index:-1;
+        }
+    }
+}

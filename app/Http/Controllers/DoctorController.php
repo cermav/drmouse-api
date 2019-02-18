@@ -83,14 +83,16 @@ class DoctorController extends Controller {
         ]);
 
         /* Save doctor's opening hours */
-        foreach ($request['weekdays'] as $weekdayId => $weekday) {
-            OpeningHour::create([
-                'weekday_id' => $weekdayId,
-                'user_id' => $user->id,
-                'opening_hours_state_id' => (int) $weekday['state'],
-                'open_at' => is_null($weekday['open_at']) ? $weekday['open_at'] : \DateTime::createFromFormat("H:i", $weekday['open_at'])->format("H:i"),
-                'close_at' => is_null($weekday['close_at']) ? $weekday['close_at'] : \DateTime::createFromFormat("H:i", $weekday['close_at'])->format("H:i")
-            ]);
+        foreach ($request['weekdays'] as $weekdayId => $weekdayItem) {
+            foreach ($weekdayItem as $weekday) {
+                OpeningHour::create([
+                    'weekday_id' => $weekdayId,
+                    'user_id' => $user->id,
+                    'opening_hours_state_id' => (int) $weekday['state'],
+                    'open_at' => is_null($weekday['open_at']) ? $weekday['open_at'] : \DateTime::createFromFormat("H:i", $weekday['open_at'])->format("H:i"),
+                    'close_at' => is_null($weekday['close_at']) ? $weekday['close_at'] : \DateTime::createFromFormat("H:i", $weekday['close_at'])->format("H:i")
+                ]);
+            }
         }
 
         /* Add properties to the doctor */

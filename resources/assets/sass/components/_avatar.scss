@@ -1,0 +1,16 @@
+.avatar{
+    position: relative;
+    width: $avatarSize;
+    height: $avatarSize;
+    z-index: 1;
+    overflow: hidden;
+    border:7px solid $color-white;
+    border-radius: 50%;
+    box-shadow: 2px 2px 2px 2px $color-shadow;
+    background-color:$color-blue;
+    background-repeat: no-repeat;
+    background-clip: padding-box;
+    background-size: contain;
+    background-position: center;
+    cursor:pointer;
+}

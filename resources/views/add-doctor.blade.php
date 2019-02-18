@@ -1,5 +1,6 @@
 @extends('layouts.page')
 @section('title', 'Přidat veterinární ordinaci -')
+@section('page-class', 'addDoctor')
 
 @section('hero')
 <div class='heroContent'>
@@ -9,129 +10,166 @@
 @endsection
 
 @section('content')
-<form method="POST" action="{{route('create-doctor')}}" aria-label="{{ __('New doctor') }}" novalidate="">
+<form method="POST" action="{{route('create-doctor')}}" class="form" aria-label="{{ __('New doctor') }}" novalidate="">
     @csrf
-    <fieldset>
-        <h3>Vaše jméno, email a krátký popis vaší ordinace.</h3>
-        <div class="formRow">
-            <label for="name" class="formRowTitle required {{ $errors->has('name') ? ' errorLabel' : '' }}">Vaše jméno a příjmení / název kliniky:</label>
-            <input type="text" name="name" id="name" class="{{ $errors->has('name') ? 'error' : '' }}" required value="{{ old('name') }}" />
-            @if ($errors->has('name'))
-            <label class="error">{{ $errors->first('name') }}</label>
-            @endif
+    <fieldset class="formSection">
+        <div class="formSectionHeader">
+            <h3 class="title">Vaše jméno a krátký popis vaší ordinace.</h3>
         </div>
-        <div class="formRow">
-            <label for="email" class="formRowTitle required {{ $errors->has('email') ? ' errorLabel' : '' }}">Váš email:</label>
-            <input type="email" name="email" id="email" class="{{ $errors->has('email') ? 'error' : '' }}" required value="{{ old('email') }}" />
-            @if ($errors->has('email'))
-            <label class="error">{{ $errors->first('email') }}</label>
-            @endif
-        </div>
-        <div class="formRow">
-            <label for="password" class="formRowTitle required {{ $errors->has('password') ? ' errorLabel' : '' }}">Zadejte heslo:</label>
-            <input type="password" name="password" id="password" class="{{ $errors->has('password') ? 'error' : '' }}" required />
-            @if ($errors->has('password'))
-            <label class="error">{{ $errors->first('password') }}</label>
-            @endif
-        </div>
-        <div class="formRow">
-            <label for="password-confirmation" class="formRowTitle required {{ $errors->has('password_confirmation') ? ' errorLabel' : '' }}">Zadejte heslo znovu:</label>
-            <input type="password" name="password_confirmation" id="password-confirmation" class="{{ $errors->has('password_confirmation') ? 'error' : '' }}" required />
-            @if ($errors->has('password_confirmation'))
-            <label class="error">{{ $errors->first('password_confirmation') }}</label>
-            @endif
-        </div>
-        <div class="formRow">
-            <label for="description" class="formRowTitle required {{ $errors->has('description') ? ' errorLabel' : '' }}">Zde můžete několika větami popsat vaši praxi / kliniku:</label>
-            <textarea name="description" id="description" class="{{ $errors->has('description') ? 'error' : '' }}" required value="{{ old('description') }}" ></textarea>
-            @if ($errors->has('description'))
-            <label class="error">{{ $errors->first('description') }}</label>
-            @endif
-        </div>
-        <div class="formRow">
-            <h5 class="formRowTitle">Mluvíte anglicky?</h5>
-            <input type="radio" name="speaks_english" id="speaks-english-yes" value="1"/><label for="speaks-english-yes">Ano</label>
-            <input type="radio" name="speaks_english" id="speaks-english-no" value="0"/><label for="speaks-english-no">Ne</label>
+        <div class="formSectionContent">
+            <div class="doctorDescription">
+                <div class="formRow avatarRow">
+                    <div class="avatar openModal" data-modal="avatarModal"></div>
+                    <input type="hidden" name="doc_profile_pic" id="doc_profile_pic" value="">
+                    <input type="hidden" name="doc_profile_pic2" id="doc_profile_pic2" value="">
+                </div>
+                <div class="formRow">
+                    <label for="name" class="formRowTitle required {{ $errors->has('name') ? ' errorLabel' : '' }}">Vaše jméno a příjmení / název kliniky:</label>
+                    <input type="text" name="name" id="name" class="{{ $errors->has('name') ? 'error' : '' }}" required value="{{ old('name') }}" />
+                    @if ($errors->has('name'))
+                    <label class="error">{{ $errors->first('name') }}</label>
+                    @endif
+                </div>
+                <div class="formRow">
+                    <label for="description" class="formRowTitle required {{ $errors->has('description') ? ' errorLabel' : '' }}">Zde můžete několika větami popsat vaši praxi / kliniku:</label>
+                    <textarea name="description" id="description" class="{{ $errors->has('description') ? 'error' : '' }}" required value="{{ old('description') }}" ></textarea>
+                    @if ($errors->has('description'))
+                    <label class="error">{{ $errors->first('description') }}</label>
+                    @endif
+                </div>
+                <div class="formRow radioRow">
+                    <h5 class="formRowTitle">Mluvíte anglicky?</h5>
+                    <input type="radio" name="speaks_english" id="speaks-english-yes" value="1"/><label for="speaks-english-yes">Ano</label>
+                    <input type="radio" name="speaks_english" id="speaks-english-no" value="0"/><label for="speaks-english-no">Ne</label>
+                </div>
+            </div>
         </div>
     </fieldset>
-    <fieldset>
-        <h3>Zadejte, prosím, vaši adresu.</h3>
-        <p>Čím přesnější údaje vyplníte, tím snáze vás klienti najdou.</p>
-        <div class="formRow">
-            <label for="street" class="formRowTitle required {{ $errors->has('street') ? ' errorLabel' : '' }}">Ulice a číslo popisné:</label>
-            <input type="text" name="street" id="street" class="{{ $errors->has('street') ? 'error' : '' }}" required value="{{ old('street') }}" />
-            @if ($errors->has('street'))
-            <label class="error">{{ $errors->first('street') }}</label>
-            @endif
+    <fieldset class="formSection">
+        <div class="formSectionHeader">
+            <h3 class="title">Vaše přihlašovací údaje</h3>
         </div>
-        <div class="formRow">
-            <label for="post-code" class="formRowTitle required {{ $errors->has('post_code') ? ' errorLabel' : '' }}">PSČ:</label>
-            <input type="text" name="post_code" id="post-code" class="{{ $errors->has('post_code') ? 'error' : '' }}" required value="{{ old('post_code') }}" />
-            @if ($errors->has('post_code'))
-            <label class="error">{{ $errors->first('post_code') }}</label>
-            @endif
-        </div>
-        <div class="formRow">
-            <label for="city" class="formRowTitle required {{ $errors->has('city') ? ' errorLabel' : '' }}">Město:</label>
-            <input type="text" name="city" id="city" class="{{ $errors->has('city') ? 'error' : '' }}" required value="{{ old('city') }}" />
-            @if ($errors->has('city'))
-            <label class="error">{{ $errors->first('city') }}</label>
-            @endif
-        </div>
-        <div class="formRow">
-            <label for="country" class="formRowTitle">Stát:</label>
-            <input type="text" name="country" id="country" value="Česká republika" disabled/>
-        </div>
-        <div class="formRow">
-            <label for="phone" class="formRowTitle required {{ $errors->has('phone') ? ' errorLabel' : '' }}">Telefonní číslo:</label>
-            <input type="text" name="phone" id="phone" class="{{ $errors->has('phone') ? 'error' : '' }}" required value="{{ old('phone') }}" />
-            @if ($errors->has('phone'))
-            <label class="error">{{ $errors->first('phone') }}</label>
-            @endif
-        </div>
-        <div class="formRow">
-            <label for="second-phone" class="formRowTitle required {{ $errors->has('second_phone') ? ' errorLabel' : '' }}">Druhé telefonní číslo:</label>
-            <input type="text" name="second_phone" id="second-phone" class="{{ $errors->has('second_phone') ? 'error' : '' }}" required value="{{ old('second_phone') }}" />
-            @if ($errors->has('second_phone'))
-            <label class="error">{{ $errors->first('second_phone') }}</label>
-            @endif
-        </div>
-        <div class="formRow">
-            <label for="website" class="formRowTitle">Webová stránka:</label>
-            <input type="text" name="website" id="website" value="{{ old('website') }}" />
+        <div class="formSectionContent">            
+            <div class="formRow">
+                <label for="email" class="formRowTitle required {{ $errors->has('email') ? ' errorLabel' : '' }}">Váš email:</label>
+                <input type="email" name="email" id="email" class="{{ $errors->has('email') ? 'error' : '' }}" required value="{{ old('email') }}" />
+                @if ($errors->has('email'))
+                <label class="error">{{ $errors->first('email') }}</label>
+                @endif
+            </div>
+            <div class="formRow">
+                <label for="password" class="formRowTitle required {{ $errors->has('password') ? ' errorLabel' : '' }}">Zadejte heslo:</label>
+                <input type="password" name="password" id="password" class="{{ $errors->has('password') ? 'error' : '' }}" required />
+                @if ($errors->has('password'))
+                <label class="error">{{ $errors->first('password') }}</label>
+                @endif
+            </div>
+            <div class="formRow">
+                <label for="password-confirmation" class="formRowTitle required {{ $errors->has('password_confirmation') ? ' errorLabel' : '' }}">Zadejte heslo znovu:</label>
+                <input type="password" name="password_confirmation" id="password-confirmation" class="{{ $errors->has('password_confirmation') ? 'error' : '' }}" required />
+                @if ($errors->has('password_confirmation'))
+                <label class="error">{{ $errors->first('password_confirmation') }}</label>
+                @endif
+            </div>
         </div>
     </fieldset>
-    <fieldset>
-        <h3>Zde můžete vyplnit otevírací hodiny.</h3>
-        <p>V případě dělené směny, použijte tlačítko +.</p>
-        @foreach ($weekdays as $weekday)
-        <div class="formRow">
-            <label for="weekday-{{$weekday->id}}">{{$weekday->name}}</label>
-            <select id="weekday-{{$weekday->id}}" name="weekdays[{{$weekday->id}}][state]">
-                @foreach ($openingHoursStates as $state)
-                 <option value="{{$state->id}}">{{$state->name}}</option>
-                @endforeach
-            </select>
-            <input type="time" name="weekdays[{{$weekday->id}}][open_at]" />
-            <input type="time" name="weekdays[{{$weekday->id}}][close_at]" />
+    <fieldset class="formSection">
+        <div class="formSectionHeader">
+            <h3 class="title">Zadejte, prosím, vaši adresu.</h3>
+            <p>Čím přesnější údaje vyplníte, tím snáze vás klienti najdou.</p>
         </div>
-        @endforeach
+        <div class="formSectionContent">
+            <div class="formRow col col-8-of-12">
+                <label for="street" class="formRowTitle required {{ $errors->has('street') ? ' errorLabel' : '' }}">Ulice a číslo popisné:</label>
+                <input type="text" name="street" id="street" class="{{ $errors->has('street') ? 'error' : '' }}" required value="{{ old('street') }}" />
+                @if ($errors->has('street'))
+                <label class="error">{{ $errors->first('street') }}</label>
+                @endif
+            </div>
+            <div class="formRow col col-4-of-12">
+                <label for="post-code" class="formRowTitle required {{ $errors->has('post_code') ? ' errorLabel' : '' }}">PSČ:</label>
+                <input type="text" name="post_code" id="post-code" class="{{ $errors->has('post_code') ? 'error' : '' }}" required value="{{ old('post_code') }}" />
+                @if ($errors->has('post_code'))
+                <label class="error">{{ $errors->first('post_code') }}</label>
+                @endif
+            </div>
+            <div class="formRow col col-6-of-12">
+                <label for="city" class="formRowTitle required {{ $errors->has('city') ? ' errorLabel' : '' }}">Město:</label>
+                <input type="text" name="city" id="city" class="{{ $errors->has('city') ? 'error' : '' }}" required value="{{ old('city') }}" />
+                @if ($errors->has('city'))
+                <label class="error">{{ $errors->first('city') }}</label>
+                @endif
+            </div>
+            <div class="formRow col col-6-of-12">
+                <label for="country" class="formRowTitle">Stát:</label>
+                <input type="text" name="country" id="country" value="Česká republika" disabled/>
+            </div>
+            <div class="formRow col col-6-of-12">
+                <label for="phone" class="formRowTitle required {{ $errors->has('phone') ? ' errorLabel' : '' }}">Telefonní číslo:</label>
+                <input type="text" name="phone" id="phone" class="{{ $errors->has('phone') ? 'error' : '' }} withPreValue" required value="{{ old('phone') }}" />
+                <div class="preValue">+420</div>
+                @if ($errors->has('phone'))
+                <label class="error">{{ $errors->first('phone') }}</label>
+                @endif
+            </div>
+            <div class="formRow col col-6-of-12">
+                <label for="second-phone" class="formRowTitle required {{ $errors->has('second_phone') ? ' errorLabel' : '' }}">Druhé telefonní číslo:</label>
+                <input type="text" name="second_phone" id="second-phone" class="{{ $errors->has('second_phone') ? 'error' : '' }} withPreValue" required value="{{ old('second_phone') }}" />
+                <div class="preValue">+420</div>
+                @if ($errors->has('second_phone'))
+                <label class="error">{{ $errors->first('second_phone') }}</label>
+                @endif
+            </div>
+            <div class="formRow">
+                <label for="website" class="formRowTitle">Webová stránka:</label>
+                <input type="text" name="website" id="website" value="{{ old('website') }}" />
+            </div>
+        </div> 
+    </fieldset>
+    <fieldset class="formSection">
+        <div class="formSectionHeader">
+            <h3 class="title">Zde můžete vyplnit otevírací hodiny.</h3>
+            <p>V případě dělené směny, použijte tlačítko +.</p>
+        </div>
+        <div class="formSectionContent">
+            @foreach ($weekdays as $weekday)
+            <div class="formRow asTableRow" data-weekday="{{$weekday->id}}">
+                <label for="weekday-{{$weekday->id}}-0" class="formRowTitle col col-2-of-12">{{$weekday->name}}</label>
+                <select id="weekday-{{$weekday->id}}-0" name="weekdays[{{$weekday->id}}][0][state]" class="weekdaySelect col col-3-of-12">
+                    @foreach ($openingHoursStates as $state)
+                    <option value="{{$state->id}}">{{$state->name}}</option>
+                    @endforeach
+                </select>
+                <input type="time" name="weekdays[{{$weekday->id}}][0][open_at]" class="col col-3-of-12" />
+                <input type="time" name="weekdays[{{$weekday->id}}][0][close_at]" class="col col-3-of-12" />
+                <button type="button" class="actionButton col col-1-of-12 addWeekdayRow">+</button>
+            </div>
+            @endforeach
+        </div>
     </fieldset>
     @foreach ($propertyCategories as $category)
     @if (count($category->properties) > 0)
-    <fieldset>
-        <h3>{{$category->form_section_title}}</h3>
-        <p>{{$category->form_section_description}}</p>
-        @foreach ($category->properties->where('show_on_registration',1) as $property)
-        <input type="checkbox" name="category_{{$category->id}}_properties[]" id="property-{{$property->id}}" value="{{$property->id}}" />
-        <label for="property-{{$property->id}}">{{$property->name}}</label>
-        @endforeach
+    <fieldset class="formSection">
+        <div class="formSectionHeader">
+            <h3 class="title">{{$category->form_section_title}}</h3>
+            <p>{{$category->form_section_description}}</p>
+        </div>
+        <div class="formSectionContent checkboxes">
+            @foreach ($category->properties->where('show_on_registration',1) as $property)
+            <div class="formRow checkboxRow">
+                <input type="checkbox" name="category_{{$category->id}}_properties[]" id="property-{{$property->id}}" value="{{$property->id}}" />
+                <label for="property-{{$property->id}}">{{$property->name}}</label>
+            </div>
+            @endforeach
+        </div>    
     </fieldset>
     @endif
     @endforeach
-    <fieldset>
-        <h3>Kolik máte zaměstnanců?</h3>
-        <p>Velikost vaší kliniky můžete přiblížit počtem zaměstnanců či si spolupracovníků.</p>
+    <fieldset class="formSection">
+        <div class="formSectionHeader">
+            <h3 class="title">Kolik máte zaměstnanců?</h3>
+            <p>Velikost vaší kliniky můžete přiblížit počtem zaměstnanců či si spolupracovníků.</p>
+        </div>
         <label for="working-doctors-count" class="formRowTitle {{ $errors->has('working_doctors_count') ? ' errorLabel' : '' }}">Doktoři:</label>
         <input type="number" name="working_doctors_count" id="working-doctors-count" class="{{ $errors->has('working_doctors_count') ? 'error' : '' }}" value="{{ old('working_doctors_count') }}" />
         @if ($errors->has('working_doctors_count'))
@@ -151,18 +189,20 @@
         <label for="working-doctors-names" class="formRowTitle">Jmena doktoru:</label>
         <textarea name="working_doctors_names" id="working-doctors-names" value="{{ old('working_doctors_names') }}" ></textarea>
     </fieldset>
-    <fieldset>
-        <h3>Můžete vyplnit ceny základních úkonů.</h3>
-        <p>Ceny jsou pouze orientační a měly by majitele připravit na potřebný výdaj. Nižší cena neznamená vyšší kvalitu služeb.</p>
+    <fieldset class="formSection">
+        <div class="formSectionHeader">
+            <h3 class="title">Můžete vyplnit ceny základních úkonů.</h3>
+            <p>Ceny jsou pouze orientační a měly by majitele připravit na potřebný výdaj. Nižší cena neznamená vyšší kvalitu služeb.</p>
+        </div>
         @foreach ($services->where('show_on_registration', 1) as $service)
-            <div class="formRow">
-                <label for="service-price-{{$service->id}}" class="formRowTitle {{ $errors->has('service_prices[' . $service->id . ']') ? ' errorLabel' : '' }}">{{$service->name}}:</label>
-                <input type="number" name="service_prices[{{$service->id}}]" id="service-price-{{$service->id}}" class="{{ $errors->has('service_prices[' . $service->id . ']') ? 'error' : '' }}" value="{{ old('service_prices[' . $service->id . ']') }}" />
-                <span>Kč</span>
-                @if ($errors->has('service_prices[' . $service->id . ']'))
-                <label class="error">{{ $errors->first('service_prices[' . $service->id . ']') }}</label>
-                @endif
-            </div>
+        <div class="formRow">
+            <label for="service-price-{{$service->id}}" class="formRowTitle {{ $errors->has('service_prices[' . $service->id . ']') ? ' errorLabel' : '' }}">{{$service->name}}:</label>
+            <input type="number" name="service_prices[{{$service->id}}]" id="service-price-{{$service->id}}" class="{{ $errors->has('service_prices[' . $service->id . ']') ? 'error' : '' }}" value="{{ old('service_prices[' . $service->id . ']') }}" />
+            <span>Kč</span>
+            @if ($errors->has('service_prices[' . $service->id . ']'))
+            <label class="error">{{ $errors->first('service_prices[' . $service->id . ']') }}</label>
+            @endif
+        </div>
         @endforeach
     </fieldset>
     <div class='formRow'>
@@ -176,5 +216,25 @@
         <input type="submit" class="submitButton" value="Save" />
     </div>
 </form>
+<div class="watermark"></div>
+<div class="modal" id="avatarModal">
+    <div class="modalInner">
+        <button class="close closeModal">X</button>
+        <h2>Vyberte, prosím, fotografii ze svého zařízení.</h2>
+        <div class="button fileButton halfWidth modalRow">
+            <input type="file" accept="image/*" id='avatarInput'>
+            <span>Nahrát fotografii</span>
+        </div>
+        <div class="croppie modalRow"></div>
+        <ul class="avatarsList modalRow">
+            <li class="selectAvatar" data-avatar="{{asset('/images/profileDoctor01.png')}}" style="background-image:url('{{asset('/images/profileDoctor01.png')}}')"></li>
+            <li class="selectAvatar" data-avatar="{{asset('/images/profileDoctor02.png')}}" style="background-image:url('{{asset('/images/profileDoctor02.png')}}')"></li>
+            <li class="selectAvatar" data-avatar="{{asset('/images/profileDoctor03.png')}}" style="background-image:url('{{asset('/images/profileDoctor03.png')}}')"></li>
+            <li class="selectAvatar" data-avatar="{{asset('/images/profileDoctor04.png')}}" style="background-image:url('{{asset('/images/profileDoctor04.png')}}')"></li>
+        </ul>
+        <button class="button greenButton modalRow" id='saveAvatar'>Uložit</button>
+    </div>
+</div>
+@include ('templates.weekdayRow');
 @endsection
 
