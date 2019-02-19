@@ -162,7 +162,7 @@
             </div>
             @endforeach
             <div class="formRow col col-3-of-12 mb0">
-                <input type="text" name="custom_property_{{$category->id}}" class="searchProperties" data-category="{{$category->id}}" autocomplete="off" />
+                <input type="text" name="custom_property_{{$category->id}}" class="searchOptions" data-category="{{$category->id}}" data-type="properties" autocomplete="off" placeholder="Jiné" />
                 <div class="customOptions"></div>
             </div>
         </div>    
@@ -208,7 +208,7 @@
             <p>Ceny jsou pouze orientační a měly by majitele připravit na potřebný výdaj. Nižší cena neznamená vyšší kvalitu služeb.</p>
         </div>
         <div class="formSectionContent">
-            @foreach ($services->where('show_on_registration', 1) as $service)
+            @foreach ($services as $service)
             <div class="formRow col col-6-of-12">
                 <label for="service-price-{{$service->id}}" class="formRowTitle {{ $errors->has('service_prices[' . $service->id . ']') ? ' errorLabel' : '' }}">{{$service->name}}:</label>
                 <input type="number" name="service_prices[{{$service->id}}]" id="service-price-{{$service->id}}" class="{{ $errors->has('service_prices[' . $service->id . ']') ? 'error' : '' }}" value="{{ old('service_prices[' . $service->id . ']') }}" />
@@ -218,6 +218,11 @@
                 @endif
             </div>
             @endforeach
+            <div class="formRow col col-6-of-12">
+                <label for="custom_service" class="formRowTitle">Přidat vlastní úkon:</label>
+                <input type="text" name="custom_service" class="searchOptions" data-service="{{$service->id}}" data-type="services" autocomplete="off" placeholder="Jiný úkon" />
+                <div class="customOptions"></div>
+            </div>
         </div>
     </fieldset>
     <div class='formRow singleCheckbox'>
@@ -251,7 +256,8 @@
     </div>
 </div>
 @include ('templates.weekdayRow');
-@include ('templates.propertyOptions');
+@include ('templates.customOptions');
 @include ('templates.propertyInput');
+@include ('templates.serviceInput');
 @endsection
 

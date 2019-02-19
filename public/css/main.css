@@ -671,6 +671,40 @@ header .menu ul li a.active {
   padding-left: 3.5rem;
 }
 
+.form .formRow input:not([type=submit]).error,
+.form .formRow textarea.error,
+.form .formRow select.error {
+  border-color: red;
+}
+
+.form .formRow input:not([type=submit])::-webkit-input-placeholder,
+.form .formRow textarea::-webkit-input-placeholder,
+.form .formRow select::-webkit-input-placeholder {
+  color: #d5e8f0;
+  font-style: italic;
+}
+
+.form .formRow input:not([type=submit]):-ms-input-placeholder,
+.form .formRow textarea:-ms-input-placeholder,
+.form .formRow select:-ms-input-placeholder {
+  color: #d5e8f0;
+  font-style: italic;
+}
+
+.form .formRow input:not([type=submit])::-ms-input-placeholder,
+.form .formRow textarea::-ms-input-placeholder,
+.form .formRow select::-ms-input-placeholder {
+  color: #d5e8f0;
+  font-style: italic;
+}
+
+.form .formRow input:not([type=submit])::placeholder,
+.form .formRow textarea::placeholder,
+.form .formRow select::placeholder {
+  color: #d5e8f0;
+  font-style: italic;
+}
+
 .form .formRow select {
   background-image: url(/images/arrow.png?6bac2e9499509a7fdea6e3e0266a9b8d);
   background-repeat: no-repeat;
@@ -680,6 +714,10 @@ header .menu ul li a.active {
 
 .form .formRow textarea {
   height: 8rem;
+}
+
+.form .formRow label.error {
+  color: red;
 }
 
 .form .formRow .preValue {

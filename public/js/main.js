@@ -557,7 +557,6 @@ module.exports = g;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getReq", function() { return getReq; });
 var getReq = function getReq(url) {
-  console.log(url);
   return fetch(url, {
     method: 'GET',
     headers: {
@@ -585,6 +584,64 @@ __webpack_require__.r(__webpack_exports__);
 window.$ = __webpack_provided_window_dot_jQuery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 window.croppie = __webpack_require__(/*! croppie */ "./node_modules/croppie/croppie.js");
 window.Handlebars = __webpack_require__(/*! handlebars */ "./node_modules/handlebars/lib/index.js");
+$(document).ready(function () {
+  console.log("DOCUMENT READY");
+  $('#doctorForm').bind('keypress keydown keyup', function (e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+    }
+  });
+  /* TOGGLE MODAL */
+
+  $(".openModal").on("click", function () {
+    openModal($(this).attr('data-modal'));
+  });
+  $(".closeModal").on("click", function () {
+    closeModal();
+  });
+  /* MANAGE AVATAR */
+
+  var $croppieEl = initCroppie(210, 210);
+  $('#avatarInput').on("change", function () {
+    updateCroppie($croppieEl, this);
+  });
+  $('#saveAvatar').on("click", function () {
+    saveCroppie($croppieEl);
+  });
+  $(".selectAvatar").on("click", function () {
+    selectAvatar($(this).attr("data-avatar"));
+  });
+  /* MANAGE WEEKDAYS SELECT */
+
+  $(".weekdaySelect").on("change", function () {
+    if (parseInt($(this).val(), 10) > 1) {
+      $(this).closest("div").find("input, button").attr("disabled", true);
+    } else {
+      $(this).closest("div").find("input, button").attr("disabled", false);
+    }
+  });
+  /* MANAGE NEW WEEKDAY ROW */
+
+  $(".addWeekdayRow").on("click", function () {
+    var $insertAfter = $(this).closest("div");
+    $(this).prop('disabled', true).addClass("invisible");
+    addNewWeekdayRow($insertAfter, $insertAfter.data("weekday"));
+  });
+  $(document).on("click", ".removeWeekdayRow", function () {
+    var $row = $(this).closest("div");
+    $row.prev().find(".addWeekdayRow").prop('disabled', false).removeClass("invisible");
+    $row.remove();
+  });
+  /* SEARCH PROERTIES OR SERVICES AND FILL IN LIST */
+
+  searchCustomOptions();
+});
+$(window).on("resize", function () {
+  console.log("RESIZE");
+});
+$(window).on("scroll", function () {
+  makeStickyHeader();
+});
 
 var makeStickyHeader = function makeStickyHeader() {
   var scroll = $(window).scrollTop();
@@ -669,22 +726,24 @@ var addNewWeekdayRow = function addNewWeekdayRow($insertAfter, weekday) {
   $(rowHtml).insertAfter($insertAfter);
 };
 
-var searchProperties = function searchProperties() {
-  $(".searchProperties").on("input", function () {
-    var categoryId = $(this).data("category");
-    var $propertyInput = $(this);
-    Object(_ajax_js__WEBPACK_IMPORTED_MODULE_0__["getReq"])("/get-properties?name=" + $(this).val() + "&category_id=" + categoryId).then(function (properties) {
-      var source = $("#propertyOptionsTemplate").html();
+var searchCustomOptions = function searchCustomOptions() {
+  $(".searchOptions").on("input", function () {
+    var type = $(this).data("type");
+    var serachUrl = type === "properties" ? "/get-properties?name=" + $(this).val() + "&category_id=" + $(this).data("category") : "/get-services?name=" + $(this).val();
+    var $optionInput = $(this);
+    Object(_ajax_js__WEBPACK_IMPORTED_MODULE_0__["getReq"])(serachUrl).then(function (response) {
+      var source = $("#optionsTemplate").html();
       var template = Handlebars.compile(source);
       var optionsHtml = template({
-        properties: properties
+        options: response
       });
-      $propertyInput.next().html(optionsHtml).slideDown();
+      $optionInput.next().html(optionsHtml).slideDown();
     });
   });
-  $(".searchProperties").keyup(function (e) {
-    var $highlighted = $('.customOptions .highlighted'),
-        $li = $('.customOptions ul li');
+  $(".searchOptions").keyup(function (e) {
+    var $highlighted = $('.customOptions .highlighted');
+    var $li = $('.customOptions ul li');
+    var type = $(this).data("type");
 
     if (e.keyCode === 40) {
       $highlighted.removeClass('highlighted').next().addClass('highlighted');
@@ -699,27 +758,21 @@ var searchProperties = function searchProperties() {
         $li.eq(-1).addClass('highlighted');
       }
     } else if (e.keyCode === 13) {
-      console.log("INPIY");
-
       if ($highlighted.length === 0) {
-        addCustomOption($(this));
+        addCustomOption($(this), type);
       } else {
-        selectCustomOption($highlighted);
+        selectCustomOption($highlighted, type);
       }
     }
   });
-  $(document).keyup(".customOptions li", function (e) {
-    if (e.keyCode === 13) {
-      selectCustomOption($(this));
-    }
-  });
   $(document).on("click", ".customOptions li", function () {
-    selectCustomOption($(this));
+    var type = $(this).closest(".formRow").find(".searchOptions").data("type");
+    selectCustomOption($(this), type);
   });
 };
 
-var addCustomOption = function addCustomOption($option) {
-  var source = $("#propertyInputTemplate").html();
+var addCustomOption = function addCustomOption($option, type) {
+  var source = type === "properties" ? $("#propertyInputTemplate").html() : $("#serviceInputTemplate").html();
   var template = Handlebars.compile(source);
   var rowHtml = template({
     id: $option.val(),
@@ -730,13 +783,13 @@ var addCustomOption = function addCustomOption($option) {
   hideCustomOptions($option.next());
 };
 
-var selectCustomOption = function selectCustomOption($option) {
-  var source = $("#propertyInputTemplate").html();
+var selectCustomOption = function selectCustomOption($option, type) {
+  var source = type === "properties" ? $("#propertyInputTemplate").html() : $("#serviceInputTemplate").html();
   var template = Handlebars.compile(source);
   var rowHtml = template({
-    id: $option.data("property-id"),
+    id: $option.data("option-id"),
     categoryId: $option.data("category-id"),
-    name: $option.data("property-name")
+    name: $option.data("option-name")
   });
   $(rowHtml).insertBefore($option.closest(".formRow"));
   hideCustomOptions($option.closest(".customOptions"));
@@ -744,67 +797,8 @@ var selectCustomOption = function selectCustomOption($option) {
 
 var hideCustomOptions = function hideCustomOptions($el) {
   $el.closest(".formRow").find("input").val("");
-  $el.slideUp(200);
+  $el.hide();
 };
-
-$(document).ready(function () {
-  console.log("DOCUMENT READY");
-  /* TOGGLE MODAL */
-
-  $(".openModal").on("click", function () {
-    openModal($(this).attr('data-modal'));
-  });
-  $(".closeModal").on("click", function () {
-    closeModal();
-  });
-  /* MANAGE AVATAR */
-
-  var $croppieEl = initCroppie(210, 210);
-  $('#avatarInput').on("change", function () {
-    updateCroppie($croppieEl, this);
-  });
-  $('#saveAvatar').on("click", function () {
-    saveCroppie($croppieEl);
-  });
-  $(".selectAvatar").on("click", function () {
-    selectAvatar($(this).attr("data-avatar"));
-  });
-  /* MANAGE WEEKDAYS SELECT */
-
-  $(".weekdaySelect").on("change", function () {
-    if (parseInt($(this).val(), 10) > 1) {
-      $(this).closest("div").find("input, button").attr("disabled", true);
-    } else {
-      $(this).closest("div").find("input, button").attr("disabled", false);
-    }
-  });
-  /* MANAGE NEW WEEKDAY ROW */
-
-  $(".addWeekdayRow").on("click", function () {
-    var $insertAfter = $(this).closest("div");
-    $(this).prop('disabled', true).addClass("invisible");
-    addNewWeekdayRow($insertAfter, $insertAfter.data("weekday"));
-  });
-  $(document).on("click", ".removeWeekdayRow", function () {
-    var $row = $(this).closest("div");
-    $row.prev().find(".addWeekdayRow").prop('disabled', false).removeClass("invisible");
-    $row.remove();
-  });
-  /* SEARCH PROERTIES AND FILL IN LIST */
-
-  searchProperties();
-  $('#doctorForm').bind('keypress keydown keyup', function (e) {
-    if (e.keyCode === 13) {
-      e.preventDefault();
-    }
-  });
-});
-$(window).on("resize", function () {
-  console.log("RESIZE");
-});
-$(window).on("scroll", function () {
-  makeStickyHeader();
-});
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"), __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"), __webpack_require__(/*! handlebars */ "./node_modules/handlebars/lib/index.js")))
 
 /***/ }),

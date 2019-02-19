@@ -11,6 +11,7 @@ use App\Weekday;
 use App\OpeningHour;
 use App\OpeningHoursState;
 use App\PropertyCategory;
+use App\Property;
 use App\Service;
 use App\Http\Controllers\HelperController;
 
@@ -20,7 +21,7 @@ class DoctorController extends Controller {
         $weekdays = Weekday::all();
         $openingHoursStates = OpeningHoursState::all();
         $propertyCategories = PropertyCategory::all();
-        $services = Service::all();
+        $services = Service::where('show_on_registration', '=', 1)->get();
         return view('add-doctor', compact('weekdays', 'openingHoursStates', 'propertyCategories', 'services'));
     }
 
@@ -65,7 +66,7 @@ class DoctorController extends Controller {
             'search_name' => HelperController::parseName($request['name']),
             'description' => $request['description'],
             'slug' => $slug,
-            'speaks_english' => $request['speaks_english'],
+            'speaks_english' => $request['speaks_english'] ? $request['speaks_english'] : 0,
             'street' => $request['street'],
             'post_code' => $request['post_code'],
             'city' => $request['city'],
@@ -85,12 +86,13 @@ class DoctorController extends Controller {
         /* Save doctor's opening hours */
         foreach ($request['weekdays'] as $weekdayId => $weekdayItem) {
             foreach ($weekdayItem as $weekday) {
+                $weekdayState = (int) $weekday['state'];
                 OpeningHour::create([
                     'weekday_id' => $weekdayId,
                     'user_id' => $user->id,
-                    'opening_hours_state_id' => (int) $weekday['state'],
-                    'open_at' => is_null($weekday['open_at']) ? $weekday['open_at'] : \DateTime::createFromFormat("H:i", $weekday['open_at'])->format("H:i"),
-                    'close_at' => is_null($weekday['close_at']) ? $weekday['close_at'] : \DateTime::createFromFormat("H:i", $weekday['close_at'])->format("H:i")
+                    'opening_hours_state_id' => $weekdayState,
+                    'open_at' => $weekdayState === 1 ? \DateTime::createFromFormat("H:i", $weekday['open_at'])->format("H:i") : null,
+                    'close_at' => $weekdayState === 1 ? \DateTime::createFromFormat("H:i", $weekday['close_at'])->format("H:i") : null
                 ]);
             }
         }
@@ -98,14 +100,36 @@ class DoctorController extends Controller {
         /* Add properties to the doctor */
         $propertyCategories = PropertyCategory::all();
         foreach ($propertyCategories as $category) {
-            foreach ($request['category_' . $category->id . '_properties'] as $property) {
-                $user->properties()->attach($property);
+            if (isset($request['category_' . $category->id . '_properties'])) {
+                foreach ($request['category_' . $category->id . '_properties'] as $property) {
+                    $propertyId = $property;
+                    if (!is_numeric($property)) {
+                        $propertyObj = Property::create([
+                                    'property_category_id' => $category->id,
+                                    'name' => $property,
+                                    'is_approved' => 0,
+                                    'show_on_registration' => 0,
+                                    'show_in_search' => 0
+                        ]);
+                        $propertyId = $propertyObj->id;
+                    }
+                    $user->properties()->attach($propertyId);
+                }
             }
         }
 
         /* Add services to the doctor */
         foreach ($request['service_prices'] as $serviceId => $price) {
             if (!is_null($price)) {
+                if (!is_numeric($serviceId)) {
+                    $serviceObj = Service::create([
+                                'name' => $serviceId,
+                                'is_approved' => 0,
+                                'show_on_registration' => 0,
+                                'show_in_search' => 0
+                    ]);
+                    $serviceId = $serviceObj->id;
+                }
                 $user->services()->attach($serviceId, compact('price'));
             }
         }
@@ -118,6 +142,8 @@ class DoctorController extends Controller {
             'email_sent' => 1,
             'doctor_object' => serialize($user)
         ]);
+
+        die;
 
         return redirect('/')->with('status', 'New doctor was added');
     }

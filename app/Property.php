@@ -13,7 +13,7 @@ class Property extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'category_id'
+        'name', 'property_category_id', 'is_approved', 'show_on_registration', 'show_in_search'
     ];
     
     /**

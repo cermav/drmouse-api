@@ -1,5 +1,4 @@
 export const getReq = (url) => {
-    console.log(url);
     return fetch(url, {
         method: 'GET',
         headers: {
