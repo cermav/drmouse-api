@@ -20,11 +20,13 @@ mix.js('resources/assets/js/main.js', 'public/js')
             'jquery',
             'croppie',
             'handlebars/dist/cjs/handlebars',
+            'jquery-validation',
         ])
         .autoload({
             jquery: ['$', 'window.jQuery', 'jQuery'],
             croppie: ['croppie'],
             handlebars: ['handlebars/dist/cjs/handlebars', 'Handlebars'],
+            validator: ['jquery-validation'],
         })
         .sass('resources/assets/sass/main.scss', 'public/css')
         .copy('resources/assets/images', 'public/images')

@@ -635,6 +635,28 @@ $(document).ready(function () {
   /* SEARCH PROERTIES OR SERVICES AND FILL IN LIST */
 
   searchCustomOptions();
+  /* MANAGE PHOTO UPLOAD */
+
+  $(".photoInput").on("change", function (e) {
+    var file = e.target.files[0];
+    var photoInput = $(this);
+    var reader = new FileReader();
+
+    reader.onloadend = function () {
+      photoInput.css({
+        "background-image": "url(" + reader.result + ")"
+      }).removeClass("empty");
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  });
+  $(".photoInput .closeButton").on("click", function () {
+    var $photoInput = $(this).closest(".photoInput");
+    $photoInput.find("input").val(null);
+    $photoInput.addClass("empty");
+  });
 });
 $(window).on("resize", function () {
   console.log("RESIZE");

@@ -471,6 +471,11 @@ h1,
   cursor: pointer;
 }
 
+.avatar.empty {
+  background-size: 35px;
+  background-image: url(/images/camera.svg?8efe42ad0078ad400add370ee50fe1a5);
+}
+
 header {
   position: fixed;
   width: 100%;
@@ -615,6 +620,10 @@ header .menu ul li a.active {
   padding: 20px;
   background: #eff4f5;
   border-radius: 3px;
+}
+
+.form .formSection .formSectionContent:after {
+  content: "";
 }
 
 .form .formSection .formSectionContent.checkboxes {
@@ -845,6 +854,49 @@ header .menu ul li a.active {
 
 .form .singleCheckbox input:checked ~ .checkmark:after {
   display: block;
+}
+
+.form .photos:after {
+  width: 156px;
+}
+
+.form .photoInput {
+  position: relative;
+  width: 156px;
+  height: 156px;
+  margin: 0.5rem 0;
+  background: #2898da url(/images/camera.svg?8efe42ad0078ad400add370ee50fe1a5) no-repeat center center/cover;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form .photoInput:hover {
+  background-color: #2289c6;
+}
+
+.form .photoInput.empty {
+  background-size: 35px;
+  background-image: url(/images/camera.svg?8efe42ad0078ad400add370ee50fe1a5) !important;
+}
+
+.form .photoInput.empty .closeButton {
+  display: none;
+}
+
+.form .photoInput input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.form .photoInput .closeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+  color: #fff;
+  line-height: initial;
 }
 
 .modal {

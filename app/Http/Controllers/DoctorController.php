@@ -13,7 +13,9 @@ use App\OpeningHoursState;
 use App\PropertyCategory;
 use App\Property;
 use App\Service;
+use App\Photo;
 use App\Http\Controllers\HelperController;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorController extends Controller {
 
@@ -51,6 +53,11 @@ class DoctorController extends Controller {
         /* Get longitude and latitude by the address */
         $location = HelperController::getLatLngFromAddress(trim($request['street']) . " " . trim($request['city']) . " " . trim($request['country']) . " " . trim($request['post_code']));
 
+        /* Create directories for uploads */
+        $galleryPath = 'public/users/gallery/';
+        $profilesPath = 'public/users/profiles/';
+
+
         /* Create user */
         $user = User::create([
                     'name' => $request['name'],
@@ -83,6 +90,31 @@ class DoctorController extends Controller {
             'gdpr_agreed_date' => date('Y-m-d H:i:s')
         ]);
 
+        if ($request["doc_profile_pic"]) {
+            $base64File = $request['doc_profile_pic'];
+            $encodedImgString = explode(',', $base64File, 2)[1];
+            $decodedImgString = base64_decode($encodedImgString);
+            $info = getimagesizefromstring($decodedImgString);
+            $ext = explode('/', $info['mime']);
+            @list($type, $file_data) = explode(';', $base64File);
+            @list(, $file_data) = explode(',', $file_data);
+            $imageName = 'profile_' . time() . '.' . $ext[1];
+            $imagePath = $profilesPath . $user->id . '/' . $imageName;
+            Storage::put($imagePath, base64_decode($file_data));
+            $user->avatar = $imagePath;
+            $user->save();
+        }
+
+        if ($request["doc_profile_pic2"]) {
+            $url = $request["doc_profile_pic2"];
+            $contents = file_get_contents($url);
+            $imageName = 'profile_' . time() . '.png';
+            $imagePath = $profilesPath . $user->id . '/' . $imageName;
+            Storage::put($imagePath, $contents);
+            $user->avatar = $imagePath;
+            $user->save();
+        }
+
         /* Save doctor's opening hours */
         foreach ($request['weekdays'] as $weekdayId => $weekdayItem) {
             foreach ($weekdayItem as $weekday) {
@@ -91,8 +123,8 @@ class DoctorController extends Controller {
                     'weekday_id' => $weekdayId,
                     'user_id' => $user->id,
                     'opening_hours_state_id' => $weekdayState,
-                    'open_at' => $weekdayState === 1 ? \DateTime::createFromFormat("H:i", $weekday['open_at'])->format("H:i") : null,
-                    'close_at' => $weekdayState === 1 ? \DateTime::createFromFormat("H:i", $weekday['close_at'])->format("H:i") : null
+                    'open_at' => $weekdayState === 1 && $weekday['open_at'] ? \DateTime::createFromFormat("H:i", $weekday['open_at'])->format("H:i") : null,
+                    'close_at' => $weekdayState === 1 && $weekday['close_at'] ? \DateTime::createFromFormat("H:i", $weekday['close_at'])->format("H:i") : null
                 ]);
             }
         }
@@ -131,6 +163,19 @@ class DoctorController extends Controller {
                     $serviceId = $serviceObj->id;
                 }
                 $user->services()->attach($serviceId, compact('price'));
+            }
+        }
+
+        $counter = 0;
+        foreach ($request->file('photos') as $file) {
+            if ($file) {
+                $path = Storage::putFile($galleryPath . $user->id, $file);
+                Photo::create([
+                    'path' => $path,
+                    'user_id' => $user->id,
+                    'position' => $counter
+                ]);
+                $counter++;
             }
         }
 

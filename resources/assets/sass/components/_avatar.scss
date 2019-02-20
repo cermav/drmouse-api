@@ -13,4 +13,8 @@
     background-size: contain;
     background-position: center;
     cursor:pointer;
+    &.empty{
+        background-size: 35px;
+        background-image: url('../images/camera.svg');
+    }
 }

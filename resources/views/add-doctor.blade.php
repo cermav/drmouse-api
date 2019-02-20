@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<form method="POST" action="{{route('create-doctor')}}" class="form" id="doctorForm" aria-label="{{ __('New doctor') }}" novalidate="">
+<form method="POST" action="{{route('create-doctor')}}" class="form" id="doctorForm" aria-label="{{ __('New doctor') }}" enctype="multipart/form-data" novalidate="">
     @csrf
     <fieldset class="formSection">
         <div class="formSectionHeader">
@@ -19,7 +19,7 @@
         <div class="formSectionContent">
             <div class="doctorDescription">
                 <div class="formRow avatarRow">
-                    <div class="avatar openModal" data-modal="avatarModal"></div>
+                    <div class="avatar empty openModal" data-modal="avatarModal"></div>
                     <input type="hidden" name="doc_profile_pic" id="doc_profile_pic" value="">
                     <input type="hidden" name="doc_profile_pic2" id="doc_profile_pic2" value="">
                 </div>
@@ -223,6 +223,21 @@
                 <input type="text" name="custom_service" class="searchOptions" data-service="{{$service->id}}" data-type="services" autocomplete="off" placeholder="Jiný úkon" />
                 <div class="customOptions"></div>
             </div>
+        </div>
+    </fieldset>
+    <fieldset class="formSection">
+        <div class="formSectionHeader">
+            <h3 class="title">Přidejte si fotky do galerie.</h3>
+            <p>Do galerie můžete nahrát fotografie, které ještě lépe přiblíží klientům vaši ordinaci.</p>
+        </div>
+        <div class="formSectionContent photos">
+            @for ($i=0;$i<8;$i++)
+            <div class="photoInput empty">
+                <div class="asInput"></div>
+                <input type="file" name="photos[]" accept="image/*" />
+                <button type="button" class="closeButton">X</button>
+            </div>
+            @endfor
         </div>
     </fieldset>
     <div class='formRow singleCheckbox'>

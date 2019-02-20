@@ -55,7 +55,25 @@ $(document).ready(function () {
 
     /* SEARCH PROERTIES OR SERVICES AND FILL IN LIST */
     searchCustomOptions();
-    
+
+    /* MANAGE PHOTO UPLOAD */
+    $(".photoInput").on("change", function (e) {
+        const file = e.target.files[0];
+        const photoInput = $(this);
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            photoInput.css({"background-image": "url(" + reader.result + ")"}).removeClass("empty");
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    });
+    $(".photoInput .closeButton").on("click", function(){
+        const $photoInput = $(this).closest(".photoInput");
+        $photoInput.find("input").val(null);
+        $photoInput.addClass("empty");
+    });
+
 
 });
 $(window).on("resize", function () {
@@ -146,9 +164,9 @@ const addNewWeekdayRow = ($insertAfter, weekday) => {
 const searchCustomOptions = () => {
     $(".searchOptions").on("input", function () {
         const type = $(this).data("type");
-        const serachUrl = type === "properties" ? 
-                                    "/get-properties?name=" + $(this).val() + "&category_id=" + $(this).data("category") : 
-                                    "/get-services?name=" + $(this).val();
+        const serachUrl = type === "properties" ?
+                "/get-properties?name=" + $(this).val() + "&category_id=" + $(this).data("category") :
+                "/get-services?name=" + $(this).val();
         const $optionInput = $(this);
         getReq(serachUrl).then((response) => {
             const source = $("#optionsTemplate").html();
@@ -203,3 +221,4 @@ const hideCustomOptions = ($el) => {
     $el.closest(".formRow").find("input").val("");
     $el.hide();
 };
+
