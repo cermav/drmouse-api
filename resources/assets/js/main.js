@@ -2,6 +2,7 @@ import {getReq} from './ajax.js';
 window.$ = window.jQuery = require('jquery');
 window.croppie = require('croppie');
 window.Handlebars = require('handlebars');
+require('jquery-validation');
 
 $(document).ready(function () {
     console.log("DOCUMENT READY");
@@ -68,12 +69,22 @@ $(document).ready(function () {
             reader.readAsDataURL(file);
         }
     });
-    $(".photoInput .closeButton").on("click", function(){
+    $(".photoInput .closeButton").on("click", function () {
         const $photoInput = $(this).closest(".photoInput");
         $photoInput.find("input").val(null);
         $photoInput.addClass("empty");
     });
-
+    
+    $("#gdpr_agreed").on("change", function(){
+       if ($(this).prop("checked")){
+           $("#submit_form").prop("disabled", false);
+       }else{
+           $("#submit_form").prop("disabled", true);
+       }
+    });
+    
+    /* VALIDATE FORM */
+    validateForm();
 
 });
 $(window).on("resize", function () {
@@ -220,5 +231,59 @@ const selectCustomOption = ($option, type) => {
 const hideCustomOptions = ($el) => {
     $el.closest(".formRow").find("input").val("");
     $el.hide();
+};
+
+const validateForm = () => {
+    $("form").validate({
+        rules: {
+            name: {
+                required: true
+            },
+            description: {
+                required: true
+            },
+            email: {
+                email: true
+            },
+            password: {
+                required: true,
+                minlength: 6
+            },
+            password_confirmation: {
+                required: true,
+                minlength: 6,
+                equalTo: "#password"
+            },
+            street: {
+                required: true
+            },
+            post_code:{
+                minlength: 5
+            },
+            city: {
+                required: true
+            },
+            phone: {
+                required: true
+            }
+        },
+        messages: {
+            name: "Zadejte jméno",
+            description: "Zadejte popis",
+            email: "Zadejte email ve správném formátu",
+            password: "Zadejte heslo",
+            password_confirmation: "Hesla se neshoduji",
+            street: "Zadejte ulici",
+            post_code: "Zadejte PSČ",
+            city: "Zadejte město",
+            phone: "Zadejte telefonní číslo"
+        },
+        highlight: function (element) {
+            $(element).addClass("error");
+        },
+        unhighlight: function (element) {
+            $(element).removeClass("error");
+        }
+    });
 };
 

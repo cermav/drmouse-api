@@ -113,8 +113,8 @@
                 @endif
             </div>
             <div class="formRow col col-6-of-12">
-                <label for="second-phone" class="formRowTitle required {{ $errors->has('second_phone') ? ' errorLabel' : '' }}">Druhé telefonní číslo:</label>
-                <input type="text" name="second_phone" id="second-phone" class="{{ $errors->has('second_phone') ? 'error' : '' }} withPreValue" required value="{{ old('second_phone') }}" />
+                <label for="second-phone" class="formRowTitle {{ $errors->has('second_phone') ? ' errorLabel' : '' }}">Druhé telefonní číslo:</label>
+                <input type="text" name="second_phone" id="second-phone" class="{{ $errors->has('second_phone') ? 'error' : '' }} withPreValue" value="{{ old('second_phone') }}" />
                 <div class="preValue">+420</div>
                 @if ($errors->has('second_phone'))
                 <label class="error">{{ $errors->first('second_phone') }}</label>
@@ -248,7 +248,7 @@
         </label>
     </div>
     <div class="formRow mt40">
-        <input type="submit" class="button greenButton fullWidth" value="Registrovat" />
+        <input type="submit" class="button greenButton fullWidth" id="submit_form" value="Registrovat" disabled />
     </div>
 </form>
 <div class="watermark"></div>

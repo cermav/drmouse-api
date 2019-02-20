@@ -584,6 +584,9 @@ __webpack_require__.r(__webpack_exports__);
 window.$ = __webpack_provided_window_dot_jQuery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 window.croppie = __webpack_require__(/*! croppie */ "./node_modules/croppie/croppie.js");
 window.Handlebars = __webpack_require__(/*! handlebars */ "./node_modules/handlebars/lib/index.js");
+
+__webpack_require__(/*! jquery-validation */ "./node_modules/jquery-validation/dist/jquery.validate.js");
+
 $(document).ready(function () {
   console.log("DOCUMENT READY");
   $('#doctorForm').bind('keypress keydown keyup', function (e) {
@@ -657,6 +660,16 @@ $(document).ready(function () {
     $photoInput.find("input").val(null);
     $photoInput.addClass("empty");
   });
+  $("#gdpr_agreed").on("change", function () {
+    if ($(this).prop("checked")) {
+      $("#submit_form").prop("disabled", false);
+    } else {
+      $("#submit_form").prop("disabled", true);
+    }
+  });
+  /* VALIDATE FORM */
+
+  validateForm();
 });
 $(window).on("resize", function () {
   console.log("RESIZE");
@@ -820,6 +833,60 @@ var selectCustomOption = function selectCustomOption($option, type) {
 var hideCustomOptions = function hideCustomOptions($el) {
   $el.closest(".formRow").find("input").val("");
   $el.hide();
+};
+
+var validateForm = function validateForm() {
+  $("form").validate({
+    rules: {
+      name: {
+        required: true
+      },
+      description: {
+        required: true
+      },
+      email: {
+        email: true
+      },
+      password: {
+        required: true,
+        minlength: 6
+      },
+      password_confirmation: {
+        required: true,
+        minlength: 6,
+        equalTo: "#password"
+      },
+      street: {
+        required: true
+      },
+      post_code: {
+        minlength: 5
+      },
+      city: {
+        required: true
+      },
+      phone: {
+        required: true
+      }
+    },
+    messages: {
+      name: "Zadejte jméno",
+      description: "Zadejte popis",
+      email: "Zadejte email ve správném formátu",
+      password: "Zadejte heslo",
+      password_confirmation: "Hesla se neshoduji",
+      street: "Zadejte ulici",
+      post_code: "Zadejte PSČ",
+      city: "Zadejte město",
+      phone: "Zadejte telefonní číslo"
+    },
+    highlight: function highlight(element) {
+      $(element).addClass("error");
+    },
+    unhighlight: function unhighlight(element) {
+      $(element).removeClass("error");
+    }
+  });
 };
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"), __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"), __webpack_require__(/*! handlebars */ "./node_modules/handlebars/lib/index.js")))
 

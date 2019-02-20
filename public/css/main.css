@@ -345,6 +345,12 @@ h1,
   border-color: #2bc06a;
 }
 
+.button.greenButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+  background-color: #2ecc71 !important;
+}
+
 .actionButton {
   display: flex;
   align-items: center;

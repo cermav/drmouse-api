@@ -37,6 +37,11 @@
             background-color:$color-green-dark;
             border-color:$color-green-dark;
         }
+        &:disabled{
+            opacity:0.6;
+            cursor:default;
+            background-color:$color-green !important;
+        }
     }
 }
 
