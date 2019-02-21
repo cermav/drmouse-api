@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Degree;
 use App\CzechName;
 
+use Illuminate\Support\Facades\Config;
+
 class HelperController extends Controller
 {
     /* Get latitude and longitude from the address string */
     public static function getLatLngFromAddress($address) {
         $address = str_replace(" ", "+", $address);
 
-        $mapResponse = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&key=AIzaSyBmIpdxoJb9qAtHGuEEkSZxrNOUWcG8j4Y");
+        $mapResponse = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&key=".Config::get('google.gmap_key'));
         $mapResponseJson = json_decode($mapResponse);
 
         $latitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
