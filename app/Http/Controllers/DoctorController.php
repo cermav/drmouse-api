@@ -54,8 +54,8 @@ class DoctorController extends Controller {
         $location = HelperController::getLatLngFromAddress(trim($request['street']) . " " . trim($request['city']) . " " . trim($request['country']) . " " . trim($request['post_code']));
 
         /* Create directories for uploads */
-        $galleryPath = 'public/users/gallery/';
-        $profilesPath = 'public/users/profiles/';
+        $galleryPath = 'users/gallery/';
+        $profilesPath = 'users/profiles/';
 
 
         /* Create user */
@@ -100,7 +100,7 @@ class DoctorController extends Controller {
             @list(, $file_data) = explode(',', $file_data);
             $imageName = 'profile_' . time() . '.' . $ext[1];
             $imagePath = $profilesPath . $user->id . '/' . $imageName;
-            Storage::put($imagePath, base64_decode($file_data));
+            Storage::disk('public')->put($imagePath, base64_decode($file_data));
             $user->avatar = $imagePath;
             $user->save();
         }
@@ -110,7 +110,7 @@ class DoctorController extends Controller {
             $contents = file_get_contents($url);
             $imageName = 'profile_' . time() . '.png';
             $imagePath = $profilesPath . $user->id . '/' . $imageName;
-            Storage::put($imagePath, $contents);
+            Storage::disk('public')->put($imagePath, $contents);
             $user->avatar = $imagePath;
             $user->save();
         }
@@ -169,7 +169,7 @@ class DoctorController extends Controller {
         $counter = 0;
         foreach ($request->file('photos') as $file) {
             if ($file) {
-                $path = Storage::putFile($galleryPath . $user->id, $file);
+                $path = Storage::disk('public')->putFile($galleryPath . $user->id, $file);
                 Photo::create([
                     'path' => $path,
                     'user_id' => $user->id,
@@ -188,9 +188,12 @@ class DoctorController extends Controller {
             'doctor_object' => serialize($user)
         ]);
 
-        die;
-
         return redirect('/')->with('status', 'New doctor was added');
+    }
+    
+    public function showAll(){
+        $doctors = Doctor::where('state_id', '=', 3)->paginate(3);
+        return view('doctors', compact('doctors'));
     }
 
 }
