@@ -14,6 +14,7 @@ use App\PropertyCategory;
 use App\Property;
 use App\Service;
 use App\Photo;
+use App\Score;
 use App\ScoreItem;
 use App\Http\Controllers\HelperController;
 use Illuminate\Support\Facades\Storage;
@@ -201,7 +202,11 @@ class DoctorController extends Controller {
         $doctor = Doctor::where('slug', '=', $slug)->first();
         $weekdays = Weekday::all();
         $scoreItems = ScoreItem::all();
-        return view('doctor', compact('doctor', 'weekdays', 'scoreItems'));
+        $showScore = Score::where([
+            ['user_id', '=', $doctor->user->id],
+            ['ip_address', '=', $_SERVER['REMOTE_ADDR']]
+        ])->first() === null ? true : false;
+        return view('doctor', compact('doctor', 'weekdays', 'scoreItems', 'showScore'));
     }
 
 }

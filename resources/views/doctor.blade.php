@@ -48,6 +48,7 @@
         </div>
         <div>
             <h3>Vaše hodnocení:</h3>
+            @if ($showScore)
             <p class="successMsg hidden">Děkujeme, Váše hodnocení bylo uloženo.</p>
             <form action="{{route('save-rating')}}" method="POST" class='form' id='rateDoctorForm'>
                 @foreach ($scoreItems as $item)
@@ -78,6 +79,7 @@
                 <p>Pro úspěšné odeslání hlasu vyhodnoťte všechny položky.</p>
                 <p class='bold'>5 hvězdiček je maximum.</p>
             </form>
+            @endif
             @foreach ($doctor->user->scores->where('is_approved', 1) as $score)
             @php $sum = 0; @endphp
             @foreach ($score->details as $detail)
