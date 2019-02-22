@@ -253,6 +253,12 @@ h1,
   line-height: 3.2rem;
 }
 
+h2,
+.asH2 {
+  font-size: 2rem;
+  line-height: 3rem;
+}
+
 .blueBg {
   background: #2898da;
 }
@@ -271,6 +277,18 @@ h1,
 
 .mb0 {
   margin-bottom: 0 !important;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.hidden {
+  display: none;
 }
 
 .logo {
@@ -432,6 +450,10 @@ h1,
   background: #8a8a8a;
 }
 
+.successMsg {
+  color: #2ecc71;
+}
+
 .col.col-1-of-12 {
   width: 7.3333333333% !important;
 }
@@ -460,6 +482,43 @@ h1,
   width: 99% !important;
 }
 
+.row {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rating {
+  position: relative;
+  width: 100px;
+  height: 20px;
+  background: url(/images/stars.png?6b61e57e33adeae281930acdb29ff54b) 0 0px;
+}
+
+.rating .filling {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: url(/images/stars.png?6b61e57e33adeae281930acdb29ff54b) 0 20px;
+}
+
+.ratingForm {
+  display: flex;
+}
+
+.ratingForm li {
+  cursor: pointer;
+  margin: 0 0.2rem;
+}
+
+.ratingForm li.hover,
+.ratingForm li.selected {
+  color: #2898da;
+}
+
 .avatar {
   position: relative;
   width: 9rem;
@@ -480,6 +539,11 @@ h1,
 .avatar.empty {
   background-size: 35px;
   background-image: url(/images/camera.svg?8efe42ad0078ad400add370ee50fe1a5);
+}
+
+.avatar.sm {
+  width: 6.3rem;
+  height: 6.3rem;
 }
 
 header {
@@ -905,6 +969,40 @@ header .menu ul li a.active {
   line-height: initial;
 }
 
+.pagination {
+  display: flex;
+}
+
+.pagination .page-item {
+  margin: 0 0.1rem;
+}
+
+.pagination .page-item.disabled {
+  display: none;
+}
+
+.pagination .page-item .page-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #eff4f5;
+  border-radius: 2px;
+  transition: -webkit-transform 0.2s ease;
+  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, -webkit-transform 0.2s ease;
+}
+
+.pagination .page-item .page-link:hover {
+  background: #f4f4f4;
+}
+
+.pagination .page-item.active .page-link {
+  color: #2898da;
+  border-color: #2898da;
+}
+
 .modal {
   display: none;
   position: fixed;
@@ -983,6 +1081,42 @@ footer .container {
   text-align: right;
 }
 
+.doctorCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1rem;
+  border: 1px solid #eff4f5;
+  border-radius: 3px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.doctorCard .info {
+  flex: 1;
+  padding-left: 1.5rem;
+}
+
+.doctorCard .info h2 {
+  color: #2898da;
+  font-size: 1.3rem;
+  line-height: 2rem;
+}
+
+.doctorCard .info p {
+  margin-top: 0.5rem;
+  line-height: 1.8rem;
+}
+
+.doctorCard .info .rating {
+  margin-top: 0.5rem;
+}
+
+.doctorCard:hover {
+  background: #f4f4f4;
+}
+
 .addDoctor {
   background: #2898da;
 }
@@ -1020,5 +1154,31 @@ footer .container {
   height: 600px;
   background: url(/images/bg-watermark.png?4b40b0eceb941f09bb99795643d9be1e) no-repeat center bottom;
   z-index: -1;
+}
+
+.doctors .mainContainer {
+  padding: 3rem 0;
+}
+
+.doctor #map {
+  width: 500px;
+  height: 500px;
+}
+
+.doctor .form {
+  padding: 0.5rem 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.doctor .score {
+  padding: 1rem 0;
+  border-bottom: 1px solid #eff4f5;
+}
+
+.doctor .score .rating,
+.doctor .score .date {
+  margin-bottom: 0.5rem;
 }
 

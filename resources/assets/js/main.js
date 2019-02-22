@@ -1,4 +1,4 @@
-import {getReq} from './ajax.js';
+import {getReq, saveRating} from './ajax.js';
 window.$ = window.jQuery = require('jquery');
 window.croppie = require('croppie');
 window.Handlebars = require('handlebars');
@@ -74,17 +74,48 @@ $(document).ready(function () {
         $photoInput.find("input").val(null);
         $photoInput.addClass("empty");
     });
-    
-    $("#gdpr_agreed").on("change", function(){
-       if ($(this).prop("checked")){
-           $("#submit_form").prop("disabled", false);
-       }else{
-           $("#submit_form").prop("disabled", true);
-       }
+
+    $("#gdpr_agreed").on("change", function () {
+        if ($(this).prop("checked")) {
+            $("#submit_form").prop("disabled", false);
+        } else {
+            $("#submit_form").prop("disabled", true);
+        }
     });
-    
+
     /* VALIDATE FORM */
     validateForm();
+
+    /* ADD MAP BOX TO DOCTOR'S PROFILE PAGE */
+    if ($("body").hasClass("doctor")) {
+        console.log(window.location);
+        const map = createMapbox($("#map").data("lat"), $("#map").data("lng"));
+        const userMarker = new google.maps.Marker({
+            position: new google.maps.LatLng($("#map").data("lat"), $("#map").data("lng")),
+            map: map,
+            icon: window.location.origin + '/images/marker.png',
+            zIndex: google.maps.Marker.MAX_ZINDEX + 1,
+            animation: google.maps.Animation.BOUNCE
+        });
+    }
+
+    /* ADD RATING TO DOCTOR */
+    manageStarsRating();
+    $("#rateDoctorForm").on("submit", function (e) {
+        e.preventDefault();
+        const rating = rateDoctor();
+        const comment = $("#comment").val();
+        const userId = $("#userId").val();
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
+        saveRating($(this).attr("action"), {comment, rating, userId}, csrfToken).then((response) => {
+          // console.log(response);
+           if (response.success){
+               $('.successMsg').removeClass('hidden');
+               $('#rateDoctorForm').addClass('hidden');
+           }
+        });
+    });
+
 
 });
 $(window).on("resize", function () {
@@ -140,6 +171,7 @@ const saveCroppie = ($croppieEl) => {
             updateAvatar(img);
             closeModal();
             $('#doc_profile_pic').val(img);
+            $(".avatar").removeClass("empty");
         });
     }
 };
@@ -148,6 +180,7 @@ const selectAvatar = (url) => {
     updateAvatar(url);
     closeModal();
     $('#doc_profile_pic2').val(url);
+    $(".avatar").removeClass("empty");
 };
 
 const updateAvatar = (img) => {
@@ -257,7 +290,7 @@ const validateForm = () => {
             street: {
                 required: true
             },
-            post_code:{
+            post_code: {
                 minlength: 5
             },
             city: {
@@ -285,5 +318,113 @@ const validateForm = () => {
             $(element).removeClass("error");
         }
     });
+};
+
+const createMapbox = (lat, lng) => {
+
+    var styles = mapboxStyle();
+    var mapsLatLgn = new google.maps.LatLng(lat, lng);
+    var mapOptions = {
+        center: mapsLatLgn,
+        zoom: 15,
+        disableDefaultUI: true,
+        scrollwheel: false,
+        zoomControl: true,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        styles: styles
+    };
+    return new google.maps.Map(document.getElementById('map'), mapOptions);
+};
+
+const mapboxStyle = () => {
+    return [{
+            "featureType": "administrative",
+            "elementType": "labels.text.fill",
+            "stylers": [{"color": "#444444"}]
+        }, {"featureType": "landscape", "elementType": "all", "stylers": [{"color": "#f2f2f2"}]}, {
+            "featureType": "poi",
+            "elementType": "all",
+            "stylers": [{"visibility": "off"}]
+        }, {
+            "featureType": "poi",
+            "elementType": "geometry.fill",
+            "stylers": [{"visibility": "on"}, {"color": "#b7b7b7"}]
+        }, {
+            "featureType": "poi",
+            "elementType": "labels.text.fill",
+            "stylers": [{"visibility": "on"}, {"color": "#414141"}]
+        }, {
+            "featureType": "poi.park",
+            "elementType": "geometry.fill",
+            "stylers": [{"visibility": "on"}, {"color": "#dfdfdf"}]
+        }, {
+            "featureType": "poi.park",
+            "elementType": "labels.text.fill",
+            "stylers": [{"visibility": "on"}, {"color": "#565656"}]
+        }, {
+            "featureType": "road",
+            "elementType": "all",
+            "stylers": [{"saturation": -100}, {"lightness": 45}]
+        }, {
+            "featureType": "road.highway",
+            "elementType": "all",
+            "stylers": [{"visibility": "simplified"}]
+        }, {
+            "featureType": "road.arterial",
+            "elementType": "labels.icon",
+            "stylers": [{"visibility": "off"}]
+        }, {"featureType": "transit", "elementType": "all", "stylers": [{"visibility": "off"}]}, {
+            "featureType": "water",
+            "elementType": "all",
+            "stylers": [{"color": "#46bcec"}, {"visibility": "on"}]
+        }, {
+            "featureType": "water",
+            "elementType": "labels.text.fill",
+            "stylers": [{"visibility": "on"}, {"color": "#ffffff"}]
+        }, {"featureType": "water", "elementType": "labels.text.stroke", "stylers": [{"visibility": "off"}]}];
+};
+
+const manageStarsRating = () => {
+    $('.ratingForm li').on('mouseover', function () {
+        const onStar = parseInt($(this).data('value'), 10); // The star currently mouse on
+
+        // Now highlight all the stars that's not after the current hovered star
+        $(this).parent().children('li.star').each(function (e) {
+            if (e < onStar) {
+                $(this).addClass('hover');
+            } else {
+                $(this).removeClass('hover');
+            }
+        });
+
+    }).on('mouseout', function () {
+        $(this).parent().children('li.star').each(function (e) {
+            $(this).removeClass('hover');
+        });
+    });
+
+    $('.ratingForm li').on('click', function () {
+        const onStar = parseInt($(this).data('value'), 10); // The star currently selected
+        const stars = $(this).parent().children('li.star');
+
+        $(this).closest(".ratingForm").attr("data-score", onStar);
+
+        for (let i = 0; i < stars.length; i++) {
+            $(stars[i]).removeClass('selected');
+        }
+
+        for (let i = 0; i < onStar; i++) {
+            $(stars[i]).addClass('selected');
+        }
+    });
+};
+
+const rateDoctor = () => {
+    const $forms = $(".ratingForm");
+    let rating = [];
+    $forms.each(function(){
+        rating.push({'id': $(this).data('item-id'), 'score': $(this).data('score')});
+    });
+    return rating;
 };
 

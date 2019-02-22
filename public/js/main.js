@@ -550,12 +550,13 @@ module.exports = g;
 /*!*************************************!*\
   !*** ./resources/assets/js/ajax.js ***!
   \*************************************/
-/*! exports provided: getReq */
+/*! exports provided: getReq, saveRating */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getReq", function() { return getReq; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "saveRating", function() { return saveRating; });
 var getReq = function getReq(url) {
   return fetch(url, {
     method: 'GET',
@@ -563,6 +564,20 @@ var getReq = function getReq(url) {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     }
+  }).then(function (response) {
+    return response.json();
+  });
+};
+var saveRating = function saveRating(url, data, csrfToken) {
+  console.log(url, data);
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': csrfToken
+    },
+    body: JSON.stringify(data)
   }).then(function (response) {
     return response.json();
   });
@@ -670,6 +685,41 @@ $(document).ready(function () {
   /* VALIDATE FORM */
 
   validateForm();
+  /* ADD MAP BOX TO DOCTOR'S PROFILE PAGE */
+
+  if ($("body").hasClass("doctor")) {
+    console.log(window.location);
+    var map = createMapbox($("#map").data("lat"), $("#map").data("lng"));
+    var userMarker = new google.maps.Marker({
+      position: new google.maps.LatLng($("#map").data("lat"), $("#map").data("lng")),
+      map: map,
+      icon: window.location.origin + '/images/marker.png',
+      zIndex: google.maps.Marker.MAX_ZINDEX + 1,
+      animation: google.maps.Animation.BOUNCE
+    });
+  }
+  /* ADD RATING TO DOCTOR */
+
+
+  manageStarsRating();
+  $("#rateDoctorForm").on("submit", function (e) {
+    e.preventDefault();
+    var rating = rateDoctor();
+    var comment = $("#comment").val();
+    var userId = $("#userId").val();
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    Object(_ajax_js__WEBPACK_IMPORTED_MODULE_0__["saveRating"])($(this).attr("action"), {
+      comment: comment,
+      rating: rating,
+      userId: userId
+    }, csrfToken).then(function (response) {
+      // console.log(response);
+      if (response.success) {
+        $('.successMsg').removeClass('hidden');
+        $('#rateDoctorForm').addClass('hidden');
+      }
+    });
+  });
 });
 $(window).on("resize", function () {
   console.log("RESIZE");
@@ -727,6 +777,7 @@ var saveCroppie = function saveCroppie($croppieEl) {
       updateAvatar(img);
       closeModal();
       $('#doc_profile_pic').val(img);
+      $(".avatar").removeClass("empty");
     });
   }
 };
@@ -735,6 +786,7 @@ var selectAvatar = function selectAvatar(url) {
   updateAvatar(url);
   closeModal();
   $('#doc_profile_pic2').val(url);
+  $(".avatar").removeClass("empty");
 };
 
 var updateAvatar = function updateAvatar(img) {
@@ -887,6 +939,168 @@ var validateForm = function validateForm() {
       $(element).removeClass("error");
     }
   });
+};
+
+var createMapbox = function createMapbox(lat, lng) {
+  var styles = mapboxStyle();
+  var mapsLatLgn = new google.maps.LatLng(lat, lng);
+  var mapOptions = {
+    center: mapsLatLgn,
+    zoom: 15,
+    disableDefaultUI: true,
+    scrollwheel: false,
+    zoomControl: true,
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    styles: styles
+  };
+  return new google.maps.Map(document.getElementById('map'), mapOptions);
+};
+
+var mapboxStyle = function mapboxStyle() {
+  return [{
+    "featureType": "administrative",
+    "elementType": "labels.text.fill",
+    "stylers": [{
+      "color": "#444444"
+    }]
+  }, {
+    "featureType": "landscape",
+    "elementType": "all",
+    "stylers": [{
+      "color": "#f2f2f2"
+    }]
+  }, {
+    "featureType": "poi",
+    "elementType": "all",
+    "stylers": [{
+      "visibility": "off"
+    }]
+  }, {
+    "featureType": "poi",
+    "elementType": "geometry.fill",
+    "stylers": [{
+      "visibility": "on"
+    }, {
+      "color": "#b7b7b7"
+    }]
+  }, {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [{
+      "visibility": "on"
+    }, {
+      "color": "#414141"
+    }]
+  }, {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [{
+      "visibility": "on"
+    }, {
+      "color": "#dfdfdf"
+    }]
+  }, {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [{
+      "visibility": "on"
+    }, {
+      "color": "#565656"
+    }]
+  }, {
+    "featureType": "road",
+    "elementType": "all",
+    "stylers": [{
+      "saturation": -100
+    }, {
+      "lightness": 45
+    }]
+  }, {
+    "featureType": "road.highway",
+    "elementType": "all",
+    "stylers": [{
+      "visibility": "simplified"
+    }]
+  }, {
+    "featureType": "road.arterial",
+    "elementType": "labels.icon",
+    "stylers": [{
+      "visibility": "off"
+    }]
+  }, {
+    "featureType": "transit",
+    "elementType": "all",
+    "stylers": [{
+      "visibility": "off"
+    }]
+  }, {
+    "featureType": "water",
+    "elementType": "all",
+    "stylers": [{
+      "color": "#46bcec"
+    }, {
+      "visibility": "on"
+    }]
+  }, {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [{
+      "visibility": "on"
+    }, {
+      "color": "#ffffff"
+    }]
+  }, {
+    "featureType": "water",
+    "elementType": "labels.text.stroke",
+    "stylers": [{
+      "visibility": "off"
+    }]
+  }];
+};
+
+var manageStarsRating = function manageStarsRating() {
+  $('.ratingForm li').on('mouseover', function () {
+    var onStar = parseInt($(this).data('value'), 10); // The star currently mouse on
+    // Now highlight all the stars that's not after the current hovered star
+
+    $(this).parent().children('li.star').each(function (e) {
+      if (e < onStar) {
+        $(this).addClass('hover');
+      } else {
+        $(this).removeClass('hover');
+      }
+    });
+  }).on('mouseout', function () {
+    $(this).parent().children('li.star').each(function (e) {
+      $(this).removeClass('hover');
+    });
+  });
+  $('.ratingForm li').on('click', function () {
+    var onStar = parseInt($(this).data('value'), 10); // The star currently selected
+
+    var stars = $(this).parent().children('li.star');
+    $(this).closest(".ratingForm").attr("data-score", onStar);
+
+    for (var i = 0; i < stars.length; i++) {
+      $(stars[i]).removeClass('selected');
+    }
+
+    for (var _i = 0; _i < onStar; _i++) {
+      $(stars[_i]).addClass('selected');
+    }
+  });
+};
+
+var rateDoctor = function rateDoctor() {
+  var $forms = $(".ratingForm");
+  var rating = [];
+  $forms.each(function () {
+    rating.push({
+      'id': $(this).data('item-id'),
+      'score': $(this).data('score')
+    });
+  });
+  return rating;
 };
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"), __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"), __webpack_require__(/*! handlebars */ "./node_modules/handlebars/lib/index.js")))
 

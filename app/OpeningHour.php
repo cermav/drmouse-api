@@ -22,5 +22,13 @@ class OpeningHour extends Model {
     {
         return $this->belongsTo('App\Weekday');
     }
+    
+    /**
+     * Get the state for the opening hour item.
+     */
+    public function openingHoursState()
+    {
+        return $this->belongsTo('App\OpeningHoursState');
+    }
 
 }

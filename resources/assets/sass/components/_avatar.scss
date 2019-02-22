@@ -17,4 +17,8 @@
         background-size: 35px;
         background-image: url('../images/camera.svg');
     }
+    &.sm{
+        width: 0.7*$avatarSize;
+        height: 0.7*$avatarSize;
+    }
 }

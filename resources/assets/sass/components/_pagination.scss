@@ -1,0 +1,28 @@
+.pagination{
+    display:flex;
+    .page-item{
+        margin:0 0.1rem;
+        &.disabled{
+            display:none;
+        }
+        .page-link{    
+            display:flex;
+            align-items:center;
+            justify-content: center;
+            width:2.5rem;
+            height:2.5rem;
+            border:1px solid $color-grey;
+            border-radius: 2px;
+            transition: transform 0.2s ease;
+            &:hover{
+                background:$color-grey-light;
+            }
+        }
+        &.active{
+            .page-link{
+                color:$color-blue;
+                border-color:$color-blue;
+            }
+        }
+    }
+}

@@ -14,6 +14,7 @@ use App\PropertyCategory;
 use App\Property;
 use App\Service;
 use App\Photo;
+use App\ScoreItem;
 use App\Http\Controllers\HelperController;
 use Illuminate\Support\Facades\Storage;
 
@@ -79,8 +80,8 @@ class DoctorController extends Controller {
             'city' => $request['city'],
             'latitude' => $location['latitude'],
             'longitude' => $location['longitude'],
-            'phone' => $request['phone'],
-            'second_phone' => $request['second_phone'],
+            'phone' => "+420 " . $request['phone'],
+            'second_phone' => $request['second_phone'] ? "+420 " . $request['second_phone'] : null,
             'website' => $request['website'],
             'working_doctors_count' => $request['working_doctors_count'],
             'working_doctors_names' => $request['working_doctors_names'],
@@ -194,6 +195,13 @@ class DoctorController extends Controller {
     public function showAll(){
         $doctors = Doctor::where('state_id', '=', 3)->paginate(3);
         return view('doctors', compact('doctors'));
+    }
+    
+    public function show($slug){
+        $doctor = Doctor::where('slug', '=', $slug)->first();
+        $weekdays = Weekday::all();
+        $scoreItems = ScoreItem::all();
+        return view('doctor', compact('doctor', 'weekdays', 'scoreItems'));
     }
 
 }

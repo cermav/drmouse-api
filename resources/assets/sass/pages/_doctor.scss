@@ -1,0 +1,19 @@
+.doctor{
+    #map{
+        width:500px;
+        height:500px;
+    }
+    .form{
+        padding:0.5rem 0;
+        border:none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .score{
+        padding:1rem 0;
+        border-bottom:1px solid $color-grey;
+        .rating, .date{
+            margin-bottom:0.5rem;
+        }
+    }
+}
