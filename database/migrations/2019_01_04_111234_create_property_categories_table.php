@@ -15,7 +15,7 @@ class CreatePropertyCategoriesTable extends Migration
     {
         Schema::create('property_categories', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 255)->collation('utf8_general_ci')->nullable(false);
+            $table->string('name')->collation('utf8_general_ci')->nullable(false);
             $table->timestamps();
         });
     }

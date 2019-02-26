@@ -21,14 +21,14 @@ class CreateDoctorsTable extends Migration {
             $table->foreign('state_id')->references('id')
                     ->on('states')->onDelete('cascade');
             $table->text('description')->collation('utf8_general_ci')->nullable(false);
-            $table->string('slug', 255)->nullable(false)->unique();
+            $table->string('slug')->nullable(false)->unique();
             $table->boolean('speaks_english')->nullable(false)->default(0);
             $table->string('phone', 20)->collation('utf8_general_ci')->nullable(false);
             $table->string('second_phone', 20)->collation('utf8_general_ci')->nullable(true);
-            $table->string('website', 255)->collation('utf8_general_ci')->nullable(true);
-            $table->string('street', 255)->collation('utf8_general_ci')->nullable(false);
-            $table->string('city', 255)->collation('utf8_general_ci')->nullable(false);
-            $table->string('country', 255)->collation('utf8_general_ci')->nullable(false)->default("Česká republika");
+            $table->string('website')->collation('utf8_general_ci')->nullable(true);
+            $table->string('street')->collation('utf8_general_ci')->nullable(false);
+            $table->string('city')->collation('utf8_general_ci')->nullable(false);
+            $table->string('country')->collation('utf8_general_ci')->nullable(false)->default("Česká republika");
             $table->integer('post_code')->nullable(false);
             $table->double('latitude')->nullable(false);
             $table->double('longitude')->nullable(false);

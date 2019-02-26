@@ -18,7 +18,7 @@ class CreatePropertiesTable extends Migration
             $table->integer('property_category_id')->unsigned();
             $table->foreign('property_category_id')->references('id')
                     ->on('property_categories')->onDelete('cascade');
-            $table->string('name', 255)->collation('utf8_general_ci')->nullable(false);
+            $table->string('name')->collation('utf8_general_ci')->nullable(false);
             $table->boolean('is_approved')->nullable(false)->default(0);
             $table->boolean('show_on_registration')->nullable(false)->default(0);
             $table->boolean('show_in_search')->nullable(false)->default(0);

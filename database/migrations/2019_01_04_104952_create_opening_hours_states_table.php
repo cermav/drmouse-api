@@ -15,7 +15,7 @@ class CreateOpeningHoursStatesTable extends Migration
     {
         Schema::create('opening_hours_states', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 255)->nullable(false);
+            $table->string('name')->nullable(false);
             $table->timestamps();
         });
     }
