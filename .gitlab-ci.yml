@@ -1,23 +1,8 @@
 stages:
-  - build
-  - test
+  - deploy
 
-composer:
-
-  # The job's stage (build, test or deploy).
-  stage: build
-
-  # What to run on the job.
+job 1:
+  stage: deploy
   script:
-      - echo "Building"
-      - mkdir build
-      - touch build/info.txt
-  artifacts:
-    paths:
-      - build/
-
-test:
-  stage: test
-  script:
-    - echo "Test"
-    - test -f "build/info.txt"
+      - echo "Deploying"
+      - envoy run deploy
