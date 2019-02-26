@@ -12,9 +12,7 @@
     clone_repository
     run_composer
     update_symlinks
-
-    echo 'Migrate'
-    php artisan migrate
+    migrate
 @endstory
 
 @task('clone_repository')
@@ -42,6 +40,13 @@
     echo 'Setup write permissions'
     chmod -R 777 {{ $new_release_dir }}/bootstrap/cache/
 
+
     echo 'Linking current release'
     ln -nfs {{ $new_release_dir }} {{ $app_dir }}/current
+@endtask
+
+@task('migrate')
+    echo "Migrate"
+    cd {{ $new_release_dir }}
+    php artisan migrate
 @endtask
