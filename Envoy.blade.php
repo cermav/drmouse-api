@@ -12,6 +12,9 @@
     clone_repository
     run_composer
     update_symlinks
+
+    echo 'Migrate'
+    php artisan migrate
 @endstory
 
 @task('clone_repository')
