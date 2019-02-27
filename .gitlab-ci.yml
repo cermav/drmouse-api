@@ -1,8 +1,13 @@
-stages:
-  - deploy
+image: tetraweb/php
 
-job 1:
-  stage: deploy
+before_script:
+  - apt-get update
+  - apt-get install zip unzip
+
+stage_deploy:
+  artifacts:
+    paths:
+      - build/
   script:
       - echo "Deploying"
       - envoy run deploy
