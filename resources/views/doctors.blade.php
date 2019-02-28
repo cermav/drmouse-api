@@ -10,6 +10,9 @@
 @endsection
 
 @section('content')
+    <div>
+        
+    </div>
     <div class="row">
     @foreach ($doctors as $doctor)
         @php $rating = 50; @endphp

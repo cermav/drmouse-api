@@ -24,15 +24,15 @@
                     <input type="hidden" name="doc_profile_pic2" id="doc_profile_pic2" value="">
                 </div>
                 <div class="formRow">
-                    <label for="name" class="formRowTitle required {{ $errors->has('name') ? ' errorLabel' : '' }}">Vaše jméno a příjmení / název kliniky:</label>
+                    <label for="name" class="formRowTitle required {{ $errors->has('name') ? ' errorLabel' : '' }}">Vaše jméno a příjmení / název kliniky<span>*</span>:</label>
                     <input type="text" name="name" id="name" class="{{ $errors->has('name') ? 'error' : '' }}" required value="{{ old('name') }}" />
                     @if ($errors->has('name'))
                     <label class="error">{{ $errors->first('name') }}</label>
                     @endif
                 </div>
                 <div class="formRow">
-                    <label for="description" class="formRowTitle required {{ $errors->has('description') ? ' errorLabel' : '' }}">Zde můžete několika větami popsat vaši praxi / kliniku:</label>
-                    <textarea name="description" id="description" class="{{ $errors->has('description') ? 'error' : '' }}" required value="{{ old('description') }}" ></textarea>
+                    <label for="description" class="formRowTitle required {{ $errors->has('description') ? ' errorLabel' : '' }}">Zde můžete několika větami popsat vaši praxi / kliniku<span>*</span>:</label>
+                    <textarea name="description" id="description" class="{{ $errors->has('description') ? 'error' : '' }}" required >{{ old('description') }}</textarea>
                     @if ($errors->has('description'))
                     <label class="error">{{ $errors->first('description') }}</label>
                     @endif
@@ -51,21 +51,21 @@
         </div>
         <div class="formSectionContent">            
             <div class="formRow">
-                <label for="email" class="formRowTitle required {{ $errors->has('email') ? ' errorLabel' : '' }}">Váš email:</label>
+                <label for="email" class="formRowTitle required {{ $errors->has('email') ? ' errorLabel' : '' }}">Váš email<span>*</span>:</label>
                 <input type="email" name="email" id="email" class="{{ $errors->has('email') ? 'error' : '' }}" required value="{{ old('email') }}" />
                 @if ($errors->has('email'))
                 <label class="error">{{ $errors->first('email') }}</label>
                 @endif
             </div>
             <div class="formRow">
-                <label for="password" class="formRowTitle required {{ $errors->has('password') ? ' errorLabel' : '' }}">Zadejte heslo:</label>
+                <label for="password" class="formRowTitle required {{ $errors->has('password') ? ' errorLabel' : '' }}">Zadejte heslo<span>*</span>:</label>
                 <input type="password" name="password" id="password" class="{{ $errors->has('password') ? 'error' : '' }}" required />
                 @if ($errors->has('password'))
                 <label class="error">{{ $errors->first('password') }}</label>
                 @endif
             </div>
             <div class="formRow">
-                <label for="password-confirmation" class="formRowTitle required {{ $errors->has('password_confirmation') ? ' errorLabel' : '' }}">Zadejte heslo znovu:</label>
+                <label for="password-confirmation" class="formRowTitle required {{ $errors->has('password_confirmation') ? ' errorLabel' : '' }}">Zadejte heslo znovu<span>*</span>:</label>
                 <input type="password" name="password_confirmation" id="password-confirmation" class="{{ $errors->has('password_confirmation') ? 'error' : '' }}" required />
                 @if ($errors->has('password_confirmation'))
                 <label class="error">{{ $errors->first('password_confirmation') }}</label>
@@ -80,21 +80,21 @@
         </div>
         <div class="formSectionContent">
             <div class="formRow col col-8-of-12">
-                <label for="street" class="formRowTitle required {{ $errors->has('street') ? ' errorLabel' : '' }}">Ulice a číslo popisné:</label>
+                <label for="street" class="formRowTitle required {{ $errors->has('street') ? ' errorLabel' : '' }}">Ulice a číslo popisné<span>*</span>:</label>
                 <input type="text" name="street" id="street" class="{{ $errors->has('street') ? 'error' : '' }}" required value="{{ old('street') }}" />
                 @if ($errors->has('street'))
                 <label class="error">{{ $errors->first('street') }}</label>
                 @endif
             </div>
             <div class="formRow col col-4-of-12">
-                <label for="post-code" class="formRowTitle required {{ $errors->has('post_code') ? ' errorLabel' : '' }}">PSČ:</label>
+                <label for="post-code" class="formRowTitle required {{ $errors->has('post_code') ? ' errorLabel' : '' }}">PSČ<span>*</span>:</label>
                 <input type="text" name="post_code" id="post-code" class="{{ $errors->has('post_code') ? 'error' : '' }}" required value="{{ old('post_code') }}" />
                 @if ($errors->has('post_code'))
                 <label class="error">{{ $errors->first('post_code') }}</label>
                 @endif
             </div>
             <div class="formRow col col-6-of-12">
-                <label for="city" class="formRowTitle required {{ $errors->has('city') ? ' errorLabel' : '' }}">Město:</label>
+                <label for="city" class="formRowTitle required {{ $errors->has('city') ? ' errorLabel' : '' }}">Město<span>*</span>:</label>
                 <input type="text" name="city" id="city" class="{{ $errors->has('city') ? 'error' : '' }}" required value="{{ old('city') }}" />
                 @if ($errors->has('city'))
                 <label class="error">{{ $errors->first('city') }}</label>
@@ -105,7 +105,7 @@
                 <input type="text" name="country" id="country" value="Česká republika" disabled/>
             </div>
             <div class="formRow col col-6-of-12">
-                <label for="phone" class="formRowTitle required {{ $errors->has('phone') ? ' errorLabel' : '' }}">Telefonní číslo:</label>
+                <label for="phone" class="formRowTitle required {{ $errors->has('phone') ? ' errorLabel' : '' }}">Telefonní číslo<span>*</span>:</label>
                 <input type="text" name="phone" id="phone" class="{{ $errors->has('phone') ? 'error' : '' }} withPreValue" required value="{{ old('phone') }}" />
                 <div class="preValue">+420</div>
                 @if ($errors->has('phone'))

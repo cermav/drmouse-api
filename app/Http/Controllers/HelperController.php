@@ -4,24 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Degree;
 use App\CzechName;
-
 use Illuminate\Support\Facades\Config;
 
-class HelperController extends Controller
-{
+class HelperController extends Controller {
     /* Get latitude and longitude from the address string */
+
     public static function getLatLngFromAddress($address) {
         $address = str_replace(" ", "+", $address);
 
-        $mapResponse = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&key=".Config::get('google.gmap_key'));
+        $mapResponse = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&key=" . Config::get('google.gmap_key'));
         $mapResponseJson = json_decode($mapResponse);
 
         $latitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
         $longitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
         return compact('latitude', 'longitude');
     }
-    
+
     /* Parse name from input - remove degree and move first name to the end of the name */
+
     public static function parseName($name) {
         $lcName = strtolower($name);
         $degrees = Degree::all();
@@ -41,8 +41,9 @@ class HelperController extends Controller
         }
         return implode(" ", $nameParts);
     }
-    
+
     /* Replace accents */
+
     public static function replaceAccents($string) {
         $chars = array(
             // Decompositions for Latin-1 Supplement
@@ -221,4 +222,51 @@ class HelperController extends Controller
         );
         return strtr($string, $chars);
     }
+
+    public static function calculateProfileCompletedness($doctor) {
+        $sectionsCount = 9; // total sections count - 1 (pswd section) 
+        $defaultPoints = 2;
+        $hasOpeningHours = self::hasOpeningHours($doctor) ? 1 : 0;
+        $hasProperties = self::hasProperties($doctor);
+        $hasServices = $doctor->user->services->count() > 0 ? 1 : 0;
+        $hasWorkers = self::hasWorkers($doctor)? 1 : 0;
+        $hasGallery = $doctor->user->photos->count() > 0 ? 1 : 0;
+        $totalPoints = $defaultPoints + $hasOpeningHours + $hasProperties + $hasServices + $hasWorkers + $hasGallery;
+        return round($totalPoints * 100 / $sectionsCount);
+    }
+
+    private static function hasOpeningHours($doctor) {
+        return $doctor->user->openingHours()->where([
+                        ['opening_hours_state_id', '=', 1],
+                        ['open_at', '!=', null],
+                        ['close_at', '!=', null],
+                        ['user_id', '=', $doctor->user->id]
+                ])->orWhere([
+                        ['opening_hours_state_id', '=', '2'],
+                        ['user_id', '=', $doctor->user->id]
+                ])->orWhere([
+                        ['opening_hours_state_id', '=', '3'],
+                        ['user_id', '=', $doctor->user->id]
+                ])->count() > 0;
+    }
+
+    private static function hasWorkers($doctor) {
+        return $doctor->where('working_doctors_count', '!=', null)
+                        ->orWhere('nurses_count', '!=', null)
+                        ->orWhere('other_workers_count', '!=', null)->count() > 0;
+    }
+
+    private static function hasProperties($doctor) {
+        $totalCount = 0;
+        $properties = $doctor->user->properties->groupBy('property_category_id');
+        if (count($properties) > 0) {
+            foreach ($properties as $property) {
+                if (count($property) > 0){
+                    $totalCount++;
+                }
+            }
+        }
+        return $totalCount;
+    }
+
 }

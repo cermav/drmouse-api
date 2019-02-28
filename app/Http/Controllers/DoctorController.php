@@ -18,6 +18,7 @@ use App\Score;
 use App\ScoreItem;
 use App\Http\Controllers\HelperController;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Input;
 
 class DoctorController extends Controller {
 
@@ -69,7 +70,7 @@ class DoctorController extends Controller {
         ]);
 
         /* Create doctor */
-        Doctor::create([
+        $doctor = Doctor::create([
             'user_id' => $user->id,
             'state_id' => 1,
             'search_name' => HelperController::parseName($request['name']),
@@ -169,18 +170,22 @@ class DoctorController extends Controller {
         }
 
         $counter = 0;
-        foreach ($request->file('photos') as $file) {
-            if ($file) {
-                $path = Storage::disk('public')->putFile($galleryPath . $user->id, $file);
-                Photo::create([
-                    'path' => $path,
-                    'user_id' => $user->id,
-                    'position' => $counter
-                ]);
-                $counter++;
+        if ($request->file('photos')) {
+            foreach ($request->file('photos') as $file) {
+                if ($file) {
+                    $path = Storage::disk('public')->putFile($galleryPath . $user->id, $file);
+                    Photo::create([
+                        'path' => $path,
+                        'user_id' => $user->id,
+                        'position' => $counter
+                    ]);
+                    $counter++;
+                }
             }
         }
 
+        $doctor->profile_completedness = HelperController::calculateProfileCompletedness($doctor);
+        $doctor->save();
 
         /* Create a record in log table */
         DoctorsLog::create([
@@ -192,21 +197,28 @@ class DoctorController extends Controller {
 
         return redirect('/')->with('status', 'New doctor was added');
     }
-    
-    public function showAll(){
-        $doctors = Doctor::where('state_id', '=', 3)->paginate(3);
+
+    public function showAll() {
+        $orderBy = Input::get('ob');
+        $orderDirection = Input::get('od') ? Input::get('od') : 'asc';
+        $doctors = Doctor::where('state_id', '=', 3);
+        if ($orderBy) {
+            $doctors->join('users', 'users.id', '=', 'doctors.user_id')->orderBy($orderBy, $orderDirection);
+        }
+        $doctors = $doctors->paginate(3);
         return view('doctors', compact('doctors'));
     }
-    
-    public function show($slug){
+
+    public function show($slug) {
         $doctor = Doctor::where('slug', '=', $slug)->first();
+        $propertyCategories = PropertyCategory::all();
         $weekdays = Weekday::all();
         $scoreItems = ScoreItem::all();
         $showScore = Score::where([
-            ['user_id', '=', $doctor->user->id],
-            ['ip_address', '=', $_SERVER['REMOTE_ADDR']]
-        ])->first() === null ? true : false;
-        return view('doctor', compact('doctor', 'weekdays', 'scoreItems', 'showScore'));
+                        ['user_id', '=', $doctor->user->id],
+                        ['ip_address', '=', $_SERVER['REMOTE_ADDR']]
+                ])->first() === null ? true : false;
+        return view('doctor', compact('doctor', 'propertyCategories', 'weekdays', 'scoreItems', 'showScore'));
     }
 
 }

@@ -30,8 +30,8 @@
             <nav class="menu">
                 <ul>
                     <li><a href="/">Úvod</a></li>
-                    <li><a href="{{route('doctors')}}">Veterináři</a></li>
-                    <li><a href="{{route('add-doctor')}}">Přidat ordinaci</a></li>
+                    <li><a href="{{route('doctors')}}" class="{{ request()->is('veterinari*') ? 'active' : '' }}">Veterináři</a></li>
+                    <li><a href="{{route('add-doctor')}}" class="{{ request()->is('pridat-veterinarni-ordinaci') ? 'active' : '' }}">Přidat ordinaci</a></li>
                     <li><a href="/">Články</a></li>
                     <li><a href="/">O Dr. Mouseovi</a></li>
                 </ul>

@@ -259,6 +259,10 @@ h2,
   line-height: 3rem;
 }
 
+img {
+  max-width: 100%;
+}
+
 .blueBg {
   background: #2898da;
 }
@@ -490,6 +494,11 @@ h2,
   align-items: center;
 }
 
+.row:after {
+  content: "";
+  display: block;
+}
+
 .rating {
   position: relative;
   width: 100px;
@@ -589,6 +598,7 @@ header .menu ul li a:hover {
 
 header .menu ul li a.active {
   background-color: #fff;
+  color: #2898da;
 }
 
 .hero {
@@ -971,6 +981,7 @@ header .menu ul li a.active {
 
 .pagination {
   display: flex;
+  margin-top: 1.5rem;
 }
 
 .pagination .page-item {
@@ -1158,6 +1169,10 @@ footer .container {
 
 .doctors .mainContainer {
   padding: 3rem 0;
+}
+
+.doctors .row:after {
+  width: 32.33333%;
 }
 
 .doctor #map {

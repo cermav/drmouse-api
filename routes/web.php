@@ -24,7 +24,7 @@ Route::post('/save-rating', 'ScoreController@saveScore')->name('save-rating');
 Route::get('/pridat-veterinarni-ordinaci', 'DoctorController@addDoctor')->name('add-doctor');
 Route::post('/create-doctor', 'DoctorController@createDoctor')->name('create-doctor');
 Route::get('/veterinari', 'DoctorController@showAll')->name('doctors');
-Route::get('/vet/{slug}/', 'DoctorController@show')->name('doctor');
+Route::get('/veterinari/{slug}/', 'DoctorController@show')->name('doctor');
 
 
 Route::group(['prefix' => 'admin'], function () {

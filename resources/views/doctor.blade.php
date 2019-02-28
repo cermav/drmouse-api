@@ -26,10 +26,12 @@
         </p>
         <p><a href="mailto:{{$doctor->user->email}}">{{$doctor->user->email}}</a></p>
         <p><a href="{{$doctor->website}}">{{$doctor->website}}</a></p>
+        
         <div class="rating">
             <div class='filling' style='width:{{$rating}}%'></div>
         </div>
         <div id="map" data-lat="{{$doctor->latitude}}" data-lng="{{$doctor->longitude}}"></div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination={{$doctor->latitude}},{{$doctor->longitude}}">Zobrazit trasu na mapě</a>
         <div>
             <h3>Otevírací hodiny</h3>
             @foreach ($weekdays as $weekday)
@@ -45,6 +47,44 @@
                 @endforeach
             </div>
             @endforeach
+        </div>
+        <div>
+            @foreach ($propertyCategories as $category)
+            @php $properties = $doctor->user->properties->where('property_category_id', $category->id)->where('is_approved', 1); @endphp
+            @if (count($properties) > 0)
+            <div>
+                <h3>{{$category->name}}</h3>
+                <div>
+                    @foreach ($properties as $property)
+                        {{$property->name}}
+                    @endforeach
+                </div>
+            </div>
+            @endif
+            @endforeach
+        </div>
+        <div>
+            <h3>Počet zaměstnanců</h3>
+            <p>Doktorů: {{$doctor->working_doctors_count}}</p>    
+            <p>Sester: {{$doctor->nurses_count}}</p>    
+            <p>Ostatní: {{$doctor->other_workers_count}}</p>    
+        </div>
+        <div>
+            <h3>Orientační ceny</h3>
+            @foreach ($doctor->user->services as $service)
+                @if ($service->is_approved)
+                    <p>{{$service->name}}: {{$service->pivot->price}}Kč</p>
+                @endif
+            @endforeach
+        </div>
+        <div>
+            <div class="row">
+                @foreach ($doctor->user->photos as $photo)
+                <div class="col col-4-of-12">
+                    <img src="{{asset('storage/'.$photo->path)}}" />
+                </div>    
+                @endforeach
+            </div>
         </div>
         <div>
             <h3>Vaše hodnocení:</h3>
@@ -83,9 +123,9 @@
             @foreach ($doctor->user->scores->where('is_approved', 1) as $score)
             @php $sum = 0; @endphp
             @foreach ($score->details as $detail)
-                @php $sum += $detail->points; @endphp
+            @php $sum += $detail->points; @endphp
             @endforeach
-            @php $rating = $sum / 25 * 100; @endphp
+            @php $rating = $sum / (count($scoreItems) * 5) * 100; @endphp
             <div class="score">
                 <div class="date">
                     {{(new DateTime($score->score_date))->format('d.m.Y')}}
@@ -94,9 +134,9 @@
                     <div class='filling' style='width:{{$rating}}%'></div>
                 </div>
                 @if ($score->comment)
-                    <span>{{$score->comment}}</span>
+                <span>{{$score->comment}}</span>
                 @else
-                    <span class="italic">Žádný komentář</span>
+                <span class="italic">Žádný komentář</span>
                 @endif
             </div>
             @endforeach
