@@ -214,11 +214,7 @@ class DoctorController extends Controller {
         $propertyCategories = PropertyCategory::all();
         $weekdays = Weekday::all();
         $scoreItems = ScoreItem::all();
-        $showScore = Score::where([
-                        ['user_id', '=', $doctor->user->id],
-                        ['ip_address', '=', $_SERVER['REMOTE_ADDR']]
-                ])->first() === null ? true : false;
-        return view('doctor', compact('doctor', 'propertyCategories', 'weekdays', 'scoreItems', 'showScore'));
+        return view('doctor', compact('doctor', 'propertyCategories', 'weekdays', 'scoreItems'));
     }
 
 }
