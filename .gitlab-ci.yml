@@ -1,13 +1,7 @@
-image: tetraweb/php
-
-before_script:
-  - apt-get update
-  - apt-get install zip unzip
+image: alexwijn/docker-git-php-composer
 
 stage_deploy:
   artifacts:
-    paths:
-      - build/
   script:
       - echo "Deploying"
       - envoy run deploy

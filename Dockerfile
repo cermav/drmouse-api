@@ -1,21 +1,16 @@
-# Set the base image for subsequent instructions
-FROM php:7.1
+FROM php:7.2-alpine
 
-# Update packages
-RUN apt-get update
+MAINTAINER Bogardo
 
-# Install PHP and composer dependencies
-RUN apt-get install -qq git curl libmcrypt-dev libjpeg-dev libpng-dev libfreetype6-dev libbz2-dev
+ENV PATH="${PATH}:/root/.composer/vendor/bin"
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Clear out the local repository of retrieved package files
-RUN apt-get clean
+RUN apk add --no-cache curl wget git zip unzip rsync bash \
+    openssh openssh-client openssh-keygen openssh-keysign \
+    && rm -rf /var/cache/apk/* \
+    && curl -sS https://getcomposer.org/installer | \
+    php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer global require laravel/envoy --no-progress --no-suggest \
+    && rm -rf /root/.composer/cache/*
 
-# Install needed extensions
-# Here you can install any other extension that you need during the test and deployment process
-RUN docker-php-ext-install mcrypt pdo_mysql zip
-
-# Install Composer
-RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Install Laravel Envoy
-RUN composer global require "laravel/envoy=~1.0"
+ENTRYPOINT ["/bin/bash"]
