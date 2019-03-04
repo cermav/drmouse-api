@@ -107,9 +107,8 @@ $(document).ready(function () {
         const comment = $("#comment").val();
         const userId = $("#userId").val();
         const csrfToken = $('meta[name="csrf-token"]').attr('content');
-        saveRating($(this).attr("action"), {comment, rating, userId}, csrfToken).then((response) => {
-          // console.log(response);
-           if (response.success){
+        saveRating($(this).attr("action"), {comment, rating, userId}).then((response) => {
+           if (response.status === 201){
                $('.successMsg').removeClass('hidden');
                $('#rateDoctorForm').addClass('hidden');
            }

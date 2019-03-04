@@ -89,7 +89,7 @@
         <div>
             <h3>Vaše hodnocení:</h3>
             <p class="successMsg hidden">Děkujeme, Váše hodnocení bylo uloženo.</p>
-            <form action="{{route('save-rating')}}" method="POST" class='form' id='rateDoctorForm'>
+            <form action="{{url('api/scores')}}" method="POST" class='form' id='rateDoctorForm'>
                 @foreach ($scoreItems as $item)
                 <h4>{{$item->title}}</h4>
                 <ul class='ratingForm' data-item-id='{{$item->id}}' data-score='0'>
