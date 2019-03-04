@@ -14,7 +14,6 @@ class ScoreController extends Controller {
             $score = Score::create([
                         'comment' => $request['comment'],
                         'ip_address' => $_SERVER['REMOTE_ADDR'],
-                        'score_date' => date('Y-m-d H:i:s'),
                         'is_approved' => 0,
                         'user_id' => $request['userId']
             ]);

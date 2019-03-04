@@ -126,7 +126,7 @@
             @php $rating = $sum / (count($scoreItems) * 5) * 100; @endphp
             <div class="score">
                 <div class="date">
-                    {{(new DateTime($score->score_date))->format('d.m.Y')}}
+                    {{(new DateTime($score->created_at))->format('d.m.Y')}}
                 </div>
                 <div class="rating">
                     <div class='filling' style='width:{{$rating}}%'></div>

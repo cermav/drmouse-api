@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Score extends Model
 {
@@ -12,8 +13,19 @@ class Score extends Model
      * @var array
      */
     protected $fillable = [
-        'comment', 'ip_address', 'score_date', 'is_approved', 'user_id'
+        'comment', 'ip_address', 'is_approved', 'user_id'
     ];
+    
+    /*
+     * Specify default order
+     * Use Score::withoutGlobalScope('order')->get() if you don't want to apply default order rules
+     */
+    protected static function boot() {
+        parent::boot();
+        static::addGlobalScope('order', function (Builder $builder) {
+            $builder->orderBy('created_at', 'desc');
+        });
+    }
     
     /**
      * Get score details

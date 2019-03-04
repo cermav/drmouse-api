@@ -67,7 +67,7 @@ class User extends \TCG\Voyager\Models\User {
      * Get doctor's score
      */
     public function scores() {
-        return $this->hasMany('App\Score')->orderBy('score_date', 'desc');
+        return $this->hasMany('App\Score')->orderBy('created_at', 'desc');
     }
 
 }
