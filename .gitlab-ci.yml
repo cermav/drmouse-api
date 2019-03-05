@@ -1,7 +1,10 @@
-image: alexwijn/docker-git-php-composer
+image: burten/laravel-envoy
 
-stage_deploy:
-  artifacts:
+stages:
+  - deploy
+
+deploy_testing:
+  stage: deploy
   script:
       - echo "Deploying"
-      - envoy run deploy
+      - ~/.composer/vendor/bin/envoy run deploy
