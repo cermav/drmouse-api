@@ -568,18 +568,22 @@ var getReq = function getReq(url) {
     return response.json();
   });
 };
-var saveRating = function saveRating(url, data, csrfToken) {
+var saveRating = function saveRating(url, data) {
   console.log(url, data);
   return fetch(url, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': csrfToken
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
   }).then(function (response) {
-    return response.json();
+    return response.json().then(function (data) {
+      return {
+        status: response.status,
+        data: data
+      };
+    });
   });
 };
 
@@ -712,9 +716,8 @@ $(document).ready(function () {
       comment: comment,
       rating: rating,
       userId: userId
-    }, csrfToken).then(function (response) {
-      // console.log(response);
-      if (response.success) {
+    }).then(function (response) {
+      if (response.status === 201) {
         $('.successMsg').removeClass('hidden');
         $('#rateDoctorForm').addClass('hidden');
       }
