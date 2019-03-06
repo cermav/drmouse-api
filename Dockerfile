@@ -19,3 +19,4 @@ RUN curl --silent --show-error https://getcomposer.org/installer | php -- --inst
 
 # Install Laravel Envoy
 RUN composer global require "laravel/envoy=~1.0"
+
