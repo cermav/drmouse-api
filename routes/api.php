@@ -19,3 +19,11 @@ Route::apiResource('scores', 'API\ScoreController');
 /* Doctors */
 Route::apiResource('doctors', 'API\DoctorController');
 
+
+/* Api for mobile application */
+Route::group(['prefix' => 'mobile'], function() {
+    Route::apiResource('doctors', 'API\Mobile\DoctorController');
+});
+
+
+

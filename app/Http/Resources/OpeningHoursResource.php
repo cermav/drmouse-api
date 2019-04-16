@@ -16,7 +16,9 @@ class OpeningHoursResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'weekday_id' => $this->weekday->id,
             'weekday' => $this->weekday->name,
+            'state_id' => $this->openingHoursState->id,
             'state' => $this->openingHoursState->name,
             'open_at' => $this->open_at,
             'close_at' => $this->close_at
