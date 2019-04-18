@@ -15,12 +15,17 @@ class DoctorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $whereArray = [
             ['state_id', '=', 3],
-            ['updated_at', '>', Input::get('updated')]
         ];
+
+        // add update condition
+        $validatedDate = $request->validate(['updated' => 'date']);
+        if (array_key_exists('updated', $validatedDate)) {
+            $whereArray[] = ['updated_at', '>', $validatedDate['updated']];
+        }
 
         return DoctorResource::collection(Doctor::where($whereArray)->get());
     }
