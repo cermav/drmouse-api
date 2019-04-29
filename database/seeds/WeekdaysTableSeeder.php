@@ -12,7 +12,9 @@ class WeekdaysTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('weekdays')->insert([
+        \DB::table('weekdays')->delete();
+
+        \DB::table('weekdays')->insert([
             ['name' => 'Pondělí', 'created_at' => date("Y-m-d H:i:s")],
             ['name' => 'Úterý', 'created_at' => date("Y-m-d H:i:s")],
             ['name' => 'Středa', 'created_at' => date("Y-m-d H:i:s")],

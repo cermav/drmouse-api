@@ -11,7 +11,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(WeekdaysTableSeeder::class);
+
+        /*
+        $this->call( WeekdaysTableSeeder::class );
         $this->call(PropertyCategoriesTableSeeder::class);
         $this->call(ScoreItemsTableSeeder::class);
         $this->call(StatesTableSeeder::class);
@@ -34,5 +36,9 @@ class DatabaseSeeder extends Seeder
         $this->call(SettingsTableSeeder::class);
 
         $this->call(TranslationsTableSeeder::class);
+
+*/
+
+        $this->call(DoctorSeeder::class);
     }
 }

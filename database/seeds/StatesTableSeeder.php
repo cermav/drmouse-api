@@ -11,6 +11,7 @@ class StatesTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('states')->delete();
         DB::table('states')->insert([
             ['name' => 'New', 'created_at' => date("Y-m-d H:i:s")],
             ['name' => 'Draft', 'created_at' => date("Y-m-d H:i:s")],

@@ -12,6 +12,7 @@ class DegreesTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('degrees')->delete();
         DB::table('degrees')->insert([
             ['name' => 'Bc.', 'created_at' => date("Y-m-d H:i:s")],
             ['name' => 'CSc.', 'created_at' => date("Y-m-d H:i:s")],

@@ -12,6 +12,7 @@ class ScoreItemsTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('score_items')->delete();
         DB::table('score_items')->insert([
             ['title' => 'Čistota', 'created_at' => date("Y-m-d H:i:s")],
             ['title' => 'Ochota personálu', 'created_at' => date("Y-m-d H:i:s")],
