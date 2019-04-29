@@ -14,14 +14,17 @@ class DatabaseSeeder extends Seeder
 
         /*
         $this->call( WeekdaysTableSeeder::class );
+        $this->call(OpeningHoursStatesTableSeeder::class);
+
         $this->call(PropertyCategoriesTableSeeder::class);
+        $this->call(PropertiesTableSeeder::class);
+
         $this->call(ScoreItemsTableSeeder::class);
         $this->call(StatesTableSeeder::class);
         $this->call(CustomRolesTableSeeder::class);
-        $this->call(OpeningHoursStatesTableSeeder::class);
+
         $this->call(DegreesTableSeeder::class);
         $this->call(CzechNamesTableSeeder::class);
-        $this->call(PropertiesTableSeeder::class);
         $this->call(ServicesTableSeeder::class);
 
         $this->call(DataTypesTableSeeder::class);
@@ -37,8 +40,12 @@ class DatabaseSeeder extends Seeder
 
         $this->call(TranslationsTableSeeder::class);
 
+
+
 */
 
         $this->call(DoctorSeeder::class);
+
+
     }
 }

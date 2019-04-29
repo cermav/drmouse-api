@@ -19,7 +19,7 @@ class PropertiesTableSeeder extends Seeder
         \DB::table('properties')->insert(array (
             0 => 
             array (
-                'id' => 1,
+                'id' => 9,
                 'property_category_id' => 2,
                 'name' => 'Psi a kočky',
                 'is_approved' => 1,
@@ -30,7 +30,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             1 => 
             array (
-                'id' => 2,
+                'id' => 10,
                 'property_category_id' => 2,
                 'name' => 'Hlodavci a drobná zvířata',
                 'is_approved' => 1,
@@ -41,7 +41,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             2 => 
             array (
-                'id' => 3,
+                'id' => 11,
                 'property_category_id' => 2,
                 'name' => 'Ptáci',
                 'is_approved' => 1,
@@ -52,7 +52,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             3 => 
             array (
-                'id' => 4,
+                'id' => 12,
                 'property_category_id' => 2,
                 'name' => 'Hospodářská zvířata',
                 'is_approved' => 1,
@@ -63,7 +63,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             4 => 
             array (
-                'id' => 5,
+                'id' => 13,
                 'property_category_id' => 2,
                 'name' => 'Plazi a obojživelníci',
                 'is_approved' => 1,
@@ -74,7 +74,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             5 => 
             array (
-                'id' => 6,
+                'id' => 14,
                 'property_category_id' => 2,
                 'name' => 'Koně',
                 'is_approved' => 1,
@@ -85,7 +85,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             6 => 
             array (
-                'id' => 7,
+                'id' => 15,
                 'property_category_id' => 3,
                 'name' => 'Ortopedie',
                 'is_approved' => 1,
@@ -96,7 +96,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             7 => 
             array (
-                'id' => 8,
+                'id' => 16,
                 'property_category_id' => 3,
                 'name' => 'Všeobecná prevence a léčba',
                 'is_approved' => 1,
@@ -107,7 +107,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             8 => 
             array (
-                'id' => 9,
+                'id' => 17,
                 'property_category_id' => 3,
                 'name' => 'Kardiologie',
                 'is_approved' => 1,
@@ -118,7 +118,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             9 => 
             array (
-                'id' => 10,
+                'id' => 18,
                 'property_category_id' => 3,
                 'name' => 'Laboratoř',
                 'is_approved' => 1,
@@ -129,7 +129,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             10 => 
             array (
-                'id' => 11,
+                'id' => 25,
                 'property_category_id' => 3,
                 'name' => 'Urologie',
                 'is_approved' => 1,
@@ -140,7 +140,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             11 => 
             array (
-                'id' => 12,
+                'id' => 26,
                 'property_category_id' => 3,
                 'name' => 'Gastroenterologie',
                 'is_approved' => 1,
@@ -151,7 +151,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             12 => 
             array (
-                'id' => 13,
+                'id' => 27,
                 'property_category_id' => 1,
                 'name' => 'RTG',
                 'is_approved' => 1,
@@ -162,7 +162,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             13 => 
             array (
-                'id' => 14,
+                'id' => 30,
                 'property_category_id' => 3,
                 'name' => 'Asistovaná reprodukce',
                 'is_approved' => 1,
@@ -173,7 +173,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             14 => 
             array (
-                'id' => 15,
+                'id' => 32,
                 'property_category_id' => 3,
                 'name' => 'Dermatologie',
                 'is_approved' => 1,
@@ -184,7 +184,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             15 => 
             array (
-                'id' => 16,
+                'id' => 33,
                 'property_category_id' => 3,
                 'name' => 'Neurologie',
                 'is_approved' => 1,
@@ -195,7 +195,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             16 => 
             array (
-                'id' => 17,
+                'id' => 34,
                 'property_category_id' => 3,
                 'name' => 'Oftalmologie',
                 'is_approved' => 1,
@@ -206,7 +206,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             17 => 
             array (
-                'id' => 18,
+                'id' => 35,
                 'property_category_id' => 3,
                 'name' => 'Onkologie',
                 'is_approved' => 1,
@@ -217,7 +217,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             18 => 
             array (
-                'id' => 19,
+                'id' => 41,
                 'property_category_id' => 1,
                 'name' => 'Operační sál',
                 'is_approved' => 1,
@@ -228,7 +228,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             19 => 
             array (
-                'id' => 20,
+                'id' => 45,
                 'property_category_id' => 2,
                 'name' => 'Exotická zvířata',
                 'is_approved' => 1,
@@ -239,7 +239,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             20 => 
             array (
-                'id' => 21,
+                'id' => 46,
                 'property_category_id' => 3,
                 'name' => 'Respirace',
                 'is_approved' => 1,
@@ -250,7 +250,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             21 => 
             array (
-                'id' => 22,
+                'id' => 95,
                 'property_category_id' => 1,
                 'name' => 'EKG',
                 'is_approved' => 1,
@@ -261,7 +261,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             22 => 
             array (
-                'id' => 23,
+                'id' => 96,
                 'property_category_id' => 3,
                 'name' => 'Interní medicína',
                 'is_approved' => 1,
@@ -272,7 +272,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             23 => 
             array (
-                'id' => 24,
+                'id' => 97,
                 'property_category_id' => 3,
                 'name' => 'Homeopatie',
                 'is_approved' => 1,
@@ -283,7 +283,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             24 => 
             array (
-                'id' => 25,
+                'id' => 98,
                 'property_category_id' => 3,
                 'name' => 'Sonografie',
                 'is_approved' => 1,
@@ -294,7 +294,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             25 => 
             array (
-                'id' => 26,
+                'id' => 99,
                 'property_category_id' => 3,
                 'name' => 'Endokrinologie',
                 'is_approved' => 1,
@@ -305,7 +305,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             26 => 
             array (
-                'id' => 27,
+                'id' => 100,
                 'property_category_id' => 3,
                 'name' => 'Chirurgie',
                 'is_approved' => 1,
@@ -316,7 +316,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             27 => 
             array (
-                'id' => 28,
+                'id' => 101,
                 'property_category_id' => 3,
                 'name' => 'Odstranění zubního kamene ultrazvukem',
                 'is_approved' => 1,
@@ -327,7 +327,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             28 => 
             array (
-                'id' => 29,
+                'id' => 102,
                 'property_category_id' => 1,
                 'name' => 'USG',
                 'is_approved' => 1,
@@ -338,7 +338,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             29 => 
             array (
-                'id' => 30,
+                'id' => 103,
                 'property_category_id' => 1,
                 'name' => 'Narkotizační přístroj',
                 'is_approved' => 1,
@@ -349,7 +349,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             30 => 
             array (
-                'id' => 31,
+                'id' => 104,
                 'property_category_id' => 1,
                 'name' => 'Mikroskop',
                 'is_approved' => 1,
@@ -360,7 +360,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             31 => 
             array (
-                'id' => 32,
+                'id' => 105,
                 'property_category_id' => 1,
                 'name' => 'Horkovzdušný sterilizátor',
                 'is_approved' => 1,
@@ -371,7 +371,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             32 => 
             array (
-                'id' => 33,
+                'id' => 106,
                 'property_category_id' => 1,
                 'name' => 'Čtečka mikročipů',
                 'is_approved' => 1,
@@ -382,7 +382,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             33 => 
             array (
-                'id' => 34,
+                'id' => 107,
                 'property_category_id' => 1,
                 'name' => 'Halogenový set',
                 'is_approved' => 1,
@@ -393,7 +393,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             34 => 
             array (
-                'id' => 35,
+                'id' => 108,
                 'property_category_id' => 1,
                 'name' => 'Refraktometr',
                 'is_approved' => 1,
@@ -404,7 +404,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             35 => 
             array (
-                'id' => 36,
+                'id' => 109,
                 'property_category_id' => 1,
                 'name' => 'Glukometr',
                 'is_approved' => 1,
@@ -415,7 +415,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             36 => 
             array (
-                'id' => 37,
+                'id' => 110,
                 'property_category_id' => 1,
                 'name' => 'Sedimentační souprava',
                 'is_approved' => 1,
@@ -426,7 +426,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             37 => 
             array (
-                'id' => 38,
+                'id' => 111,
                 'property_category_id' => 1,
                 'name' => 'Výjezdové vozidlo',
                 'is_approved' => 1,
@@ -437,7 +437,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             38 => 
             array (
-                'id' => 39,
+                'id' => 112,
                 'property_category_id' => 3,
                 'name' => 'Stomatologie',
                 'is_approved' => 1,
@@ -448,7 +448,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             39 => 
             array (
-                'id' => 40,
+                'id' => 113,
                 'property_category_id' => 3,
                 'name' => 'Gynekologie',
                 'is_approved' => 1,
@@ -459,7 +459,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             40 => 
             array (
-                'id' => 41,
+                'id' => 114,
                 'property_category_id' => 3,
                 'name' => 'Andrologie',
                 'is_approved' => 1,
@@ -470,7 +470,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             41 => 
             array (
-                'id' => 42,
+                'id' => 115,
                 'property_category_id' => 3,
                 'name' => 'Výjezdy k pacientům',
                 'is_approved' => 1,
@@ -481,7 +481,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             42 => 
             array (
-                'id' => 43,
+                'id' => 116,
                 'property_category_id' => 3,
                 'name' => 'Biochemie',
                 'is_approved' => 1,
@@ -492,7 +492,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             43 => 
             array (
-                'id' => 44,
+                'id' => 117,
                 'property_category_id' => 3,
                 'name' => 'Akutní péče',
                 'is_approved' => 1,
@@ -503,7 +503,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             44 => 
             array (
-                'id' => 45,
+                'id' => 118,
                 'property_category_id' => 3,
                 'name' => 'RTG',
                 'is_approved' => 1,
@@ -514,7 +514,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             45 => 
             array (
-                'id' => 46,
+                'id' => 120,
                 'property_category_id' => 1,
                 'name' => 'Laboratoř',
                 'is_approved' => 1,
@@ -525,7 +525,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             46 => 
             array (
-                'id' => 47,
+                'id' => 121,
                 'property_category_id' => 1,
                 'name' => 'Otoskop',
                 'is_approved' => 1,
@@ -536,7 +536,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             47 => 
             array (
-                'id' => 48,
+                'id' => 122,
                 'property_category_id' => 1,
                 'name' => 'Laryngoskop',
                 'is_approved' => 1,
@@ -547,7 +547,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             48 => 
             array (
-                'id' => 49,
+                'id' => 130,
                 'property_category_id' => 1,
                 'name' => 'CT',
                 'is_approved' => 1,
@@ -558,7 +558,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             49 => 
             array (
-                'id' => 50,
+                'id' => 131,
                 'property_category_id' => 3,
                 'name' => 'Nonstop pohotovost',
                 'is_approved' => 1,
@@ -569,7 +569,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             50 => 
             array (
-                'id' => 51,
+                'id' => 132,
                 'property_category_id' => 1,
                 'name' => 'Psí salón',
                 'is_approved' => 1,
@@ -580,7 +580,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             51 => 
             array (
-                'id' => 52,
+                'id' => 133,
                 'property_category_id' => 1,
                 'name' => 'Oftalmolaryngoskop',
                 'is_approved' => 1,
@@ -591,7 +591,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             52 => 
             array (
-                'id' => 53,
+                'id' => 134,
                 'property_category_id' => 1,
                 'name' => 'Zubní vrtačka',
                 'is_approved' => 1,
@@ -602,7 +602,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             53 => 
             array (
-                'id' => 54,
+                'id' => 135,
                 'property_category_id' => 3,
                 'name' => 'Čipování',
                 'is_approved' => 1,
@@ -613,7 +613,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             54 => 
             array (
-                'id' => 55,
+                'id' => 136,
                 'property_category_id' => 1,
                 'name' => 'Magnetická rezonance',
                 'is_approved' => 1,
@@ -624,7 +624,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             55 => 
             array (
-                'id' => 56,
+                'id' => 137,
                 'property_category_id' => 1,
                 'name' => 'Rehabilitační bazén',
                 'is_approved' => 1,
@@ -635,7 +635,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             56 => 
             array (
-                'id' => 57,
+                'id' => 138,
                 'property_category_id' => 1,
                 'name' => 'JIP',
                 'is_approved' => 1,
@@ -646,7 +646,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             57 => 
             array (
-                'id' => 58,
+                'id' => 139,
                 'property_category_id' => 3,
                 'name' => 'Medicína fretek',
                 'is_approved' => 1,
@@ -657,7 +657,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             58 => 
             array (
-                'id' => 59,
+                'id' => 140,
                 'property_category_id' => 3,
                 'name' => 'Rehabilitace',
                 'is_approved' => 1,
@@ -668,7 +668,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             59 => 
             array (
-                'id' => 60,
+                'id' => 141,
                 'property_category_id' => 3,
                 'name' => 'Fyzioterapie',
                 'is_approved' => 1,
@@ -679,7 +679,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             60 => 
             array (
-                'id' => 61,
+                'id' => 142,
                 'property_category_id' => 3,
                 'name' => 'Neurochirurgie',
                 'is_approved' => 1,
@@ -690,7 +690,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             61 => 
             array (
-                'id' => 62,
+                'id' => 144,
                 'property_category_id' => 1,
                 'name' => 'Biochemický analyzátor',
                 'is_approved' => 1,
@@ -701,7 +701,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             62 => 
             array (
-                'id' => 63,
+                'id' => 145,
                 'property_category_id' => 1,
                 'name' => 'Cytologický mikroskop',
                 'is_approved' => 1,
@@ -712,7 +712,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             63 => 
             array (
-                'id' => 64,
+                'id' => 146,
                 'property_category_id' => 3,
                 'name' => 'Vystavování europasů',
                 'is_approved' => 1,
@@ -723,7 +723,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             64 => 
             array (
-                'id' => 65,
+                'id' => 147,
                 'property_category_id' => 3,
                 'name' => 'Vakcinace',
                 'is_approved' => 1,
@@ -734,7 +734,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             65 => 
             array (
-                'id' => 66,
+                'id' => 148,
                 'property_category_id' => 3,
                 'name' => 'Odčervování',
                 'is_approved' => 1,
@@ -745,7 +745,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             66 => 
             array (
-                'id' => 67,
+                'id' => 149,
                 'property_category_id' => 3,
                 'name' => 'Akutní medicína',
                 'is_approved' => 1,
@@ -756,7 +756,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             67 => 
             array (
-                'id' => 68,
+                'id' => 150,
                 'property_category_id' => 3,
                 'name' => 'Anesteziologie',
                 'is_approved' => 1,
@@ -767,7 +767,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             68 => 
             array (
-                'id' => 69,
+                'id' => 151,
                 'property_category_id' => 3,
                 'name' => 'Čínská medicína',
                 'is_approved' => 1,
@@ -778,7 +778,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             69 => 
             array (
-                'id' => 70,
+                'id' => 152,
                 'property_category_id' => 3,
                 'name' => 'Endoskopie',
                 'is_approved' => 1,
@@ -789,7 +789,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             70 => 
             array (
-                'id' => 71,
+                'id' => 153,
                 'property_category_id' => 3,
                 'name' => 'Felinní medicína',
                 'is_approved' => 1,
@@ -800,7 +800,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             71 => 
             array (
-                'id' => 72,
+                'id' => 154,
                 'property_category_id' => 3,
                 'name' => 'Hospitalizace',
                 'is_approved' => 1,
@@ -811,7 +811,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             72 => 
             array (
-                'id' => 73,
+                'id' => 155,
                 'property_category_id' => 3,
                 'name' => 'Počítačová tomografie',
                 'is_approved' => 1,
@@ -822,7 +822,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             73 => 
             array (
-                'id' => 74,
+                'id' => 156,
                 'property_category_id' => 3,
                 'name' => 'Respiratorní choroby',
                 'is_approved' => 1,
@@ -833,7 +833,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             74 => 
             array (
-                'id' => 75,
+                'id' => 157,
                 'property_category_id' => 3,
                 'name' => 'Traumatologie',
                 'is_approved' => 1,
@@ -844,7 +844,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             75 => 
             array (
-                'id' => 76,
+                'id' => 158,
                 'property_category_id' => 3,
                 'name' => 'Všeobecná medicína',
                 'is_approved' => 1,
@@ -855,7 +855,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             76 => 
             array (
-                'id' => 77,
+                'id' => 159,
                 'property_category_id' => 3,
                 'name' => 'Výcvik psů a štěňat',
                 'is_approved' => 1,
@@ -866,7 +866,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             77 => 
             array (
-                'id' => 78,
+                'id' => 160,
                 'property_category_id' => 3,
                 'name' => 'Výživové poradenství',
                 'is_approved' => 1,
@@ -877,7 +877,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             78 => 
             array (
-                'id' => 79,
+                'id' => 161,
                 'property_category_id' => 1,
                 'name' => 'Defibrilátor',
                 'is_approved' => 1,
@@ -888,7 +888,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             79 => 
             array (
-                'id' => 80,
+                'id' => 162,
                 'property_category_id' => 1,
                 'name' => 'Endoskop',
                 'is_approved' => 1,
@@ -899,7 +899,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             80 => 
             array (
-                'id' => 81,
+                'id' => 163,
                 'property_category_id' => 1,
                 'name' => 'Oddělené čekárny',
                 'is_approved' => 1,
@@ -910,7 +910,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             81 => 
             array (
-                'id' => 82,
+                'id' => 164,
                 'property_category_id' => 1,
                 'name' => 'Skiaskop',
                 'is_approved' => 1,
@@ -921,7 +921,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             82 => 
             array (
-                'id' => 83,
+                'id' => 165,
                 'property_category_id' => 1,
                 'name' => 'Ultrazvuk na čištění zubů',
                 'is_approved' => 1,
@@ -932,7 +932,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             83 => 
             array (
-                'id' => 84,
+                'id' => 167,
                 'property_category_id' => 3,
                 'name' => 'Stříhání a úprava psů',
                 'is_approved' => 1,
@@ -943,7 +943,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             84 => 
             array (
-                'id' => 85,
+                'id' => 168,
                 'property_category_id' => 3,
                 'name' => 'Pohotovost',
                 'is_approved' => 1,
@@ -954,7 +954,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             85 => 
             array (
-                'id' => 86,
+                'id' => 218,
                 'property_category_id' => 1,
                 'name' => 'C - rameno',
                 'is_approved' => 1,
@@ -965,7 +965,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             86 => 
             array (
-                'id' => 87,
+                'id' => 219,
                 'property_category_id' => 1,
                 'name' => 'Plicní ventilátor',
                 'is_approved' => 1,
@@ -976,7 +976,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             87 => 
             array (
-                'id' => 88,
+                'id' => 220,
                 'property_category_id' => 1,
                 'name' => 'Caiman',
                 'is_approved' => 1,
@@ -987,7 +987,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             88 => 
             array (
-                'id' => 89,
+                'id' => 221,
                 'property_category_id' => 3,
                 'name' => 'CT',
                 'is_approved' => 1,
@@ -998,7 +998,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             89 => 
             array (
-                'id' => 90,
+                'id' => 222,
                 'property_category_id' => 3,
                 'name' => 'Celostní medicína',
                 'is_approved' => 1,
@@ -1009,7 +1009,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             90 => 
             array (
-                'id' => 91,
+                'id' => 223,
                 'property_category_id' => 3,
                 'name' => 'Gerontologie',
                 'is_approved' => 1,
@@ -1020,7 +1020,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             91 => 
             array (
-                'id' => 92,
+                'id' => 224,
                 'property_category_id' => 3,
                 'name' => 'Magnetoterapie',
                 'is_approved' => 1,
@@ -1031,7 +1031,7 @@ class PropertiesTableSeeder extends Seeder
             ),
             92 => 
             array (
-                'id' => 93,
+                'id' => 225,
                 'property_category_id' => 3,
                 'name' => 'Dialýza',
                 'is_approved' => 1,

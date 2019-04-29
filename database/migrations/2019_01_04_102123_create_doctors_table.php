@@ -37,7 +37,7 @@ class CreateDoctorsTable extends Migration {
             $table->integer('nurses_count')->nullable(true);
             $table->integer('other_workers_count')->nullable(true);
             $table->boolean('gdpr_agreed')->nullable(false)->default(0);
-            $table->dateTime('gdpr_agreed_date')->nullable(false);
+            $table->dateTime('gdpr_agreed_date')->nullable(true)->default(null);
             $table->integer('profile_completedness')->nullable(false)->default(0);
             $table->timestamps();
         });
