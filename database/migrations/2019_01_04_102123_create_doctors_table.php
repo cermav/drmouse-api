@@ -24,12 +24,12 @@ class CreateDoctorsTable extends Migration {
             $table->string('slug')->nullable(false)->unique();
             $table->boolean('speaks_english')->nullable(false)->default(0);
             $table->string('phone', 20)->collation('utf8_general_ci')->nullable(false);
-            $table->string('second_phone', 20)->collation('utf8_general_ci')->nullable(true);
-            $table->string('website')->collation('utf8_general_ci')->nullable(true);
-            $table->string('street')->collation('utf8_general_ci')->nullable(false);
-            $table->string('city')->collation('utf8_general_ci')->nullable(false);
-            $table->string('country')->collation('utf8_general_ci')->nullable(false)->default("Česká republika");
-            $table->integer('post_code')->nullable(false);
+            $table->string('second_phone', 20)->collation('utf8_general_ci')->nullable(true)->default(null);
+            $table->string('website')->collation('utf8_general_ci')->nullable(true)->default(null);
+            $table->string('street')->collation('utf8_general_ci')->nullable(true)->default(null);
+            $table->string('city')->collation('utf8_general_ci')->nullable(true)->default(null);
+            $table->string('country')->collation('utf8_general_ci')->nullable(true)->default(null);
+            $table->integer('post_code')->nullable(true)->default(null);
             $table->double('latitude')->nullable(false);
             $table->double('longitude')->nullable(false);
             $table->integer('working_doctors_count')->nullable(true);

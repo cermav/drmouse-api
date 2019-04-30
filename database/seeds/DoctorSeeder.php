@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use App\Enum\OpeningHoursState;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -23,13 +24,15 @@ class DoctorSeeder extends Seeder
           LEFT JOIN drmouse_old.doctor_address AS a ON d.id = a.doctor_id
           LEFT JOIN drmouse_old.doctor_staff_info AS inf ON d.id = inf.doc_id
           WHERE d.parent_doctor_id = 0
+            -- AND EXISTS(SELECT 1 FROM drmouse_old.doctor_price WHERE doctor_id = d.id)
+            -- AND slug = 'mvdr-iveta-tumova-axa1'
         ");
         foreach ($rows as $row) {
 
             // create user
             $user = new App\User();
             $user->password = Hash::make('Furier8');
-            $user->email = empty($row->email) || User::where('email', '=', $row->email) ? $row->slug . '@drmouse.cz' : $row->email;
+            $user->email = empty($row->email) || \App\User::where('email', '=', $row->email) ? $row->slug . '@drmouse.cz' : $row->email;
             $user->name = $row->name;
             $user->avatar = str_replace("https://www.drmouse.cz/new/wp-content/themes/DrMouse2/img/", "", $row->photo_url);
             $user->save();
@@ -38,21 +41,16 @@ class DoctorSeeder extends Seeder
             $doctor = $this->createDoctor($user->id, $row);
 
             // migrate services
-            foreach (DB::select("SELECT service_id, price FROM drmouse_old.doctor_price WHERE doctor_id = " . $row->id) as $item) {
-                \App\Models\DoctorsService::create([
-                    'user_id' => $user->id,
-                    'service_id' => $this->mapService($item->service_id),
-                    'price' => $item->price
-                ]);
-            }
+            $this->createService($user->id, $row->id);
 
             // migrate properties
-            foreach (DB::select("SELECT cat_val_id FROM drmouse_old.doctor_info WHERE doctor_id = " . $row->id) as $item) {
-                \App\Models\DoctorsProperty::create([
-                    'user_id' => $user->id,
-                    'property_id' => $item->cat_val_id
-                ]);
-            }
+            $this->createProperties($user->id, $row->id);
+
+            // migrate opening hours
+            $this->createOpeningHours($user->id, $row->id);
+
+            // migrate images
+            $this->createPhotos($user->id, $row->id);
 
 
 //            dd($doctor);
@@ -66,6 +64,8 @@ class DoctorSeeder extends Seeder
      */
     private function deleteAll()
     {
+        DB::table('photos')->delete();
+        DB::table('opening_hours')->delete();
         DB::table('doctors_properties')->delete();
         DB::table('doctors_services')->delete();
         DB::table('doctors')->delete();
@@ -73,17 +73,16 @@ class DoctorSeeder extends Seeder
     }
 
     /***
-     * Create database record
-     *
+     * Create doctor database record
      * @param int $user_id
      * @param stdClass $data
      * @return \App\Doctor
      */
-    private function createDoctor(int $user_id, stdClass $data) : \App\Doctor
+    private function createDoctor(int $userId, stdClass $data) : \App\Doctor
     {
         return App\Doctor::create([
-            'user_id' => $user_id,
-            'state_id' => $data->status,
+            'user_id' => $userId,
+            'state_id' => $this->mapStatus(intval($data->status)),
             'description' => $data->description,
             'slug' => $data->slug,
             'speaks_english' => $data->speaks_english,
@@ -103,10 +102,108 @@ class DoctorSeeder extends Seeder
             'gdpr_agreed' => 0,
             'gdpr_agreed_date' => null,
             'profile_completedness' => $data->profile_completedness,
-            'created_at' => $data->date_create,
+            'created_at' => ($data->date_create == '0000-00-00 00:00:00' ? $data->date_modified : $data->date_create),
             'updated_at' => $data->date_modified,
             'search_name' => $data->name
         ]);
+    }
+
+    /***
+     * Migrate services     *
+     * @param int $userId
+     * @param int $originalDoctorId
+     */
+    private function createService(int $userId, int $originalDoctorId)
+    {
+        foreach (DB::select("SELECT service_id, price FROM drmouse_old.doctor_price WHERE doctor_id = " . $originalDoctorId) as $item) {
+            if (in_array($item->service_id, [0, 49])) continue; // skip incorrect values
+            try {
+                \App\Models\DoctorsService::create([
+                    'user_id' => $userId,
+                    'service_id' => $this->mapService(intval($item->service_id)),
+                    'price' => $item->price
+                ]);
+            }
+            catch (Throwable $tr) {
+                echo $originalDoctorId;
+                dd($item);
+            }
+
+        }
+    }
+
+
+    /***
+     * Migrate properities
+     * @param int $userId
+     * @param int $originalDoctorId
+     */
+    private function createProperties(int $userId, int $originalDoctorId)
+    {
+        foreach (DB::select("SELECT cat_val_id FROM drmouse_old.doctor_info WHERE doctor_id = " . $originalDoctorId) as $item) {
+            if (in_array($item->cat_val_id, [0, 8, 40, 44, 169, 171])) continue; // skip incorrect values
+            try {
+                \App\Models\DoctorsProperty::create([
+                    'user_id' => $userId,
+                    'property_id' => $item->cat_val_id
+                ]);
+            }
+            catch (Throwable $tr) {
+                echo $originalDoctorId;
+                dd($item);
+            }
+
+        }
+    }
+
+    /***
+     * Migrate opening hours
+     * @param int $userId
+     * @param int $originalDoctorId
+     */
+    private function createOpeningHours(int $userId, int $originalDoctorId)
+    {
+        foreach (DB::select("SELECT weekday_index, opening_hour, closing_hour, is_non_stop, is_closed FROM drmouse_old.doctor_workshift WHERE doctor_id = " . $originalDoctorId) as $item) {
+            \App\Models\OpeningHour::create([
+                'weekday_id' => ($item->weekday_index + 1),
+                'user_id' => $userId,
+                'opening_hours_state_id' => ($item->is_non_stop == 1 ? OpeningHoursState::NONSTOP : ( $item->is_closed == 1 ? OpeningHoursState::CLOSED : OpeningHoursState::OPEN )),
+                'open_at' => $item->opening_hour,
+                'close_at' => $item->closing_hour
+            ]);
+        }
+    }
+
+    /***
+     * Migrate photos
+     * @param int $userId
+     * @param int $originalDoctorId
+     */
+    private function createPhotos(int $userId, int $originalDoctorId)
+    {
+        foreach (DB::select("SELECT image_url, position FROM drmouse_old.doctor_gallery WHERE doctor_id = " . $originalDoctorId) as $item) {
+            \App\Models\Photo::create([
+                'user_id' => $userId,
+                'path' => str_replace('http://www.drmouse.cz/new/wp-content/uploads/', '', $item->image_url),
+                'position' => $item->position
+            ]);
+        }
+    }
+
+    /***
+     * Convert old status to new status
+     * @param int $statusId
+     * @return int
+     */
+    private function mapStatus(int $statusId) : int
+    {
+        switch($statusId) {
+            case 1: return \App\Enum\DoctorStatus::DRAFT;
+            case 2: return \App\Enum\DoctorStatus::PUBLISHED;
+            case 3: return \App\Enum\DoctorStatus::UNPUBLISHED;
+            case -999: return \App\Enum\DoctorStatus::DELETED;
+        }
+        return \App\Enum\DoctorStatus::NEW;
     }
 
     /***

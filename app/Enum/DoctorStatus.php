@@ -4,7 +4,7 @@
 namespace App\Enum;
 
 
-final class DoctorStatus extends Enum
+final class DoctorStatus
 {
     const NEW = 1;
     const DRAFT = 2;
