@@ -24,15 +24,15 @@ class DoctorSeeder extends Seeder
           LEFT JOIN drmouse_old.doctor_address AS a ON d.id = a.doctor_id
           LEFT JOIN drmouse_old.doctor_staff_info AS inf ON d.id = inf.doc_id
           WHERE d.parent_doctor_id = 0
-            -- AND EXISTS(SELECT 1 FROM drmouse_old.doctor_price WHERE doctor_id = d.id)
-            -- AND slug = 'mvdr-iveta-tumova-axa1'
+            -- AND EXISTS(SELECT 1 FROM drmouse_old.doctor_info WHERE doctor_id = d.id)
+            -- AND slug = 'mvdr-zdenek-andreas'
         ");
         foreach ($rows as $row) {
 
             // create user
             $user = new App\User();
             $user->password = Hash::make('Furier8');
-            $user->email = empty($row->email) || \App\User::where('email', '=', $row->email) ? $row->slug . '_' . \Illuminate\Support\Str::random(8) . '@drmouse.cz' : $row->email;
+            $user->email = empty($row->email) || \App\User::where('email', '=', $row->email)->exists() ? $row->slug . '_' . \Illuminate\Support\Str::random(8) . '@drmouse.cz' : $row->email;
             $user->name = $row->name;
             $user->avatar = str_replace("https://www.drmouse.cz/new/wp-content/themes/DrMouse2/img/", "", $row->photo_url);
             $user->save();
@@ -84,7 +84,7 @@ class DoctorSeeder extends Seeder
             'user_id' => $userId,
             'state_id' => $this->mapStatus(intval($data->status)),
             'description' => $data->description,
-            'slug' => $data->slug,
+            'slug' => $this->getSlug($userId, $data->slug),
             'speaks_english' => $data->speaks_english,
             'phone' => $data->phone,
             'second_phone' => $data->phone2,
@@ -102,10 +102,39 @@ class DoctorSeeder extends Seeder
             'gdpr_agreed' => 0,
             'gdpr_agreed_date' => null,
             'profile_completedness' => $data->profile_completedness,
-            'created_at' => ($data->date_create == '0000-00-00 00:00:00' ? $data->date_modified : $data->date_create),
-            'updated_at' => $data->date_modified,
+            'created_at' => $this->convertDate($data->date_create),
+            'updated_at' => $this->convertDate($data->date_modified),
             'search_name' => $data->name
         ]);
+    }
+
+    /***
+     * Genereate unique slug
+     * @param int $userId
+     * @param string $slug
+     * @return string
+     */
+    private function getSlug(int $userId, string $slug) : string
+    {
+        $index = 0;
+        $new_slug = $slug;
+        while ( \App\Doctor::where('slug', '=', $new_slug)->where('user_id', '!=', $userId)->exists() ) {
+            $new_slug = $slug . '-' . ++$index;
+        }
+        return $new_slug;
+    }
+
+    /***
+     * Prevent empty date
+     * @param string $dateString
+     * @return string
+     */
+    private function convertDate(string $dateString) : string
+    {
+        if ($dateString == '0000-00-00 00:00:00') {
+            return date('Y-m-d H:i:s');
+        }
+        return $dateString;
     }
 
     /***
@@ -125,7 +154,6 @@ class DoctorSeeder extends Seeder
                 ]);
             }
             catch (Throwable $tr) {
-                echo $originalDoctorId;
                 dd($item);
             }
 
@@ -141,18 +169,19 @@ class DoctorSeeder extends Seeder
     private function createProperties(int $userId, int $originalDoctorId)
     {
         foreach (DB::select("SELECT cat_val_id FROM drmouse_old.doctor_info WHERE doctor_id = " . $originalDoctorId) as $item) {
-            if (in_array($item->cat_val_id, [0, 8, 40, 44, 169, 171])) continue; // skip incorrect values
-            try {
-                \App\Models\DoctorsProperty::create([
-                    'user_id' => $userId,
-                    'property_id' => $item->cat_val_id
-                ]);
-            }
-            catch (Throwable $tr) {
-                echo $originalDoctorId;
-                dd($item);
-            }
 
+            if ( \App\Property::where('id', '=',  $item->cat_val_id)->exists() )
+            {
+                try {
+                    \App\Models\DoctorsProperty::create([
+                        'user_id' => $userId,
+                        'property_id' => $item->cat_val_id
+                    ]);
+                }
+                catch (Throwable $tr) {
+                    dd($item);
+                }
+            }
         }
     }
 
@@ -164,13 +193,20 @@ class DoctorSeeder extends Seeder
     private function createOpeningHours(int $userId, int $originalDoctorId)
     {
         foreach (DB::select("SELECT weekday_index, opening_hour, closing_hour, is_non_stop, is_closed FROM drmouse_old.doctor_workshift WHERE doctor_id = " . $originalDoctorId) as $item) {
-            \App\Models\OpeningHour::create([
-                'weekday_id' => ($item->weekday_index + 1),
-                'user_id' => $userId,
-                'opening_hours_state_id' => ($item->is_non_stop == 1 ? OpeningHoursState::NONSTOP : ( $item->is_closed == 1 ? OpeningHoursState::CLOSED : OpeningHoursState::OPEN )),
-                'open_at' => $item->opening_hour,
-                'close_at' => $item->closing_hour
-            ]);
+
+            // arrange weekday
+            $weekdayId = $item->weekday_index + 1;
+
+            if ( \App\Weekday::where('id', '=',  $weekdayId)->exists() )
+            {
+                \App\Models\OpeningHour::create([
+                    'weekday_id' => ($item->weekday_index + 1),
+                    'user_id' => $userId,
+                    'opening_hours_state_id' => ($item->is_non_stop == 1 ? OpeningHoursState::NONSTOP : ( $item->is_closed == 1 ? OpeningHoursState::CLOSED : OpeningHoursState::OPEN )),
+                    'open_at' => $item->opening_hour,
+                    'close_at' => $item->closing_hour
+                ]);
+            }
         }
     }
 
