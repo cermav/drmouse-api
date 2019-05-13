@@ -33,6 +33,8 @@
     echo "Linking storage directory"
     rm -rf {{ $new_release_dir }}/storage
     ln -nfs {{ $app_dir }}/storage {{ $new_release_dir }}/storage
+    ln -s {{ $new_release_dir }}/storage/app/public {{ $new_release_dir }}/public/storage
+
 
     echo 'Linking .env file'
     ln -nfs {{ $app_dir }}/.env {{ $new_release_dir }}/.env
