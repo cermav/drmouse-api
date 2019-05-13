@@ -11,8 +11,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-
-        /*
         $this->call( WeekdaysTableSeeder::class );
         $this->call(OpeningHoursStatesTableSeeder::class);
 
@@ -40,12 +38,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(TranslationsTableSeeder::class);
 
-
-
-*/
-
-        $this->call(DoctorSeeder::class);
-
-
+        // $this->call(DoctorSeeder::class);
     }
 }
