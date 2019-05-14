@@ -47,7 +47,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 0,
                 'delete' => 0,
                 'details' => '{}',
-                'order' => 3,
+                'order' => 4,
             ),
             2 => 
             array (
@@ -58,19 +58,19 @@ class DataRowsTableSeeder extends Seeder
                 'display_name' => 'State Id',
                 'required' => 1,
                 'browse' => 0,
-                'read' => 1,
-                'edit' => 1,
-                'add' => 1,
+                'read' => 0,
+                'edit' => 0,
+                'add' => 0,
                 'delete' => 0,
                 'details' => '{}',
-                'order' => 4,
+                'order' => 5,
             ),
             3 => 
             array (
                 'id' => 102,
                 'data_type_id' => 4,
                 'field' => 'description',
-                'type' => 'text',
+                'type' => 'text_area',
                 'display_name' => 'Description',
                 'required' => 1,
                 'browse' => 0,
@@ -79,7 +79,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 5,
+                'order' => 6,
             ),
             4 => 
             array (
@@ -95,14 +95,14 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 6,
+                'order' => 7,
             ),
             5 => 
             array (
                 'id' => 104,
                 'data_type_id' => 4,
                 'field' => 'speaks_english',
-                'type' => 'text',
+                'type' => 'checkbox',
                 'display_name' => 'Speaks English',
                 'required' => 1,
                 'browse' => 0,
@@ -111,7 +111,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 7,
+                'order' => 8,
             ),
             6 => 
             array (
@@ -127,7 +127,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 8,
+                'order' => 9,
             ),
             7 => 
             array (
@@ -143,7 +143,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 9,
+                'order' => 10,
             ),
             8 => 
             array (
@@ -159,7 +159,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 10,
+                'order' => 11,
             ),
             9 => 
             array (
@@ -168,23 +168,7 @@ class DataRowsTableSeeder extends Seeder
                 'field' => 'street',
                 'type' => 'text',
                 'display_name' => 'Street',
-                'required' => 1,
-                'browse' => 0,
-                'read' => 1,
-                'edit' => 1,
-                'add' => 1,
-                'delete' => 1,
-                'details' => '{}',
-                'order' => 11,
-            ),
-            10 => 
-            array (
-                'id' => 109,
-                'data_type_id' => 4,
-                'field' => 'city',
-                'type' => 'text',
-                'display_name' => 'City',
-                'required' => 1,
+                'required' => 0,
                 'browse' => 0,
                 'read' => 1,
                 'edit' => 1,
@@ -193,14 +177,14 @@ class DataRowsTableSeeder extends Seeder
                 'details' => '{}',
                 'order' => 12,
             ),
-            11 => 
+            10 => 
             array (
-                'id' => 110,
+                'id' => 109,
                 'data_type_id' => 4,
-                'field' => 'country',
+                'field' => 'city',
                 'type' => 'text',
-                'display_name' => 'Country',
-                'required' => 1,
+                'display_name' => 'City',
+                'required' => 0,
                 'browse' => 0,
                 'read' => 1,
                 'edit' => 1,
@@ -209,14 +193,14 @@ class DataRowsTableSeeder extends Seeder
                 'details' => '{}',
                 'order' => 13,
             ),
-            12 => 
+            11 => 
             array (
-                'id' => 111,
+                'id' => 110,
                 'data_type_id' => 4,
-                'field' => 'post_code',
+                'field' => 'country',
                 'type' => 'text',
-                'display_name' => 'Post Code',
-                'required' => 1,
+                'display_name' => 'Country',
+                'required' => 0,
                 'browse' => 0,
                 'read' => 1,
                 'edit' => 1,
@@ -224,6 +208,22 @@ class DataRowsTableSeeder extends Seeder
                 'delete' => 1,
                 'details' => '{}',
                 'order' => 14,
+            ),
+            12 => 
+            array (
+                'id' => 111,
+                'data_type_id' => 4,
+                'field' => 'post_code',
+                'type' => 'text',
+                'display_name' => 'Post Code',
+                'required' => 0,
+                'browse' => 0,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 1,
+                'delete' => 1,
+                'details' => '{}',
+                'order' => 15,
             ),
             13 => 
             array (
@@ -239,7 +239,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 15,
+                'order' => 16,
             ),
             14 => 
             array (
@@ -255,14 +255,14 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 16,
+                'order' => 17,
             ),
             15 => 
             array (
                 'id' => 114,
                 'data_type_id' => 4,
                 'field' => 'working_doctors_count',
-                'type' => 'text',
+                'type' => 'number',
                 'display_name' => 'Working Doctors Count',
                 'required' => 0,
                 'browse' => 0,
@@ -271,7 +271,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 17,
+                'order' => 18,
             ),
             16 => 
             array (
@@ -287,31 +287,15 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 18,
+                'order' => 19,
             ),
             17 => 
             array (
                 'id' => 116,
                 'data_type_id' => 4,
                 'field' => 'nurses_count',
-                'type' => 'text',
+                'type' => 'number',
                 'display_name' => 'Nurses Count',
-                'required' => 0,
-                'browse' => 0,
-                'read' => 1,
-                'edit' => 1,
-                'add' => 1,
-                'delete' => 1,
-                'details' => '{}',
-                'order' => 19,
-            ),
-            18 => 
-            array (
-                'id' => 117,
-                'data_type_id' => 4,
-                'field' => 'other_workers_count',
-                'type' => 'text',
-                'display_name' => 'Other Workers Count',
                 'required' => 0,
                 'browse' => 0,
                 'read' => 1,
@@ -321,14 +305,14 @@ class DataRowsTableSeeder extends Seeder
                 'details' => '{}',
                 'order' => 20,
             ),
-            19 => 
+            18 => 
             array (
-                'id' => 118,
+                'id' => 117,
                 'data_type_id' => 4,
-                'field' => 'gdpr_agreed',
-                'type' => 'text',
-                'display_name' => 'Gdpr Agreed',
-                'required' => 1,
+                'field' => 'other_workers_count',
+                'type' => 'number',
+                'display_name' => 'Other Workers Count',
+                'required' => 0,
                 'browse' => 0,
                 'read' => 1,
                 'edit' => 1,
@@ -337,13 +321,13 @@ class DataRowsTableSeeder extends Seeder
                 'details' => '{}',
                 'order' => 21,
             ),
-            20 => 
+            19 => 
             array (
-                'id' => 119,
+                'id' => 118,
                 'data_type_id' => 4,
-                'field' => 'gdpr_agreed_date',
-                'type' => 'text',
-                'display_name' => 'Gdpr Agreed Date',
+                'field' => 'gdpr_agreed',
+                'type' => 'checkbox',
+                'display_name' => 'Gdpr Agreed',
                 'required' => 1,
                 'browse' => 0,
                 'read' => 1,
@@ -353,12 +337,28 @@ class DataRowsTableSeeder extends Seeder
                 'details' => '{}',
                 'order' => 22,
             ),
+            20 => 
+            array (
+                'id' => 119,
+                'data_type_id' => 4,
+                'field' => 'gdpr_agreed_date',
+                'type' => 'date',
+                'display_name' => 'Gdpr Agreed Date',
+                'required' => 0,
+                'browse' => 0,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 1,
+                'delete' => 1,
+                'details' => '{}',
+                'order' => 23,
+            ),
             21 => 
             array (
                 'id' => 120,
                 'data_type_id' => 4,
                 'field' => 'profile_completedness',
-                'type' => 'text',
+                'type' => 'number',
                 'display_name' => 'Profile Completedness',
                 'required' => 1,
                 'browse' => 0,
@@ -367,7 +367,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 23,
+                'order' => 24,
             ),
             22 => 
             array (
@@ -383,7 +383,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 0,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 24,
+                'order' => 25,
             ),
             23 => 
             array (
@@ -399,7 +399,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 0,
                 'delete' => 0,
                 'details' => '{}',
-                'order' => 25,
+                'order' => 26,
             ),
             24 => 
             array (
@@ -415,7 +415,7 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{}',
-                'order' => 26,
+                'order' => 27,
             ),
             25 => 
             array (
@@ -431,6 +431,22 @@ class DataRowsTableSeeder extends Seeder
                 'add' => 1,
                 'delete' => 1,
                 'details' => '{"model":"App\\\\User","table":"users","type":"belongsTo","column":"user_id","key":"id","label":"name","pivot_table":"czech_names","pivot":"0","taggable":"0"}',
+                'order' => 3,
+            ),
+            26 => 
+            array (
+                'id' => 125,
+                'data_type_id' => 4,
+                'field' => 'doctor_hasone_state_relationship',
+                'type' => 'relationship',
+                'display_name' => 'states',
+                'required' => 0,
+                'browse' => 1,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 1,
+                'delete' => 1,
+                'details' => '{"model":"App\\\\Models\\\\State","table":"states","type":"belongsTo","column":"state_id","key":"id","label":"name","pivot_table":"czech_names","pivot":"0","taggable":"0"}',
                 'order' => 2,
             ),
         ));

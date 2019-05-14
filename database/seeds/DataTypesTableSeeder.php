@@ -81,13 +81,13 @@ class DataTypesTableSeeder extends Seeder
                 'icon' => 'voyager-people',
                 'model_name' => 'App\\Doctor',
                 'policy_name' => NULL,
-                'controller' => NULL,
+                'controller' => 'Voyager\\DoctorController',
                 'description' => NULL,
                 'generate_permissions' => 1,
-                'server_side' => 0,
-                'details' => '{"order_column":null,"order_display_column":null,"order_direction":"asc","default_search_key":null}',
+                'server_side' => 1,
+                'details' => '{"order_column":"created_at","order_display_column":null,"order_direction":"asc","default_search_key":null}',
                 'created_at' => '2019-01-24 13:23:41',
-                'updated_at' => '2019-01-24 14:59:43',
+                'updated_at' => '2019-05-14 09:06:33',
             ),
         ));
         

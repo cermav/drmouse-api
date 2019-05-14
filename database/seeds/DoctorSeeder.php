@@ -69,7 +69,7 @@ class DoctorSeeder extends Seeder
         DB::table('doctors_properties')->delete();
         DB::table('doctors_services')->delete();
         DB::table('doctors')->delete();
-        DB::table('users')->delete();
+        DB::table('users')->where('role_id', '=', 2)->delete();
     }
 
     /***
