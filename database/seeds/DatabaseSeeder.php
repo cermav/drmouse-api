@@ -39,5 +39,6 @@ class DatabaseSeeder extends Seeder
         $this->call(TranslationsTableSeeder::class);
 
         // $this->call(DoctorSeeder::class);
+        $this->call(WeekdaysTableSeeder::class);
     }
 }

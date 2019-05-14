@@ -1,24 +1,59 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class ScoreItemsTableSeeder extends Seeder
 {
+
     /**
-     * Run the database seeds.
+     * Auto generated seed file
      *
      * @return void
      */
     public function run()
     {
-        DB::table('score_items')->delete();
-        DB::table('score_items')->insert([
-            ['title' => 'Čistota', 'created_at' => date("Y-m-d H:i:s")],
-            ['title' => 'Ochota personálu', 'created_at' => date("Y-m-d H:i:s")],
-            ['title' => 'Doba čekání na oštření', 'created_at' => date("Y-m-d H:i:s")],
-            ['title' => 'Prostředí a vybavení kliniky', 'created_at' => date("Y-m-d H:i:s")],
-            ['title' => 'Efektivita ošetření / léčby', 'created_at' => date("Y-m-d H:i:s")],
-        ]);
+        
+
+        \DB::table('score_items')->delete();
+        
+        \DB::table('score_items')->insert(array (
+            0 => 
+            array (
+                'id' => 1,
+                'title' => 'Čistota',
+                'created_at' => '2019-01-24 11:10:51',
+                'updated_at' => NULL,
+            ),
+            1 => 
+            array (
+                'id' => 2,
+                'title' => 'Ochota personálu',
+                'created_at' => '2019-01-24 11:10:51',
+                'updated_at' => NULL,
+            ),
+            2 => 
+            array (
+                'id' => 3,
+                'title' => 'Doba čekání na oštření',
+                'created_at' => '2019-01-24 11:10:51',
+                'updated_at' => NULL,
+            ),
+            3 => 
+            array (
+                'id' => 4,
+                'title' => 'Prostředí a vybavení kliniky',
+                'created_at' => '2019-01-24 11:10:51',
+                'updated_at' => NULL,
+            ),
+            4 => 
+            array (
+                'id' => 5,
+                'title' => 'Efektivita ošetření / léčby',
+                'created_at' => '2019-01-24 11:10:51',
+                'updated_at' => NULL,
+            ),
+        ));
+        
+        
     }
 }
