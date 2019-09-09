@@ -36,7 +36,7 @@ class DoctorController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        return Doctor::where(['id', $id])->firstOrFail();
+        return Doctor::where('id', $id)->firstOrFail();
     }
 
     /**
