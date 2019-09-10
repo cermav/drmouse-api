@@ -16,7 +16,7 @@ class DoctorController extends Controller {
      */
     public function index() {
         $whereArray = [['state_id', '=', 3]];
-        return DoctorResource::collection(Doctor::where($whereArray)->take(20)->get());
+        return Doctor::where($whereArray)->take(20)->get();
     }
 
     /**
@@ -36,7 +36,8 @@ class DoctorController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        return Doctor::where('id', $id)->firstOrFail();
+        //return DoctorResource::collection(Doctor::where('id', $id)->firstOrFail());
+        return DoctorResource::collection( Doctor::where('id', $id)->get() )->first();
     }
 
     /**
