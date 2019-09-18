@@ -32,7 +32,8 @@ class DoctorSeeder extends Seeder
             // create user
             $user = new App\User();
             $user->password = Hash::make('Furier8');
-            $user->email = empty($row->email) || \App\User::where('email', '=', $row->email)->exists() ? $row->slug . '_' . \Illuminate\Support\Str::random(8) . '@drmouse.cz' : $row->email;
+            // $user->email = empty($row->email) || \App\User::where('email', '=', $row->email)->exists() ? $row->slug . '_' . \Illuminate\Support\Str::random(8) . '@drmouse.cz' : $row->email;
+            $user->email = empty($row->email) ? $row->slug . '_' . \Illuminate\Support\Str::random(8) . '@drmouse.cz' : $row->email;
             $user->name = $row->name;
             $user->avatar = str_replace("https://www.drmouse.cz/new/wp-content/themes/DrMouse2/img/", "", $row->photo_url);
             $user->save();
