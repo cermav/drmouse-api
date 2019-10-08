@@ -14,10 +14,11 @@ use Illuminate\Http\Request;
 */
 
 /* Scores */
-Route::apiResource('scores', 'API\ScoreController');
+Route::apiResource('scores', 'Api\ScoreController');
 
 /* Doctors */
-Route::apiResource('doctors', 'API\DoctorController');
+Route::apiResource('doctors', 'Api\DoctorController');
+Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 
 
 /* Api for mobile application */

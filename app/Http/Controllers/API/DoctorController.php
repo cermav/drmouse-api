@@ -9,6 +9,8 @@ use App\Http\Resources\DoctorResource;
 
 class DoctorController extends Controller {
 
+    private $pageLimit = 30;
+
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +18,7 @@ class DoctorController extends Controller {
      */
     public function index() {
         $whereArray = [['state_id', '=', 3]];
-        return Doctor::where($whereArray)->take(20)->get();
+        return Doctor::where($whereArray)->paginate($this->pageLimit);
     }
 
     /**
@@ -36,8 +38,25 @@ class DoctorController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        //return DoctorResource::collection(Doctor::where('id', $id)->firstOrFail());
-        return DoctorResource::collection( Doctor::where('id', $id)->get() )->first();
+
+        $doctor = Doctor::where('id', $id)->get();
+        if (sizeof($doctor) > 0) {
+            return DoctorResource::collection( $doctor )->first();
+        }
+        return response()->json(['message' => 'Not Found!'], 404);
+    }
+
+    /**
+     * Display doctor by slug
+     * @param $slug
+     */
+    public function showBySlug($slug)
+    {
+        $doctor = Doctor::where('slug', $slug)->get();
+        if (sizeof($doctor) > 0) {
+            return DoctorResource::collection( $doctor )->first();
+        }
+        return response()->json(['message' => 'Not Found!'], 404);
     }
 
     /**
