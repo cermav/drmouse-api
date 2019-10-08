@@ -1,9 +1,9 @@
 @servers(['web' => 'deployer@10.0.0.9'])
 
 @setup
-    $repository = 'git@gitlab.code8.cz:burt/drmouse.git';
-    $releases_dir = '/var/www/drmouse/releases';
-    $app_dir = '/var/www/drmouse';
+    $repository = 'git@gitlab.code8.cz:burt/drmouse-api.git';
+    $releases_dir = '/var/www/drmouse-api/releases';
+    $app_dir = '/var/www/drmouse-api';
     $release = date('YmdHis');
     $new_release_dir = $releases_dir .'/'. $release;
 @endsetup
