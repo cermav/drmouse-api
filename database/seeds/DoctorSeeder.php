@@ -223,11 +223,25 @@ class DoctorSeeder extends Seeder
     private function createPhotos(int $userId, int $originalDoctorId)
     {
         foreach (DB::select("SELECT image_url, position FROM drmouse_old.doctor_gallery WHERE doctor_id = " . $originalDoctorId) as $item) {
-            \App\Models\Photo::create([
-                'user_id' => $userId,
-                'path' => str_replace('http://www.drmouse.cz/new/wp-content/uploads/', '', $item->image_url),
-                'position' => $item->position
-            ]);
+
+            try {
+
+                // get relative path to image
+                $path = str_replace('https://www.drmouse.cz/wp-content/uploads/', '', $item->image_url);
+                $path = str_replace('https://www.drmouse.cz/new/wp-content/uploads/', '', $path);
+
+                // save file to disk
+                Storage::disk('public')->put($path, file_get_contents($item->image_url));
+
+                \App\Models\Photo::create([
+                    'user_id' => $userId,
+                    'path' => $path,
+                    'position' => $item->position
+                ]);
+            }
+            catch (Exception $ex) {
+               error_log("Import image error (" . $ex->getMessage() . ") - " . $item->image_url);
+            }
         }
     }
 
