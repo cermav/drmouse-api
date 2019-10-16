@@ -24,6 +24,10 @@ class DoctorSeeder extends Seeder
           LEFT JOIN drmouse_old.doctor_address AS a ON d.id = a.doctor_id
           LEFT JOIN drmouse_old.doctor_staff_info AS inf ON d.id = inf.doc_id
           WHERE d.parent_doctor_id = 0
+          
+          ORDER BY d.name
+          
+          
             -- AND EXISTS(SELECT 1 FROM drmouse_old.doctor_info WHERE doctor_id = d.id)
             -- AND slug = 'mvdr-zdenek-andreas'
         ");

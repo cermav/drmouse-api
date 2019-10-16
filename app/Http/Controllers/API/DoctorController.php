@@ -17,7 +17,7 @@ class DoctorController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $whereArray = [['state_id', '=', 3]];
+        $whereArray = [['state_id', '=', 1]];
         return Doctor::where($whereArray)->paginate($this->pageLimit);
     }
 
