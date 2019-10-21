@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Doctor;
 use App\Http\Resources\DoctorResource;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class DoctorController extends Controller {
 
@@ -16,9 +19,67 @@ class DoctorController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
-        $whereArray = [['state_id', '=', 1]];
-        return Doctor::where($whereArray)->paginate($this->pageLimit);
+    public function index(Request $request)
+    {
+        // prepare basid select
+        $doctors = DB::table('doctors')
+            ->select(
+                'doctors.id', 'name', 'slug', 'street', 'city', 'country', 'post_code', 'avatar',
+                DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties")
+            )
+            ->join('users', 'doctors.user_id', '=', 'users.id')
+            ->where('doctors.state_id', 1);
+
+        // add fulltext condition
+        if ($request->has('fulltext')) {
+            $doctors->whereRaw(
+                "MATCH (search_name, description, street, city, country) AGAINST (? IN NATURAL LANGUAGE MODE)",
+                trim($request->input('fulltext'))
+            );
+            /*
+            $doctors->where(function ($query) use ($request) {
+                $query->where('doctors.search_name', 'like', '%' . trim($request->input('fulltext')) . '%')
+                    ->orWhere('doctors.description', 'like', '%' . trim($request->input('fulltext')) . '%')
+                    ->orWhere('doctors.street', 'like', '%' . trim($request->input('fulltext')) . '%')
+                    ->orWhere('doctors.city', 'like', '%' . trim($request->input('fulltext')) . '%')
+                    ->orWhere('doctors.country', 'like', '%' . trim($request->input('fulltext')) . '%');
+            });
+            */
+        }
+
+        // add specialization condition
+        if ($request->has('spec') && intval($request->input('spec')) > 0) {
+            $doctors->whereExists(function ($query) use ($request) {
+                $query->select(DB::raw(1))
+                    ->from('doctors_properties')
+                    ->where([
+                        ['doctors_properties.user_id', '=', 'users.id'],
+                        ['doctors_properties.property_id', '=', intval($request->input('spec'))]
+                    ]);
+            });
+        }
+
+        // add experience condition
+        if ($request->has('exp') && intval($request->input('exp')) > 0) {
+            $doctors->whereExists(function ($query) use ($request) {
+                $query->select(DB::raw(1))
+                    ->from('doctors_properties')
+                    ->where([
+                        ['doctors_properties.user_id', '=', 'users.id'],
+                        ['doctors_properties.property_id', '=', intval($request->input('exp'))]
+                    ]);
+            });
+        }
+
+        // sorting
+        $order_fields = [];
+        if ($request->has('order') && in_array(trim($request->input('order')), $order_fields)) {
+            $direction = $request->has('dir') && strtolower(trim($request->input('dir') == 'desc')) ? 'desc' : 'asc';
+            $doctors->orderBy(trim($request->input('order')), $direction);
+        }
+
+
+        return $doctors->paginate($this->pageLimit);
     }
 
     /**

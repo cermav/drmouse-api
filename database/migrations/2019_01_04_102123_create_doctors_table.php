@@ -20,6 +20,7 @@ class CreateDoctorsTable extends Migration {
             $table->integer('state_id')->unsigned();
             $table->foreign('state_id')->references('id')
                     ->on('states')->onDelete('cascade');
+            $table->string('search_name')->collation('utf8_general_ci')->nullable(true);
             $table->text('description')->collation('utf8_general_ci')->nullable(false);
             $table->string('slug')->nullable(false)->unique();
             $table->boolean('speaks_english')->nullable(false)->default(0);
@@ -41,6 +42,8 @@ class CreateDoctorsTable extends Migration {
             $table->integer('profile_completedness')->nullable(false)->default(0);
             $table->timestamps();
         });
+
+        DB::statement('ALTER TABLE doctors ADD FULLTEXT search_data(search_name, description, street, city, country)');
     }
 
     /**
