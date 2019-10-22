@@ -31,20 +31,11 @@ class DoctorController extends Controller {
             ->where('doctors.state_id', 1);
 
         // add fulltext condition
-        if ($request->has('fulltext')) {
+        if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2 ) {
             $doctors->whereRaw(
                 "MATCH (search_name, description, street, city, country) AGAINST (? IN NATURAL LANGUAGE MODE)",
                 trim($request->input('fulltext'))
             );
-            /*
-            $doctors->where(function ($query) use ($request) {
-                $query->where('doctors.search_name', 'like', '%' . trim($request->input('fulltext')) . '%')
-                    ->orWhere('doctors.description', 'like', '%' . trim($request->input('fulltext')) . '%')
-                    ->orWhere('doctors.street', 'like', '%' . trim($request->input('fulltext')) . '%')
-                    ->orWhere('doctors.city', 'like', '%' . trim($request->input('fulltext')) . '%')
-                    ->orWhere('doctors.country', 'like', '%' . trim($request->input('fulltext')) . '%');
-            });
-            */
         }
 
         // add specialization condition

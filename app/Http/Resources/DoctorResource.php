@@ -15,9 +15,15 @@ class DoctorResource extends JsonResource
     public function toArray($request)
     {
         $openingHours = $this->user->openingHours;
-        $properties = $this->user->properties()->where('is_approved', 1)->get();
+        $all_properties = $this->user->properties()->where('is_approved', 1)->get();
         $services = $this->user->services()->where('is_approved', 1)->get();
         $photos = $this->user->photos;
+
+        // split properties
+        $properties = [];
+        foreach ($all_properties as $item) {
+            $properties[$item->property_category_id][] = (object)['id' => $item->id, 'name' => $item->name];
+        }
 
         return [
 
@@ -50,7 +56,7 @@ class DoctorResource extends JsonResource
 
             'opening_hours' => OpeningHoursResource::collection($openingHours),
 
-            'staf_info' => [
+            'staff_info' => [
                 'doctors_count' => $this->working_doctors_count,
                 'doctors_names' => $this->working_doctors_names,
                 'nurses_count' => $this->nurses_count,
@@ -61,7 +67,11 @@ class DoctorResource extends JsonResource
 
             'gallery' => PhotoResource::collection($photos),
 
-            'properties' => PropertyResource::collection($properties),
+            'properties' => [
+                'equipment' => $properties[1],
+                'expertise' => $properties[2],
+                'specialization' => $properties[3]
+            ],
 
             'gdpr' => [
                 'agreed' => $this->gdpr_agreed,
