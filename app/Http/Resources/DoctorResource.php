@@ -22,7 +22,7 @@ class DoctorResource extends JsonResource
         // split properties
         $properties = [];
         foreach ($all_properties as $item) {
-            $properties[$item->property_category_id][] = (object)['id' => $item->id, 'name' => $item->name];
+            $properties[$item->property_category_id][] = (object) ['id' => $item->id, 'name' => $item->name];
         }
 
         return [
@@ -68,9 +68,9 @@ class DoctorResource extends JsonResource
             'gallery' => PhotoResource::collection($photos),
 
             'properties' => [
-                'equipment' => $properties[1],
-                'expertise' => $properties[2],
-                'specialization' => $properties[3]
+                'equipment' => array_key_exists(1, $properties) ? $properties[1] : [],
+                'expertise' => array_key_exists(2, $properties) ? $properties[2] : [],
+                'specialization' => array_key_exists(3, $properties) ? $properties[3] : []
             ],
 
             'gdpr' => [
