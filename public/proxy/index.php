@@ -1,6 +1,6 @@
 <?php
 
-define('REMOTE_SERVER', 'https://api.drmouse.code8.link/');
+define('REMOTE_SERVER', 'http://cockpit.code8.cz/');
 
 // Allow from any origin
 if (isset($_SERVER['HTTP_ORIGIN'])) {
