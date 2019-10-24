@@ -20,6 +20,14 @@ Route::apiResource('scores', 'Api\ScoreController');
 Route::apiResource('doctors', 'Api\DoctorController');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 
+Route::post('/register', 'Api\AuthController@register');
+Route::post('auth/login', 'Api\AuthController@login');
+
+Route::group(['middleware' => ['jwt.auth']], function() {
+    Route::get('auth/refresh', 'Api\AuthController@refresh');
+    Route::get('auth/logout', 'Api\AuthController@logout');
+});
+
 
 /* Api for mobile application */
 Route::group(['prefix' => 'mobile'], function() {

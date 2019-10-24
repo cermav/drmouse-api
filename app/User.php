@@ -5,8 +5,9 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends \TCG\Voyager\Models\User {
+class User extends \TCG\Voyager\Models\User implements JWTSubject {
 
     use Notifiable;
 
@@ -62,12 +63,28 @@ class User extends \TCG\Voyager\Models\User {
     public function photos() {
         return $this->hasMany('App\Photo');
     }
-    
+
     /**
      * Get doctor's score
      */
     public function scores() {
         return $this->hasMany('App\Score')->orderBy('created_at', 'desc');
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [
+            'id' => $this->id,
+            'role_id' => $this->role_id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'avatar' => $this->avatar
+        ];
     }
 
 }
