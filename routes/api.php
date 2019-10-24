@@ -13,10 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
-/* Scores */
+/* Api for web */
 Route::apiResource('scores', 'Api\ScoreController');
-
-/* Doctors */
+Route::apiResource('properties', 'Api\PropertyController');
+Route::apiResource('services', 'Api\ServiceController');
 Route::apiResource('doctors', 'Api\DoctorController');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 
