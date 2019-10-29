@@ -101,7 +101,7 @@ class DoctorController extends Controller
     public function show($id)
     {
 
-        $doctor = Doctor::where('user_id', $id)->get();
+        $doctor = Doctor::where(['user_id' => $id, 'status_id' => 1])->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
