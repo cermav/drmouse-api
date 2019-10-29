@@ -10,7 +10,8 @@ use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class DoctorController extends Controller {
+class DoctorController extends Controller
+{
 
     private $pageLimit = 30;
 
@@ -21,17 +22,24 @@ class DoctorController extends Controller {
      */
     public function index(Request $request)
     {
-        // prepare basid select
+        // prepare basic select
         $doctors = DB::table('doctors')
             ->select(
-                'doctors.id', 'name', 'slug', 'street', 'city', 'country', 'post_code', 'avatar',
+                'users.id',
+                'name',
+                'slug',
+                'street',
+                'city',
+                'country',
+                'post_code',
+                'avatar',
                 DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties")
             )
             ->join('users', 'doctors.user_id', '=', 'users.id')
             ->where('doctors.state_id', 1);
 
         // add fulltext condition
-        if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2 ) {
+        if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
             $doctors->whereRaw(
                 "MATCH (search_name, description, street, city, country) AGAINST (? IN NATURAL LANGUAGE MODE)",
                 trim($request->input('fulltext'))
@@ -79,7 +87,8 @@ class DoctorController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         return response()->json(null, 501);
     }
 
@@ -89,11 +98,12 @@ class DoctorController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id) {
+    public function show($id)
+    {
 
-        $doctor = Doctor::where('id', $id)->get();
+        $doctor = Doctor::where(['user_id', '=', $id], ['state_id', '=', '1'])->get();
         if (sizeof($doctor) > 0) {
-            return DoctorResource::collection( $doctor )->first();
+            return DoctorResource::collection($doctor)->first();
         }
         return response()->json(['message' => 'Not Found!'], 404);
     }
@@ -106,7 +116,7 @@ class DoctorController extends Controller {
     {
         $doctor = Doctor::where('slug', $slug)->get();
         if (sizeof($doctor) > 0) {
-            return DoctorResource::collection( $doctor )->first();
+            return DoctorResource::collection($doctor)->first();
         }
         return response()->json(['message' => 'Not Found!'], 404);
     }
@@ -118,7 +128,8 @@ class DoctorController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         return response()->json(null, 501);
     }
 
@@ -128,8 +139,8 @@ class DoctorController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id) {
+    public function destroy($id)
+    {
         return response()->json(null, 501);
     }
-
 }
