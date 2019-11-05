@@ -13,7 +13,9 @@
         "laravel/framework": "5.7.*",
         "laravel/tinker": "^1.0",
         "lorisleiva/laravel-deployer": "^0.2.5",
+        "mll-lab/laravel-graphql-playground": "^1.1",
         "orangehill/iseed": "^2.6",
+        "rebing/graphql-laravel": "^3.1",
         "reliese/laravel": "^0.0.13",
         "tcg/voyager": "^1.1",
         "tymon/jwt-auth": "1.0.*"
