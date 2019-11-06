@@ -19,6 +19,7 @@ Route::apiResource('properties', 'Api\PropertyController');
 Route::apiResource('services', 'Api\ServiceController');
 Route::apiResource('doctors', 'Api\DoctorController');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
+Route::get('all-doctors', 'Api\DoctorController@showAll');
 
 Route::post('/register', 'Api\AuthController@register');
 Route::post('auth/login', 'Api\AuthController@login');

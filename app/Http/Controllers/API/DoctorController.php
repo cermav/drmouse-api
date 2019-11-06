@@ -108,6 +108,50 @@ class DoctorController extends Controller
         return response()->json(['message' => 'Not Found!'], 404);
     }
 
+    public function showAll()
+    {
+        // prepare basic select
+        $doctors = DB::table('doctors')
+            ->select(
+                'users.id',
+                'name',
+                'slug',
+                'street',
+                'city',
+                'post_code',
+                'latitude',
+                'longitude',
+                DB::raw("IFNULL((
+                    SELECT true
+                    FROM opening_hours
+                    WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                    LIMIT 1)
+                  , false) AS open ")
+            )
+            ->join('users', 'doctors.user_id', '=', 'users.id')
+            ->where('doctors.state_id', 1);
+
+        /*
+         DB::raw("(
+                    SELECT 1
+                    FROM opening_hours
+                    WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                  ) AS open ")
+         */
+
+        return $doctors->get();
+    }
+
     /**
      * Display doctor by slug
      * @param $slug
