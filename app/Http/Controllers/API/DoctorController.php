@@ -33,7 +33,18 @@ class DoctorController extends Controller
                 'country',
                 'post_code',
                 'avatar',
-                DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties")
+                DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties"),
+                DB::raw("IFNULL((
+                    SELECT true
+                    FROM opening_hours
+                    WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                    LIMIT 1)
+                  , false) AS open ")
             )
             ->join('users', 'doctors.user_id', '=', 'users.id')
             ->where('doctors.state_id', 1);
