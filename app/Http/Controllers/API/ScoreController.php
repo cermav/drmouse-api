@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\ScoreItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use App\Score;
 use App\ScoreDetail;
@@ -32,6 +33,9 @@ class ScoreController extends Controller {
      */
     public function show(int $id)
     {
+
+//                DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties"),
+
         $dateFrom = Input::get('date_from');
         $whereArray = [['is_approved', '=', 1]];
         array_push($whereArray, ['user_id', '=', $id]);
@@ -39,7 +43,10 @@ class ScoreController extends Controller {
             array_push($whereArray, ['created_at', '>', $dateFrom]);
         }
         //var_dump(Score::where($whereArray));die;
-        return ScoreResource::collection(Score::where($whereArray)->get());
+        return ScoreResource::collection(Score::select(
+            'id', 'user_id', 'comment', 'ip_address', 'created_at', 'updated_at',
+            DB::raw("(SELECT SUM(value) FROM score_votes WHERE score_id = scores.id) AS voting")
+        )->where($whereArray)->get());
     }
 
     /**
