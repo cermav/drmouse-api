@@ -16,5 +16,17 @@ class ScoreController extends Controller
     public function index(Request $request)
     {
         return response()->json(ScoreItem::get());
+
+        $userId = Input::get('user_id');
+        $dateFrom = Input::get('date_from');
+        $whereArray = [['is_approved', '=', 1]];
+        if ($userId) {
+            array_push($whereArray, ['user_id', '=', $userId]);
+        }
+        if ($dateFrom) {
+            array_push($whereArray, ['created_at', '>', $dateFrom]);
+        }
+        //var_dump(Score::where($whereArray));die;
+        return ScoreResource::collection(Score::where($whereArray)->get());
     }
 }

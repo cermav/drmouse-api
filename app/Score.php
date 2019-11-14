@@ -13,9 +13,9 @@ class Score extends Model
      * @var array
      */
     protected $fillable = [
-        'comment', 'ip_address', 'is_approved', 'user_id'
+        'user_id', 'author_id', 'comment', 'ip_address', 'is_approved'
     ];
-    
+
     /*
      * Specify default order
      * Use Score::withoutGlobalScope('order')->get() if you don't want to apply default order rules
@@ -26,14 +26,14 @@ class Score extends Model
             $builder->orderBy('created_at', 'desc');
         });
     }
-    
+
     /**
      * Get score details
      */
     public function details() {
         return $this->hasMany('App\ScoreDetail');
     }
-    
+
     /**
      * Get user who added the score
      */

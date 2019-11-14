@@ -14,19 +14,31 @@ use Illuminate\Http\Request;
 */
 
 /* Api for web */
-Route::apiResource('scores', 'Api\ScoreController');
 Route::apiResource('properties', 'Api\PropertyController');
 Route::apiResource('services', 'Api\ServiceController');
+
 Route::apiResource('doctors', 'Api\DoctorController');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 Route::get('all-doctors', 'Api\DoctorController@showAll');
+
+// score
+Route::put('score/{id}', 'Api\ScoreController@update'); // should be under auth, but it is not working now
+Route::get('score', 'Api\ScoreController@index');
+Route::get('score/{id}', 'Api\ScoreController@show');
+Route::post('score', 'Api\ScoreController@store');
 
 Route::post('/register', 'Api\AuthController@register');
 Route::post('auth/login', 'Api\AuthController@login');
 
 Route::group(['middleware' => ['jwt.auth']], function() {
+
+    // auth
     Route::get('auth/refresh', 'Api\AuthController@refresh');
     Route::get('auth/logout', 'Api\AuthController@logout');
+
+    // score
+    Route::delete('score/{id}', 'Api\ScoreController@delete');
+
 });
 
 
