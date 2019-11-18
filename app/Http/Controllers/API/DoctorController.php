@@ -47,7 +47,7 @@ class DoctorController extends Controller
                       )
                     LIMIT 1)
                   , false) AS open "),
-                DB::raw("(SELECT SUM(points)/COUNT(id) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
+                DB::raw("(SELECT IFNULL(SUM(points)/COUNT(id), 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
             )
             ->join('users', 'doctors.user_id', '=', 'users.id')
             ->where('doctors.state_id', 1);
