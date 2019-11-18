@@ -18,9 +18,7 @@ class ScoreDetailResource extends JsonResource
             'id' => $this->id,
             'score_id' => $this->score_id,
             'score_item_id' => $this->score_item_id,
-            'points' => $this->points,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'points' => $this->points
         ];
     }
 }
