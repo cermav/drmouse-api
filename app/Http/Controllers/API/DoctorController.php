@@ -32,8 +32,10 @@ class DoctorController extends Controller
                 'city',
                 'country',
                 'post_code',
+                'latitude',
+                'longitude',
                 'avatar',
-                DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties"),
+                // DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties"),
                 DB::raw("IFNULL((
                     SELECT true
                     FROM opening_hours
@@ -44,7 +46,8 @@ class DoctorController extends Controller
                         opening_hours_state_id = 3
                       )
                     LIMIT 1)
-                  , false) AS open ")
+                  , false) AS open "),
+                DB::raw("(SELECT SUM(points)/COUNT(id) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
             )
             ->join('users', 'doctors.user_id', '=', 'users.id')
             ->where('doctors.state_id', 1);
@@ -82,7 +85,7 @@ class DoctorController extends Controller
         }
 
         // sorting
-        $order_fields = [];
+        $order_fields = ['total_score'];
         if ($request->has('order') && in_array(trim($request->input('order')), $order_fields)) {
             $direction = $request->has('dir') && strtolower(trim($request->input('dir') == 'desc')) ? 'desc' : 'asc';
             $doctors->orderBy(trim($request->input('order')), $direction);
