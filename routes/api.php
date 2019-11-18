@@ -27,6 +27,7 @@ Route::get('score', 'Api\ScoreController@index');
 Route::get('score/{id}', 'Api\ScoreController@show');
 Route::post('score', 'Api\ScoreController@store');
 Route::post('vote', 'Api\ScoreVoteController@store');
+Route::get('score-waiting', 'Api\ScoreController@waiting');
 
 Route::post('/register', 'Api\AuthController@register');
 Route::post('auth/login', 'Api\AuthController@login');

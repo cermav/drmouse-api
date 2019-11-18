@@ -33,9 +33,6 @@ class ScoreController extends Controller {
      */
     public function show(int $id)
     {
-
-//                DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties"),
-
         $dateFrom = Input::get('date_from');
         $whereArray = [['is_approved', '=', 1]];
         array_push($whereArray, ['user_id', '=', $id]);
@@ -47,6 +44,15 @@ class ScoreController extends Controller {
             'id', 'user_id', 'comment', 'ip_address', 'created_at', 'updated_at',
             DB::raw("(SELECT SUM(value) FROM score_votes WHERE score_id = scores.id) AS voting")
         )->where($whereArray)->get());
+    }
+
+    public function waiting()
+    {
+        return ScoreResource::collection(
+            Score::select('id', 'user_id', 'comment', 'ip_address', 'created_at', 'updated_at')
+                ->where('is_approved', 0)
+                ->get()
+        );
     }
 
     /**
