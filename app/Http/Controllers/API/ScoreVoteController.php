@@ -23,10 +23,16 @@ class ScoreVoteController extends Controller
         $validator = Validator::make((array)$input, [
             'score_id' => 'required|integer',
             'author_id' => 'integer',
-            'value' => 'integer|required'
+            'value' => 'integer|required',
+            'ip_address' => []
         ]);
         if($validator->fails()){
             return response()->json($validator->errors(), 422);
+        }
+
+        // validate ip address
+        if (ScoreVote::where([ ['score_id', $input->score_id], ['ip_address', $_SERVER['REMOTE_ADDR']] ])->exists()) {
+            return response()->json("Request from same IP.", 401);
         }
 
         // store score vote

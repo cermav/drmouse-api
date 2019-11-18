@@ -14,7 +14,14 @@ class ScoreDetail extends Model
     protected $fillable = [
         'score_id', 'score_item_id', 'points'
     ];
-    
+
+    /**
+     * Get score detail votes
+     */
+    public function votes() {
+        return $this->hasMany('App\Models\ScoreVote');
+    }
+
      /**
      * Get score parent
      */
