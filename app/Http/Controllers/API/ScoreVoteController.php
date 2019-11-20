@@ -31,9 +31,11 @@ class ScoreVoteController extends Controller
         }
 
         // validate ip address
+        /*
         if (ScoreVote::where([ ['score_id', $input->score_id], ['ip_address', $_SERVER['REMOTE_ADDR']] ])->exists()) {
             return response()->json("Request from same IP.", 401);
         }
+        */
 
         // store score vote
         $vote = ScoreVote::create([
