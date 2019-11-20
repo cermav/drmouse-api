@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\RegistrationRequest;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -105,8 +106,96 @@ class DoctorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(RegistrationRequest $request)
     {
+
+        dd($request);
+
+        /* Create slug - if already exists, add the number at the end */
+        $slug = strtolower(str_replace(" ", "-", preg_replace("/[^A-Za-z0-9 ]/", '', HelperController::replaceAccents($request['name']))));
+        $existingCount = Doctor::where('slug', 'like', $slug . '%')->count();
+        if ($existingCount > 0) {
+            $slug = $slug . '-' . ($existingCount);
+        }
+
+        /* Get longitude and latitude by the address */
+        $location = HelperController::getLatLngFromAddress(trim($request['street']) . " " . trim($request['city']) . " " . trim($request['country']) . " " . trim($request['post_code']));
+
+        /* Create directories for uploads */
+        $galleryPath = 'users/gallery/';
+        $profilesPath = 'users/profiles/';
+
+
+        /* Create user */
+        $user = User::create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => Hash::make(trim($request['password'])),
+            'role_id' => 3
+        ]);
+
+        /* Create doctor */
+        $doctor = Doctor::create([
+            'user_id' => $user->id,
+            'state_id' => 1,
+            'search_name' => HelperController::parseName($request['name']),
+            'description' => $request['description'],
+            'slug' => $slug,
+            'speaks_english' => $request['speaks_english'] ? $request['speaks_english'] : 0,
+            'street' => $request['street'],
+            'post_code' => $request['post_code'],
+            'city' => $request['city'],
+            'latitude' => $location['latitude'],
+            'longitude' => $location['longitude'],
+            'phone' => "+420 " . $request['phone'],
+            'second_phone' => $request['second_phone'] ? "+420 " . $request['second_phone'] : null,
+            'website' => $request['website'],
+            'working_doctors_count' => $request['working_doctors_count'],
+            'working_doctors_names' => $request['working_doctors_names'],
+            'nurses_count' => $request['nurses_count'],
+            'other_workers_count' => $request['other_workers_count'],
+            'gdpr_agreed' => 1,
+            'gdpr_agreed_date' => date('Y-m-d H:i:s')
+        ]);
+
+        if ($request["doc_profile_pic"]) {
+            $base64File = $request['doc_profile_pic'];
+            $encodedImgString = explode(',', $base64File, 2)[1];
+            $decodedImgString = base64_decode($encodedImgString);
+            $info = getimagesizefromstring($decodedImgString);
+            $ext = explode('/', $info['mime']);
+            @list($type, $file_data) = explode(';', $base64File);
+            @list(, $file_data) = explode(',', $file_data);
+            $imageName = 'profile_' . time() . '.' . $ext[1];
+            $imagePath = $profilesPath . $user->id . '/' . $imageName;
+            Storage::disk('public')->put($imagePath, base64_decode($file_data));
+            $user->avatar = $imagePath;
+            $user->save();
+        }
+
+        if ($request["doc_profile_pic2"]) {
+            $url = $request["doc_profile_pic2"];
+            $contents = file_get_contents($url);
+            $imageName = 'profile_' . time() . '.png';
+            $imagePath = $profilesPath . $user->id . '/' . $imageName;
+            Storage::disk('public')->put($imagePath, $contents);
+            $user->avatar = $imagePath;
+            $user->save();
+        }
+
+        $doctor->profile_completedness = HelperController::calculateProfileCompletedness($doctor);
+        $doctor->save();
+
+        /* Create a record in log table */
+        DoctorsLog::create([
+            'user_id' => $user->id,
+            'state_id' => 1,
+            'email_sent' => 1,
+            'doctor_object' => serialize($user)
+        ]);
+
+
+
         return response()->json(null, 501);
     }
 

@@ -17,7 +17,8 @@ use Illuminate\Http\Request;
 Route::apiResource('properties', 'Api\PropertyController');
 Route::apiResource('services', 'Api\ServiceController');
 
-Route::apiResource('doctors', 'Api\DoctorController');
+Route::get('doctors', 'Api\DoctorController@index');
+Route::post('doctors', 'Api\DoctorController@store');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 Route::get('all-doctors', 'Api\DoctorController@showAll');
 
