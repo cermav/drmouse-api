@@ -6,13 +6,17 @@ use App\Degree;
 use App\CzechName;
 use Illuminate\Support\Facades\Config;
 
-class HelperController extends Controller {
-    /* Get latitude and longitude from the address string */
+class HelperController extends Controller
+{
 
-    public static function getLatLngFromAddress($address) {
+    /* Get latitude and longitude from the address string */
+    public static function getLatLngFromAddress($address)
+    {
         $address = str_replace(" ", "+", $address);
 
-        $mapResponse = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&key=" . Config::get('google.gmap_key'));
+        $mapResponse = file_get_contents(
+            "https://maps.google.com/maps/api/geocode/json?address=" . $address . "&sensor=false&key=" . Config::get('google.gmap_key')
+        );
         $mapResponseJson = json_decode($mapResponse);
 
         $latitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
@@ -21,9 +25,9 @@ class HelperController extends Controller {
     }
 
     /* Parse name from input - remove degree and move first name to the end of the name */
-
-    public static function parseName($name) {
-        $lcName = strtolower($name);
+    public static function parseName($name)
+    {
+        $lcName = mb_strtolower($name);
         $degrees = Degree::all();
         foreach ($degrees as $degree) {
             $degreeName = strtolower($degree->name);
@@ -224,7 +228,7 @@ class HelperController extends Controller {
     }
 
     public static function calculateProfileCompletedness($doctor) {
-        $sectionsCount = 9; // total sections count - 1 (pswd section) 
+        $sectionsCount = 9; // total sections count - 1 (pswd section)
         $defaultPoints = 2;
         $hasOpeningHours = self::hasOpeningHours($doctor) ? 1 : 0;
         $hasProperties = self::hasProperties($doctor);

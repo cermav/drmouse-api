@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\RegistrationRequest;
+use App\DoctorsLog;
+use App\Http\Controllers\HelperController;
+use App\Types\UserRole;
+use App\Types\UserState;
 use App\User;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Doctor;
 use App\Http\Resources\DoctorResource;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends Controller
 {
@@ -106,60 +113,37 @@ class DoctorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(RegistrationRequest $request)
+    public function store(Request $request)
     {
+        // validate input
+        $input = $this->validateRegistration($request);
 
-        dd($request);
+        // get location
+        $location = $this->getDoctorLocation($input);
 
-        /* Create slug - if already exists, add the number at the end */
-        $slug = strtolower(str_replace(" ", "-", preg_replace("/[^A-Za-z0-9 ]/", '', HelperController::replaceAccents($request['name']))));
-        $existingCount = Doctor::where('slug', 'like', $slug . '%')->count();
-        if ($existingCount > 0) {
-            $slug = $slug . '-' . ($existingCount);
-        }
+        // Create user
+        $user = $this->createUser($input);
 
-        /* Get longitude and latitude by the address */
-        $location = HelperController::getLatLngFromAddress(trim($request['street']) . " " . trim($request['city']) . " " . trim($request['country']) . " " . trim($request['post_code']));
-
-        /* Create directories for uploads */
-        $galleryPath = 'users/gallery/';
-        $profilesPath = 'users/profiles/';
-
-
-        /* Create user */
-        $user = User::create([
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'password' => Hash::make(trim($request['password'])),
-            'role_id' => 3
-        ]);
-
-        /* Create doctor */
+        // Create doctor
         $doctor = Doctor::create([
             'user_id' => $user->id,
-            'state_id' => 1,
-            'search_name' => HelperController::parseName($request['name']),
-            'description' => $request['description'],
-            'slug' => $slug,
-            'speaks_english' => $request['speaks_english'] ? $request['speaks_english'] : 0,
-            'street' => $request['street'],
-            'post_code' => $request['post_code'],
-            'city' => $request['city'],
+            'state_id' => UserState::NEW,
+            'description' => "",
+            'search_name' => HelperController::parseName($input->name),
+            'slug' => $this->getDoctorSlug($input->name),
+            'street' => $input->street,
+            'post_code' => str_replace(' ', '', $input->post_code),
+            'city' => $input->city,
             'latitude' => $location['latitude'],
             'longitude' => $location['longitude'],
-            'phone' => "+420 " . $request['phone'],
-            'second_phone' => $request['second_phone'] ? "+420 " . $request['second_phone'] : null,
-            'website' => $request['website'],
-            'working_doctors_count' => $request['working_doctors_count'],
-            'working_doctors_names' => $request['working_doctors_names'],
-            'nurses_count' => $request['nurses_count'],
-            'other_workers_count' => $request['other_workers_count'],
-            'gdpr_agreed' => 1,
+            'phone' => $input->phone,
+            'gdpr_agreed' => true,
             'gdpr_agreed_date' => date('Y-m-d H:i:s')
         ]);
 
-        if ($request["doc_profile_pic"]) {
-            $base64File = $request['doc_profile_pic'];
+        // TODO: predelat
+        if (!empty($input->profile_image)) {
+            $base64File = $input->profile_image;
             $encodedImgString = explode(',', $base64File, 2)[1];
             $decodedImgString = base64_decode($encodedImgString);
             $info = getimagesizefromstring($decodedImgString);
@@ -167,18 +151,8 @@ class DoctorController extends Controller
             @list($type, $file_data) = explode(';', $base64File);
             @list(, $file_data) = explode(',', $file_data);
             $imageName = 'profile_' . time() . '.' . $ext[1];
-            $imagePath = $profilesPath . $user->id . '/' . $imageName;
+            $imagePath = 'users/profiles/' . $user->id . '/' . $imageName;
             Storage::disk('public')->put($imagePath, base64_decode($file_data));
-            $user->avatar = $imagePath;
-            $user->save();
-        }
-
-        if ($request["doc_profile_pic2"]) {
-            $url = $request["doc_profile_pic2"];
-            $contents = file_get_contents($url);
-            $imageName = 'profile_' . time() . '.png';
-            $imagePath = $profilesPath . $user->id . '/' . $imageName;
-            Storage::disk('public')->put($imagePath, $contents);
             $user->avatar = $imagePath;
             $user->save();
         }
@@ -186,18 +160,121 @@ class DoctorController extends Controller
         $doctor->profile_completedness = HelperController::calculateProfileCompletedness($doctor);
         $doctor->save();
 
+        // send registration email
+        $this->sendRegistrationEmail($doctor, $user);
+
         /* Create a record in log table */
         DoctorsLog::create([
             'user_id' => $user->id,
-            'state_id' => 1,
-            'email_sent' => 1,
-            'doctor_object' => serialize($user)
+            'state_id' => UserState::NEW,
+            'email_sent' => true,
+            'doctor_object' => serialize($doctor)
         ]);
 
-
-
-        return response()->json(null, 501);
+        return response()->json($doctor, JsonResponse::HTTP_CREATED);
     }
+
+    /**
+     * Validate Input
+     * @param Request $request
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validateRegistration(Request $request)
+    {
+        // get data from json
+        $input = json_decode($request->getContent());
+        // prepare validator
+        $validator = Validator::make((array) $input, [
+            'name' => 'required|max:255',
+            'email' => 'unique:users|required|email',
+            'password' => 'required|min:6',
+            'street' => 'required|max:255',
+            'post_code' => 'required|max:6',
+            'city' => 'required|max:255',
+            'phone' => 'required|max:20',
+            'gdpr' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            throw new HttpResponseException(
+                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+            );
+        }
+
+        return $input;
+    }
+
+    /**
+     * Create slug - if already exists, add the number at the end
+     * @param string $name
+     * @return string
+     */
+    protected function getDoctorSlug(string $name)
+    {
+        $slug = strtolower(str_replace(" ", "-", preg_replace("/[^A-Za-z0-9 ]/", '', HelperController::replaceAccents($name))));
+        $existingCount = Doctor::where('slug', 'like', $slug . '%')->count();
+        if ($existingCount > 0) {
+            $slug = $slug . '-' . ($existingCount);
+        }
+        return $slug;
+    }
+
+    /**
+     * Get longitude and latitude by the address
+     * @param array $data
+     * @return array
+     */
+    protected function getDoctorLocation(object $data)
+    {
+        return HelperController::getLatLngFromAddress(
+            trim($data->street) . " " . trim($data->city) . " CZ " . trim($data->post_code)
+        );
+    }
+
+    /**
+     * Create user
+     * @param array $data
+     * @return User
+     */
+    protected function createUser(object $data)
+    {
+        try{
+            return User::create([
+                'name' => $data->name,
+                'email' => $data->email,
+                'password' => Hash::make(trim($data->password)),
+                'role_id' => UserRole::DOCTOR
+            ]);
+        } catch (\Exception $ex) {
+            throw new HttpResponseException(
+                response()->json(
+                    ['errors' => "Error creating user: " . $ex->getMessage()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
+            );
+        }
+    }
+
+    protected function saveProfileImage()
+    {
+
+    }
+
+    protected function sendRegistrationEmail(Doctor $doctor, User $user)
+    {
+        $email = $user->email;
+        $data = [
+            'doctor' => $doctor,
+            'user' => $user
+        ];
+        Mail::send('emails/registration', $data, function ($message) use ($email) {
+            $message->to($email)
+                ->subject('Dr.Mouse ověření emailu');
+        });
+    }
+
+
+
 
     /**
      * Display the specified resource.
