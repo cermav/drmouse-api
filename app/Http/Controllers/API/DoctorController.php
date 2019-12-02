@@ -108,6 +108,83 @@ class DoctorController extends Controller
     }
 
     /**
+     * Return all doctors, for homepage
+     * @return \Illuminate\Support\Collection
+     */
+    public function showAll()
+    {
+        // prepare basic select
+        $doctors = DB::table('doctors')
+            ->select(
+                'users.id',
+                'name',
+                'slug',
+                'street',
+                'city',
+                'post_code',
+                'latitude',
+                'longitude',
+                DB::raw("IFNULL((
+                    SELECT true
+                    FROM opening_hours
+                    WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                    LIMIT 1)
+                  , false) AS open ")
+            )
+            ->join('users', 'doctors.user_id', '=', 'users.id')
+            ->where('doctors.state_id', 1);
+
+        /*
+         DB::raw("(
+                    SELECT 1
+                    FROM opening_hours
+                    WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                  ) AS open ")
+         */
+
+        return $doctors->get();
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+
+        $doctor = Doctor::where(['user_id' => $id, 'state_id' => 1])->get();
+        if (sizeof($doctor) > 0) {
+            return DoctorResource::collection($doctor)->first();
+        }
+        return response()->json(['message' => 'Not Found!'], 404);
+    }
+
+    /**
+     * Display doctor by slug
+     * @param $slug
+     */
+    public function showBySlug($slug)
+    {
+        $doctor = Doctor::where('slug', $slug)->get();
+        if (sizeof($doctor) > 0) {
+            return DoctorResource::collection($doctor)->first();
+        }
+        return response()->json(['message' => 'Not Found!'], 404);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -161,7 +238,14 @@ class DoctorController extends Controller
         $doctor->save();
 
         // send registration email
-        $this->sendRegistrationEmail($doctor, $user);
+
+
+        // $this->sendRegistrationEmail($doctor, $user);
+
+        // create password reset tokem
+
+
+        $user->sendEmailVerificationNotification();
 
         /* Create a record in log table */
         DoctorsLog::create([
@@ -172,6 +256,29 @@ class DoctorController extends Controller
         ]);
 
         return response()->json($doctor, JsonResponse::HTTP_CREATED);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, int $id)
+    {
+        // validate input
+        $input = $this->validateProfile($request, $id);
+
+        // TODO : add validation
+        $user = User::find($id);
+        $user->update($input['user']);
+
+        $doctor = Doctor::where(['user_id' => $id])->get()->first();
+        $doctor->update($input['doctor']);
+
+
+        return response()->json(DoctorResource::make($doctor), 200);
     }
 
     /**
@@ -186,7 +293,7 @@ class DoctorController extends Controller
         // prepare validator
         $validator = Validator::make((array) $input, [
             'name' => 'required|max:255',
-            'email' => 'unique:users|required|email',
+            'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
             'street' => 'required|max:255',
             'post_code' => 'required|max:6',
@@ -202,6 +309,102 @@ class DoctorController extends Controller
         }
 
         return $input;
+    }
+
+    /**
+     * Validate Input
+     * @param Request $request
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validateProfile(Request $request, int $user_id)
+    {
+        // get data from json
+        $input = json_decode($request->getContent());
+        // prepare validator
+        $validator = Validator::make((array) $input, [
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:users,email,'.$user_id.',id',
+            'description' => 'string',
+            'speaks_english' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            throw new HttpResponseException(
+                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+            );
+        }
+
+        $this->validateAddress($input->address);
+        $this->validateStaffInfo($input->staff_info);
+
+        return [
+            'user' => [
+                'name' => $input->name,
+                'email' => $input->email
+            ],
+            'doctor' => [
+                'description' => $input->description,
+                'speaks_english' => $input->speaks_english,
+                // address detail
+                'phone' => $input->address->phone,
+                'second_phone' => $input->address->second_phone,
+                'website' => $input->address->website,
+                'street' => $input->address->street,
+                'city' => $input->address->city,
+                'post_code' => $input->address->post_code,
+                // staff info
+                'working_doctors_count' => $input->staff_info->doctors_count,
+                'working_doctors_names' => $input->staff_info->doctors_names,
+                'nurses_count' => $input->staff_info->nurses_count,
+                'other_workers_count' => $input->staff_info->others_count
+            ]
+        ];
+    }
+
+    /**
+     * Validate Input
+     * @param Request $request
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validateAddress(object $address)
+    {
+        // prepare validator
+        $validator = Validator::make((array) $address, [
+            'street' => 'required|max:255',
+            'post_code' => 'required|max:6',
+            'city' => 'required|max:255',
+            'phone' => 'required|max:20',
+            'second_phone' => 'string|max:20',
+            'website' => 'string|max:150'
+        ]);
+
+        if ($validator->fails()) {
+            throw new HttpResponseException(
+                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+            );
+        }
+    }
+
+    /**
+     * Validate Input
+     * @param Request $request
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validateStaffInfo(object $staffInfo)
+    {
+        // prepare validator
+        $validator = Validator::make((array) $staffInfo, [
+            'doctors_count' => 'required|integer',
+            'nurses_count' => 'required|integer',
+            'others_count' => 'required|integer',
+            'doctors_names' => 'string|max:1000'
+        ]);
+
+        if ($validator->fails()) {
+            throw new HttpResponseException(
+                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+            );
+        }
     }
 
     /**
@@ -273,102 +476,4 @@ class DoctorController extends Controller
         });
     }
 
-
-
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-
-        $doctor = Doctor::where(['user_id' => $id, 'state_id' => 1])->get();
-        if (sizeof($doctor) > 0) {
-            return DoctorResource::collection($doctor)->first();
-        }
-        return response()->json(['message' => 'Not Found!'], 404);
-    }
-
-    public function showAll()
-    {
-        // prepare basic select
-        $doctors = DB::table('doctors')
-            ->select(
-                'users.id',
-                'name',
-                'slug',
-                'street',
-                'city',
-                'post_code',
-                'latitude',
-                'longitude',
-                DB::raw("IFNULL((
-                    SELECT true
-                    FROM opening_hours
-                    WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
-                      AND (
-                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
-                        OR
-                        opening_hours_state_id = 3
-                      )
-                    LIMIT 1)
-                  , false) AS open ")
-            )
-            ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->where('doctors.state_id', 1);
-
-        /*
-         DB::raw("(
-                    SELECT 1
-                    FROM opening_hours
-                    WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
-                      AND (
-                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
-                        OR
-                        opening_hours_state_id = 3
-                      )
-                  ) AS open ")
-         */
-
-        return $doctors->get();
-    }
-
-    /**
-     * Display doctor by slug
-     * @param $slug
-     */
-    public function showBySlug($slug)
-    {
-        $doctor = Doctor::where('slug', $slug)->get();
-        if (sizeof($doctor) > 0) {
-            return DoctorResource::collection($doctor)->first();
-        }
-        return response()->json(['message' => 'Not Found!'], 404);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        return response()->json(null, 501);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        return response()->json(null, 501);
-    }
 }

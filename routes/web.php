@@ -30,3 +30,7 @@ Route::get('/veterinari/{slug}/', 'DoctorController@show')->name('doctor');
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

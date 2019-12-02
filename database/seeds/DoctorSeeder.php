@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use App\Enum\OpeningHoursState;
+use App\Types\OpeningHoursState;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -253,12 +253,12 @@ class DoctorSeeder extends Seeder
     private function mapStatus(int $statusId) : int
     {
         switch($statusId) {
-            case 1: return \App\Enum\DoctorStatus::DRAFT;
-            case 2: return \App\Enum\DoctorStatus::PUBLISHED;
-            case 3: return \App\Enum\DoctorStatus::UNPUBLISHED;
-            case -999: return \App\Enum\DoctorStatus::DELETED;
+            case 1: return \App\Types\DoctorStatus::DRAFT;
+            case 2: return \App\Types\DoctorStatus::PUBLISHED;
+            case 3: return \App\Types\DoctorStatus::UNPUBLISHED;
+            case -999: return \App\Types\DoctorStatus::DELETED;
         }
-        return \App\Enum\DoctorStatus::NEW;
+        return \App\Types\DoctorStatus::NEW;
     }
 
     /***

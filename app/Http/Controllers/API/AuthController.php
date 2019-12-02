@@ -11,40 +11,6 @@ use Validator, DB, Hash, Mail, Illuminate\Support\Facades\Password;
 class AuthController extends Controller
 {
     /**
-     * API Register
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function register(Request $request)
-    {
-        $credentials = $request->only('name', 'email', 'password', 'surname', 'relationship', 'birthday', 'gender', 'ethnicity', 'ethnicity_other');
-        $validator = Validator::make($credentials, User::getValidationRules());
-        if($validator->fails()) {
-            return response()->json(['success'=> false, 'error'=> $validator->messages()]);
-        }
-        $user_data = [
-            'name' => $request->name,
-            'role_id' => 2,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ];
-        $optional_fields = ['avatar'];
-        foreach ($optional_fields as $field) {
-            if ($request->has($field) && !empty($request->$field)) {
-                if ($field == 'birthday') {
-                    $user_data[$field] = date('Y-m-d', strtotime($request->get($field)));
-                } else {
-                    $user_data[$field] = $request->get($field);
-                }
-
-            }
-        }
-
-        User::create($user_data);
-        return $this->login($request);
-    }
-    /**
      * API Login, on success return JWT Auth token
      *
      * @param Request $request

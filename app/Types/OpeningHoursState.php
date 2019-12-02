@@ -6,7 +6,7 @@
  * Time: 12:06
  */
 
-namespace App\Enum;
+namespace App\Types;
 
 
 final class OpeningHoursState
