@@ -2,8 +2,10 @@
 
 namespace App;
 
+
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\VerifyEmail;
+use App\Notifications\ResetPasswordEmail;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends \TCG\Voyager\Models\User implements JWTSubject {
@@ -94,6 +96,14 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject {
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail); // my notification
+    }
+
+    /**
+     * Send a password reset email to the user
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordEmail($token));
     }
 
 }
