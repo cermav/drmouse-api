@@ -36,6 +36,7 @@ Route::get('score-waiting', 'Api\ScoreController@waiting');
 
 Route::post('auth/login', 'Api\AuthController@login');
 Route::post('auth/forgot-password', 'Api\Auth\ForgotPasswordController')->name('forgot.password');
+Route::post('auth/reset-password', 'Api\Auth\ResetPasswordController@reset')->name('reset.password');
 Route::get('email/verify/{id}', 'Api\Auth\VerificationController@verify')->name('verification.verify');
 // Route::get('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
 

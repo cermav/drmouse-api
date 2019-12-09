@@ -62,14 +62,14 @@ class ResetPasswordEmail extends Notification
      */
     protected function resetUrl($notifiable)
     {
-        // create token
-        $token = app(PasswordBroker::class)->createToken(User::findOrFail($notifiable->getKey()));
+        // get user
+        $user = User::findOrFail($notifiable->getKey());
 
         // prepare signed link
         $link = URL::temporarySignedRoute(
-            'forgot.password', Carbon::now()->addMinutes(60), [
-                'id' => $notifiable->getKey(),
-                'token' => $token
+            'reset.password', Carbon::now()->addMinutes(60), [
+                'email' => $user->email,
+                'token' => app(PasswordBroker::class)->createToken($user)
             ]
         );
 
