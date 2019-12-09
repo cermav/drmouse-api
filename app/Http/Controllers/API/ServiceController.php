@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\ServiceResource;
 use App\Models\DoctorsService;
 use App\Service;
 use App\User;
@@ -71,7 +72,10 @@ class ServiceController extends Controller
                 }
             }
 
-            return response()->json('Service changed.', JsonResponse::HTTP_OK);
+            return response()->json(
+                ServiceResource::collection($requestUser->services()->where('is_approved', 1)->get()),
+                JsonResponse::HTTP_OK
+            );
 
         } else {
             // return unauthorized
