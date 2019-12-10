@@ -87,7 +87,15 @@ class PropertyController extends Controller
                 }
             }
 
-            return response()->json('Property changed.', JsonResponse::HTTP_OK);
+            // return data
+            $all_properties = $requestUser->properties()->where('is_approved', 1)->get();
+            // split properties
+            $properties = [];
+            $categories = [ 1 => 'equipment', 'expertise', 'specialization' ];
+            foreach ($all_properties as $item) {
+                $properties[$categories[$item->property_category_id]][] = (object) ['id' => $item->id, 'name' => $item->name];
+            }
+            return response()->json($properties, JsonResponse::HTTP_OK);
 
         } else {
             // return unauthorized
