@@ -28,37 +28,37 @@ class OpeningHoursController extends Controller
 
         if ($requestUser->id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
 
+            // remove all records
+            OpeningHour::where('user_id', $requestUser->id)->delete();
+
             // validate input
             $input = json_decode($request->getContent());
             foreach ($input as $day) {
                 foreach ($day as $item) {
                     $validator = OpeningHoursValidator::create((array)$item);
                     if ($validator->fails()) {
-                        var_dump($item);
+                        /*
                         throw new HttpResponseException(
                             response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
                         );
+                        */
+                    } else {
+                        // save record
+                        OpeningHour::create([
+                            'weekday_id' => $item->weekday_id,
+                            'user_id' => $requestUser->id,
+                            'opening_hours_state_id' => $item->state_id,
+                            'open_at' => $item->open_at,
+                            'close_at' => $item->close_at
+                        ]);
                     }
                 }
             }
 
-            // remove all records
-            OpeningHour::where('user_id', $requestUser->id)->delete();
-
-            // save each new record
-            foreach ($input as $day) {
-                foreach ($day as $item) {
-                    OpeningHour::create([
-                        'weekday_id' => $item->weekday_id,
-                        'user_id' => $requestUser->id,
-                        'opening_hours_state_id' => $item->state_id,
-                        'open_at' => $item->open_at,
-                        'close_at' => $item->close_at
-                    ]);
-                }
-            }
-
-            return response()->json('Opening hours changed.', JsonResponse::HTTP_OK);
+            return response()->json(
+                OpeningHoursResource::collection($requestUser->openingHours),
+                JsonResponse::HTTP_OK
+            );
 
         } else {
             // return unauthorized
