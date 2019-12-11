@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\OpeningHoursResource;
 use App\Models\OpeningHour;
 use App\User;
 use App\Validators\OpeningHoursValidator;
