@@ -18,7 +18,6 @@ class DoctorResource extends JsonResource
         $all_properties = $this->user->properties()->where('is_approved', 1)->get();
         $services = $this->user->services()->where('is_approved', 1)->get();
         $photos = $this->user->photos;
-        $scores = $this->user->scores()->get();
 
         // split properties
         $properties = [];
@@ -39,7 +38,7 @@ class DoctorResource extends JsonResource
             'speaks_english' => $this->speaks_english,
             'completeness' => $this->profile_completedness,
 
-            'score' => ScoreResource::collection($scores),
+            'total_score' => $this->total_score,
 
             'address' => [
                 'street' => $this->street,

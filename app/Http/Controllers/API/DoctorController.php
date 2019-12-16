@@ -72,7 +72,7 @@ class DoctorController extends Controller
             );
         }
 
-        // add specialization condition
+        // add specialization condition - condition has to be RAW, otherwhise not working
         if ($request->has('spec') && intval($request->input('spec')) > 0) {
             $doctors->whereExists(function ($query) use ($request) {
                 $query->select(DB::raw(1))
@@ -81,7 +81,7 @@ class DoctorController extends Controller
             });
         }
 
-        // add experience condition
+        // add experience condition - condition has to be RAW, otherwhise not working
         if ($request->has('exp') && intval($request->input('exp')) > 0) {
             $doctors->whereExists(function ($query) use ($request) {
                 $query->select(DB::raw(1))
@@ -157,7 +157,12 @@ class DoctorController extends Controller
     public function show($id)
     {
 
-        $doctor = Doctor::where('user_id', $id)->whereIn('state_id', [1, 3])->get();
+        $doctor = Doctor::where('user_id', $id)
+            ->select(
+                'doctors.*',
+                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
+            )
+            ->whereIn('state_id', [1, 3])->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
@@ -170,7 +175,13 @@ class DoctorController extends Controller
      */
     public function showBySlug($slug)
     {
-        $doctor = Doctor::where('slug', $slug)->get();
+        $doctor = Doctor::where('slug', $slug)
+            ->select(
+                'doctors.*',
+                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
+            )
+            ->whereIn('state_id', [1, 3])
+            ->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
