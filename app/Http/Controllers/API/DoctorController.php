@@ -77,10 +77,7 @@ class DoctorController extends Controller
             $doctors->whereExists(function ($query) use ($request) {
                 $query->select(DB::raw(1))
                     ->from('doctors_properties')
-                    ->where([
-                        ['doctors_properties.user_id', '=', 'users.id'],
-                        ['doctors_properties.property_id', '=', intval($request->input('spec'))]
-                    ]);
+                    ->whereRaw('doctors_properties.user_id = users.id AND doctors_properties.property_id = ' . intval($request->input('spec')));
             });
         }
 
@@ -89,10 +86,7 @@ class DoctorController extends Controller
             $doctors->whereExists(function ($query) use ($request) {
                 $query->select(DB::raw(1))
                     ->from('doctors_properties')
-                    ->where([
-                        ['doctors_properties.user_id', '=', 'users.id'],
-                        ['doctors_properties.property_id', '=', intval($request->input('exp'))]
-                    ]);
+                    ->whereRaw('doctors_properties.user_id = users.id AND doctors_properties.property_id = ' . intval($request->input('exp')));
             });
         }
 
@@ -102,7 +96,6 @@ class DoctorController extends Controller
             $direction = $request->has('dir') && strtolower(trim($request->input('dir') == 'desc')) ? 'desc' : 'asc';
             $doctors->orderBy(trim($request->input('order')), $direction);
         }
-
 
         return $doctors->paginate($this->pageLimit);
     }
