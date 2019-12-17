@@ -199,8 +199,12 @@ class DoctorController extends Controller
         // validate input
         $input = $this->validateRegistration($request);
 
-        // get location
-        $location = $this->getDoctorLocation($input);
+        try {
+            // get location
+            $location = $this->getDoctorLocation($input);
+        } catch (\Exception $ex) {
+            return response()->json($ex->getMessage(), 200);
+        }
 
         // Create user
         $user = $this->createUser($input);

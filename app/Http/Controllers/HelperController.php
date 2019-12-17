@@ -19,9 +19,13 @@ class HelperController extends Controller
         );
         $mapResponseJson = json_decode($mapResponse);
 
-        $latitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
-        $longitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
-        return compact('latitude', 'longitude');
+        if (sizeof($mapResponseJson->{'results'}) > 0) {
+            $latitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+            $longitude = $mapResponseJson->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+            return compact('latitude', 'longitude');
+        }
+
+        throw new \Exception($mapResponseJson->status . ': ' . $mapResponseJson->error_message);
     }
 
     /* Parse name from input - remove degree and move first name to the end of the name */
