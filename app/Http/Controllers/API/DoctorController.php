@@ -203,7 +203,7 @@ class DoctorController extends Controller
             // get location
             $location = $this->getDoctorLocation($input);
         } catch (\Exception $ex) {
-            return response()->json($ex->getMessage(), 200);
+            return response()->json(['error' => ['location' => $ex->getMessage()]], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         // Create user
@@ -246,13 +246,6 @@ class DoctorController extends Controller
         $doctor->save();
 
         // send registration email
-
-
-        // $this->sendRegistrationEmail($doctor, $user);
-
-        // create password reset tokem
-
-
         $user->sendEmailVerificationNotification();
 
         /* Create a record in log table */
