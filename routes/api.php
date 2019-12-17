@@ -40,6 +40,9 @@ Route::post('auth/reset-password', 'Api\Auth\ResetPasswordController@reset')->na
 Route::get('email/verify/{id}', 'Api\Auth\VerificationController@verify')->name('verification.verify');
 // Route::get('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
 
+Route::post('newsletter', 'Api\NewsletterUserController@store');
+Route::get('newsletter/verify/{id}', 'Api\NewsletterUserController@verify')->name('newsletter.verify');
+
 Route::group(['middleware' => ['jwt.auth']], function() {
 
     // auth
