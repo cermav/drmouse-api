@@ -6,6 +6,7 @@ use App\Doctor;
 use App\Http\Resources\DoctorResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 class DoctorController extends Controller
@@ -24,10 +25,16 @@ class DoctorController extends Controller
         // add update condition
         $validatedDate = $request->validate(['updated' => 'date']);
         if (array_key_exists('updated', $validatedDate)) {
-            $whereArray[] = ['updated_at', '>', $validatedDate['updated']];
+            $whereArray[] = ['doctors.updated_at', '>', $validatedDate['updated']];
         }
-
-        return DoctorResource::collection(Doctor::where($whereArray)->get());
+        return DoctorResource::collection(
+            Doctor::where($whereArray)
+                ->select(
+                    'doctors.*',
+                    DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
+                )
+                ->get()
+        );
     }
 
     /**
