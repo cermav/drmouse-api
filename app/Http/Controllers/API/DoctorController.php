@@ -91,10 +91,14 @@ class DoctorController extends Controller
         }
 
         // sorting
-        $order_fields = ['total_score'];
-        if ($request->has('order') && in_array(trim($request->input('order')), $order_fields)) {
+        $order_fields = ['rank' => 'total_score'];
+        if ($request->has('order') && array_key_exists(trim($request->input('order')), $order_fields)) {
             $direction = $request->has('dir') && strtolower(trim($request->input('dir') == 'desc')) ? 'desc' : 'asc';
-            $doctors->orderBy(trim($request->input('order')), $direction);
+            // some exception
+            if ($request->input('order') == 'rank') {
+                $direction = 'desc';
+            }
+            $doctors->orderBy($order_fields[$request->input('order')], $direction);
         }
 
         return $doctors->paginate($this->pageLimit);
