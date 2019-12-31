@@ -25,6 +25,18 @@ class VerifyEmail extends VerifyEmailBase
             return call_user_func(static::$toMailCallback, $notifiable);
         }
 
+        /*
+        $email = $user->email;
+        $data = [
+            'doctor' => $doctor,
+            'user' => $user
+        ];
+        Mail::send('emails/registration', $data, function ($message) use ($email) {
+            $message->to($email)
+                ->subject('Dr.Mouse ověření emailu');
+        });
+        */
+
         return (new MailMessage())
             ->subject(Lang::getFromJson('Oveření registračního emailu'))
             ->greeting("Dobrý den,")
@@ -33,7 +45,7 @@ class VerifyEmail extends VerifyEmailBase
                 "Ověřit emailovou adresu",
                 $this->verificationUrl($notifiable)
             )
-            ->line(Lang::getFromJson('If you did not create an account, no further action is required.'));
+            ->line("Pokud jste nežádali o registraci v databazi veterinářů Dr. Mouse, pak tento email prosím ignorujte.");
     }
 
     /**
@@ -57,6 +69,8 @@ class VerifyEmail extends VerifyEmailBase
 
         // prepare remote link
         $remoteLink = config('frontend.url') . 'vet/verify?link=' . base64_encode($link);
+
+//        $remoteLink = config('frontend.url') . 'vet/verify?id=' . $notifiable->getKey() . parse_url($link, PHP_URL_QUERY );
 
         return $remoteLink;
     }
