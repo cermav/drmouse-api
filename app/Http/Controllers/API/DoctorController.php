@@ -164,7 +164,18 @@ class DoctorController extends Controller
         $doctor = Doctor::where('user_id', $id)
             ->select(
                 'doctors.*',
-                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
+                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score "),
+                DB::raw("IFNULL((
+                    SELECT true
+                    FROM opening_hours
+                    WHERE user_id = doctors.user_id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                    LIMIT 1)
+                  , false) AS open ")
             )
             ->whereIn('state_id', [1, 3])->get();
         if (sizeof($doctor) > 0) {
@@ -182,7 +193,18 @@ class DoctorController extends Controller
         $doctor = Doctor::where('slug', $slug)
             ->select(
                 'doctors.*',
-                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
+                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score "),
+                DB::raw("IFNULL((
+                    SELECT true
+                    FROM opening_hours
+                    WHERE user_id = doctors.user_id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                    LIMIT 1)
+                  , false) AS open ")
             )
             ->whereIn('state_id', [1, 3])
             ->get();

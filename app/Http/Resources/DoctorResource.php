@@ -39,6 +39,7 @@ class DoctorResource extends JsonResource
             'completeness' => $this->profile_completedness,
 
             'total_score' => $this->total_score,
+            'open' => $this->open,
 
             'address' => [
                 'street' => $this->street,
