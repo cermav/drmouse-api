@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\ServiceResource;
 use App\Models\DoctorsService;
 use App\Service;
+use App\Types\UserRole;
 use App\User;
 use App\Validators\ServiceValidator;
 use Illuminate\Auth\AuthenticationException;

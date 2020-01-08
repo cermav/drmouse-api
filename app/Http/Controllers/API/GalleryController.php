@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Doctor;
 use App\Http\Resources\PhotoResource;
 use App\Models\Photo;
+use App\Types\UserRole;
 use App\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;

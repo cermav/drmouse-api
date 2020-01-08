@@ -80,19 +80,6 @@ class DoctorResource extends JsonResource
 
             'created_at' => $this->user->created_at,
             'updated_at' => $this->user->updated_at,
-
-
-
-
-
-
-
-
-
-
-
-
-
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\DoctorsProperty;
 use App\Property;
+use App\Types\UserRole;
 use App\User;
 use App\Validators\PropertyValidator;
 use Illuminate\Auth\AuthenticationException;
