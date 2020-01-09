@@ -21,7 +21,17 @@ class ImageHandler
         return $fileName;
     }
 
-    private static function getExtensionByType(string $type)
+    public static function splitEncodedData($data)
+    {
+        // parse image data
+        $image_part = explode(';', $data);
+        return (object)[
+            'type' =>  explode('/', $image_part[0])[1],
+            'content' => explode(',', $image_part[1])[1]
+        ];
+    }
+
+    public static function getExtensionByType(string $type)
     {
         if (strpos($type, 'svg') !== false) {
             return 'svg';

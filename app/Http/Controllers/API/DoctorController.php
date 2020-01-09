@@ -7,16 +7,20 @@ use App\Http\Controllers\HelperController;
 use App\Types\UserRole;
 use App\Types\UserState;
 use App\User;
+use App\Utils\ImageHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Doctor;
 use App\Http\Resources\DoctorResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\ImageManager;
 
 class DoctorController extends Controller
 {
@@ -294,18 +298,33 @@ class DoctorController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        // validate input
-        $input = $this->validateProfile($request, $id);
+        // verify user
+        $requestUser = User::find($id);
+        $loggedUser = Auth::User();
 
-        // TODO : add validation
-        $user = User::find($id);
-        $user->update($input['user']);
+        if ($requestUser->id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
 
-        $doctor = Doctor::where(['user_id' => $id])->get()->first();
-        $doctor->update($input['doctor']);
+            // validate input
+            $input = $this->validateProfile($request, $id);
 
+            // TODO : add validation
+            $user = User::find($id);
+            $user->update($input['user']);
 
-        return response()->json(DoctorResource::make($doctor), 200);
+            $doctor = Doctor::where(['user_id' => $id])->get()->first();
+            $doctor->update($input['doctor']);
+
+            // store image
+            if ($input['avatar'] !== null) {
+                $user->update(['avatar' => $this->saveProfileImage($id, $input['avatar'])]);
+            }
+
+            return response()->json(DoctorResource::make($doctor), 200);
+
+        } else {
+            // return unauthorized
+            throw new AuthenticationException();
+        }
     }
 
     /**
@@ -384,7 +403,8 @@ class DoctorController extends Controller
                 'working_doctors_names' => $input->staff_info->doctors_names,
                 'nurses_count' => $input->staff_info->nurses_count,
                 'other_workers_count' => $input->staff_info->others_count
-            ]
+            ],
+            'avatar' => $input->avatar
         ];
     }
 
@@ -485,9 +505,21 @@ class DoctorController extends Controller
         }
     }
 
-    protected function saveProfileImage()
+    protected function saveProfileImage($user_id, $data)
     {
+        // get doctor info
+        $doctor = Doctor::where('user_id', $user_id)->first();
 
+        // split image data
+        $image = ImageHandler::splitEncodedData($data);
+
+        // prepare file name
+        $fileName = strtolower($doctor->slug . '.' . ImageHandler::getExtensionByType($image->type));
+
+        // save file to local storage
+        Storage::disk('public')->put('profile' . DIRECTORY_SEPARATOR . $fileName, base64_decode($image->content));
+
+        return $fileName;
     }
 
     protected function sendRegistrationEmail(Doctor $doctor, User $user)
