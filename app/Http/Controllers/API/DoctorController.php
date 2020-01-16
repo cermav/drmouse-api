@@ -101,7 +101,7 @@ class DoctorController extends Controller
         }
 
         // sorting
-        $order_fields = ['rank' => 'total_score', 'dist' => 'distance'];
+        $order_fields = ['rank' => 'total_score']; // , 'dist' => 'distance'
         if ($request->has('order') && array_key_exists(trim($request->input('order')), $order_fields)) {
             $direction = $request->has('dir') && strtolower(trim($request->input('dir') == 'desc')) ? 'desc' : 'asc';
             // some exception
