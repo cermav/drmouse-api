@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\DoctorsLog;
 use App\Http\Controllers\HelperController;
+use App\ScoreItem;
 use App\Types\UserRole;
 use App\Types\UserState;
 use App\User;
@@ -164,11 +165,21 @@ class DoctorController extends Controller
      */
     public function show($id)
     {
+        // build score query
+        $scoreQuery = [];
+        foreach (ScoreItem::get() as $item) {
+            $scoreQuery[] = "(
+                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
+                FROM score_details 
+                WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
+                    AND score_item_id = {$item->id}
+            ) AS total_score_{$item->id} ";
+        }
 
         $doctor = Doctor::where('user_id', $id)
             ->select(
                 'doctors.*',
-                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score "),
+                DB::raw(implode(", ", $scoreQuery)),
                 DB::raw("IFNULL((
                     SELECT true
                     FROM opening_hours
@@ -194,10 +205,21 @@ class DoctorController extends Controller
      */
     public function showBySlug($slug)
     {
+        // build score query
+        $scoreQuery = [];
+        foreach (ScoreItem::get() as $item) {
+            $scoreQuery[] = "(
+                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
+                FROM score_details 
+                WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
+                    AND score_item_id = {$item->id}
+            ) AS total_score_{$item->id} ";
+        }
+
         $doctor = Doctor::where('slug', $slug)
             ->select(
                 'doctors.*',
-                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score "),
+                DB::raw(implode(", ", $scoreQuery)),
                 DB::raw("IFNULL((
                     SELECT true
                     FROM opening_hours

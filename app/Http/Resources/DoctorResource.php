@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\ScoreItem;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class DoctorResource extends JsonResource
@@ -25,6 +26,17 @@ class DoctorResource extends JsonResource
             $properties[$item->property_category_id][] = (object) ['id' => $item->id, 'name' => $item->name];
         }
 
+        // count score
+        $score_sum = 0;
+        $score_count = 0;
+        $score_detail = [];
+        foreach (ScoreItem::get() as $item) {
+            $variable = 'total_score_' . $item->id;
+            $score_detail[$item->id] = $this->$variable;
+            $score_sum += $this->$variable;
+            $score_count++;
+        }
+
         return [
 
             'id' => $this->user->id,
@@ -38,7 +50,10 @@ class DoctorResource extends JsonResource
             'speaks_english' => $this->speaks_english,
             'completeness' => $this->profile_completedness,
 
-            'total_score' => $this->total_score,
+            'score' => (object)[
+                'total' => $score_sum / $score_count,
+                'detail' => $score_detail
+            ],
             'open' => $this->open,
 
             'address' => [
