@@ -52,15 +52,14 @@ Route::group(['middleware' => ['jwt.auth']], function() {
 
     // doctor profile
     Route::put('doctors/{id}', 'Api\DoctorController@update');
+    Route::delete('doctors/{id}', 'Api\DoctorController@delete');
     Route::put('opening-hours/{id}', 'Api\OpeningHoursController@update');
     Route::put('property/{id}', 'Api\PropertyController@update');
     Route::put('service/{id}', 'Api\ServiceController@update');
     Route::put('gallery/{id}', 'Api\GalleryController@update');
 
-
     // score
     Route::delete('score/{id}', 'Api\ScoreController@delete');
-
 });
 
 

@@ -116,6 +116,13 @@ UPDATE users SET avatar = REPLACE(avatar, '2019/12/', '') WHERE avatar LIKE '201
 
 
 
+SELECT *
+FROM doctors AS d
+INNER JOIN doctors AS d2 ON d.latitude = d2.latitude AND d.longitude = d2.longitude
+  AND d.id != d2.id
+
+
+
 
 
 
