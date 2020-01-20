@@ -340,6 +340,9 @@ class DoctorController extends Controller
             $user->update($input['user']);
 
             $doctor = Doctor::where(['user_id' => $id])->get()->first();
+            // add search name
+            $input['doctor']['search_name'] = HelperController::parseName($input['user']['name']);
+            $input['doctor']['profile_completedness'] = HelperController::calculateProfileCompletedness($doctor);
             $doctor->update($input['doctor']);
 
             // store image
