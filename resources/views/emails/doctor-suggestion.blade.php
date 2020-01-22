@@ -3,7 +3,7 @@
 @section('title', 'Doctors suggestions')
 @section('content')
     <p>Dobrý den,</p>
-    <p>na webu drmouse.cz jsem byl doporučen nový doktor</p>
+    <p>na webu drmouse.cz byl doporučen nový veterinář</p>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0">
         <tbody>
         <tr>
