@@ -63,14 +63,13 @@ class DoctorController extends Controller
                   , false) AS open "),
                 DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
             )
-            /*
             ->selectRaw(
                 "(SELECT ST_Distance_Sphere(point(?, ?), point(longitude, latitude)) ) AS distance",
                 [
                     $request->has('long') ? floatval($request->input('long')) : 15.7,
                     $request->has('lat') ? floatval($request->input('lat')) : 49.8
                 ]
-            )*/
+            )
             ->join('users', 'doctors.user_id', '=', 'users.id')
             ->where('doctors.state_id', [1]);
 
@@ -102,7 +101,7 @@ class DoctorController extends Controller
         }
 
         // sorting
-        $order_fields = ['rank' => 'total_score']; // , 'dist' => 'distance'
+        $order_fields = ['rank' => 'total_score' , 'dist' => 'distance'];
         if ($request->has('order') && array_key_exists(trim($request->input('order')), $order_fields)) {
             $direction = $request->has('dir') && strtolower(trim($request->input('dir') == 'desc')) ? 'desc' : 'asc';
             // some exception
