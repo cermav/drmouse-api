@@ -138,24 +138,3 @@ ALTER TABLE `doctors` CHANGE `search_name` `search_name` varchar(191) CHARACTER 
 ALTER TABLE `doctors` ADD FULLTEXT(search_name, description, street, city, country, working_doctors_names);
 
 
-select count(*) as aggregate
-from `doctors`
-  inner join `users` on `doctors`.`user_id` = `users`.`id`
-where `doctors`.`state_id` = 1
-      and MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST ('jagg' IN NATURAL LANGUAGE MODE) or MATCH (email) AGAINST ('jagg' IN NATURAL LANGUAGE MODE)
-
-
-
-UPDATE doctors SET street_new = street;
-UPDATE doctors SET street = '';
-ALTER TABLE `doctors` CHANGE `street` `street` TEXT CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL;
-UPDATE doctors SET street = street_new;
-
-UPDATE doctors SET street_new = '' WHERE street_new IS NULL;
-
-ALTER TABLE `doctors` ADD `city_new` VARCHAR(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL AFTER `city`;
-UPDATE doctors SET city_new = city;
-ALTER TABLE `doctors` CHANGE `city` `city` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci  NULL DEFAULT NULL ;
-UPDATE doctors SET city = city_new;
-
-

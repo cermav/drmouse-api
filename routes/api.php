@@ -24,6 +24,7 @@ Route::get('all-doctors', 'Api\DoctorController@showAll');
 Route::get('doctors/{id}', 'Api\DoctorController@show');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 Route::post('doctors', 'Api\DoctorController@store');
+Route::post('doctor-suggestion', 'Api\DoctorSuggestionController@store');
 
 
 // score
