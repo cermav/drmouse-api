@@ -119,12 +119,43 @@ UPDATE users SET avatar = REPLACE(avatar, '2019/12/', '') WHERE avatar LIKE '201
 SELECT *
 FROM doctors AS d
 INNER JOIN doctors AS d2 ON d.latitude = d2.latitude AND d.longitude = d2.longitude
-  AND d.id != d2.id
+  AND d.id != d2.id;
 
 
 
 
+ALTER TABLE doctors DROP INDEX search_data;
+ALTER TABLE `doctors` CHANGE `description` `description` TEXT CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL;
+ALTER TABLE `doctors` CHANGE `phone` `phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL ;
+ALTER TABLE `doctors` CHANGE `second_phone` `second_phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `website` `website` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `street` `street` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `city` `city` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `country` `country` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `working_doctors_names` `working_doctors_names` TEXT CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `search_name` `search_name` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
+
+ALTER TABLE `doctors` ADD FULLTEXT(search_name, description, street, city, country, working_doctors_names);
 
 
+select count(*) as aggregate
+from `doctors`
+  inner join `users` on `doctors`.`user_id` = `users`.`id`
+where `doctors`.`state_id` = 1
+      and MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST ('jagg' IN NATURAL LANGUAGE MODE) or MATCH (email) AGAINST ('jagg' IN NATURAL LANGUAGE MODE)
+
+
+
+UPDATE doctors SET street_new = street;
+UPDATE doctors SET street = '';
+ALTER TABLE `doctors` CHANGE `street` `street` TEXT CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL;
+UPDATE doctors SET street = street_new;
+
+UPDATE doctors SET street_new = '' WHERE street_new IS NULL;
+
+ALTER TABLE `doctors` ADD `city_new` VARCHAR(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL AFTER `city`;
+UPDATE doctors SET city_new = city;
+ALTER TABLE `doctors` CHANGE `city` `city` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci  NULL DEFAULT NULL ;
+UPDATE doctors SET city = city_new;
 
 

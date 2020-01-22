@@ -70,16 +70,28 @@ class DoctorController extends Controller
                     $request->has('lat') ? floatval($request->input('lat')) : 49.8
                 ]
             )
+
             ->join('users', 'doctors.user_id', '=', 'users.id')
             ->where('doctors.state_id', [1]);
 
 
         // add fulltext condition
         if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
+            // split words and add wildcard
+            $search_text = '*' . implode('* *', explode(' ', urldecode(trim($request->input('fulltext'))))) . '*';
+            $doctors->selectRaw(
+                "(
+                    MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST (? IN BOOLEAN MODE) +
+                    MATCH (email) AGAINST (? IN BOOLEAN MODE)
+                ) AS relevance",
+                [$search_text, $search_text]
+            );
             $doctors->whereRaw(
-                "MATCH (search_name, description, street, city, country) AGAINST (? IN NATURAL LANGUAGE MODE)", trim($request->input('fulltext')));
+                "MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST (? IN BOOLEAN MODE)", $search_text);
             $doctors->orwhereRaw(
-                "MATCH (email) AGAINST (? IN NATURAL LANGUAGE MODE)", trim($request->input('fulltext')));
+                "MATCH (email) AGAINST (? IN BOOLEAN MODE)", $search_text);
+        } else {
+            $doctors->selectRaw('0 AS relevance');
         }
 
         // add specialization condition - condition has to be RAW, otherwhise not working
@@ -101,15 +113,17 @@ class DoctorController extends Controller
         }
 
         // sorting
-        $order_fields = ['rank' => 'total_score' , 'dist' => 'distance'];
+        $order_fields = ['rank' => 'total_score' , 'dist' => 'distance', 'rel' => 'relevance'];
         if ($request->has('order') && array_key_exists(trim($request->input('order')), $order_fields)) {
             $direction = $request->has('dir') && strtolower(trim($request->input('dir') == 'desc')) ? 'desc' : 'asc';
             // some exception
-            if ($request->input('order') == 'rank') {
+            if (in_array($request->input('order'), ['rank', 'rel'])) {
                 $direction = 'desc';
             }
             $doctors->orderBy($order_fields[$request->input('order')], $direction);
         }
+
+        $doctors->paginate($this->pageLimit);
 
         return $doctors->paginate($this->pageLimit);
     }
