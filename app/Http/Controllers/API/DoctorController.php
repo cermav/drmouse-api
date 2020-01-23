@@ -91,7 +91,7 @@ class DoctorController extends Controller
                     MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST (? IN BOOLEAN MODE)
                     OR
                     MATCH (email) AGAINST (? IN BOOLEAN MODE)
-                )", $search_text, $search_text);
+                )", [$search_text, $search_text]);
         } else {
             $doctors->selectRaw('0 AS relevance');
         }
