@@ -69,7 +69,10 @@ Route::group(['prefix' => 'mobile'], function() {
     Route::apiResource('doctors', 'Api\Mobile\DoctorController');
     Route::apiResource('properties', 'Api\Mobile\PropertyController');
     Route::apiResource('score', 'Api\Mobile\ScoreController');
+    Route::apiResource('score-category', 'Api\Mobile\ScoreCategoryController');
     Route::apiResource('services', 'Api\Mobile\ServiceController');
+    Route::apiResource('opening-hours', 'Api\Mobile\OpeningHoursController');
+
 });
 
 
