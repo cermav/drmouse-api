@@ -122,7 +122,9 @@ class DoctorController extends Controller
             if (in_array($request->input('order'), ['rank', 'rel'])) {
                 $direction = 'desc';
             }
-            $doctors->orderBy($order_fields[$request->input('order')], $direction);
+            $doctors
+                ->orderBy($order_fields[$request->input('order')], $direction)
+                ->orderBy('doctors.search_name');
         }
 
         $doctors->paginate($this->pageLimit);
