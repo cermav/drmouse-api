@@ -16,7 +16,6 @@ class ScoreDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'score_id' => $this->score_id,
             'score_item_id' => $this->score_item_id,
             'points' => $this->points
         ];
