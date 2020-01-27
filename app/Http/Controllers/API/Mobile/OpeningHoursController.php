@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api\Mobile;
 
-use App\Http\Resources\ScoreResource;
-use App\Score;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\OpeningHour;
+use Illuminate\Http\Request;
 
-class ScoreController extends Controller
+class OpeningHoursController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,8 +20,10 @@ class ScoreController extends Controller
         // add update condition
         $validatedDate = $request->validate(['updated' => 'date']);
         if (array_key_exists('updated', $validatedDate)) {
-            $whereArray[] = ['scores.updated_at', '>', $validatedDate['updated']];
+            $whereArray[] = ['opening_hours.updated_at', '>', $validatedDate['updated']];
         }
-        return ScoreResource::collection(Score::where($whereArray)->get());
+        return OpeningHour::where($whereArray)
+            ->select('id', 'user_id', 'weekday_id', 'open_at', 'close_at', 'updated_at')
+            ->get();
     }
 }

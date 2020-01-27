@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Mobile;
 
 use App\Doctor;
-use App\Http\Resources\DoctorResource;
+use App\Http\Resources\Mobile\DoctorResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +34,7 @@ class DoctorController extends Controller
                     DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
                 )
                 ->get()
+
         );
     }
 
