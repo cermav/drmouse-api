@@ -72,7 +72,7 @@ class DoctorController extends Controller
             )
 
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->where('doctors.state_id', [DoctorStatus::PUBLISHED]);
+            ->where('doctors.state_id', DoctorStatus::PUBLISHED);
 
 
         // add fulltext condition
@@ -129,9 +129,9 @@ class DoctorController extends Controller
     }
 
     /**
-     * Return all doctors, for homepage
-     * @return \Illuminate\Support\Collection
-     */
+ * Return all doctors, for homepage
+ * @return \Illuminate\Support\Collection
+ */
     public function showAll()
     {
         // prepare basic select

@@ -137,4 +137,11 @@ ALTER TABLE `doctors` CHANGE `search_name` `search_name` varchar(191) CHARACTER 
 
 ALTER TABLE `doctors` ADD FULLTEXT(search_name, description, street, city, country, working_doctors_names);
 
+CREATE TABLE doctors_old_state
+SELECT id, state_id FROM doctors;
+
+UPDATE doctors SET state_id = 3 WHERE state_id = 1;
+
+UPDATE doctors SET state_id = 6 WHERE id IN (SELECT id FROM doctors_old_state WHERE state_id = 3)
+
 

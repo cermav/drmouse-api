@@ -11,4 +11,5 @@ final class DoctorStatus
     const PUBLISHED = 3;
     const UNPUBLISHED = 4;
     const DELETED = 5;
+    const INCOMPLETE = 6;
 }

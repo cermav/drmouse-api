@@ -59,6 +59,10 @@ Route::group(['middleware' => ['jwt.auth']], function() {
     Route::put('service/{id}', 'Api\ServiceController@update');
     Route::put('gallery/{id}', 'Api\GalleryController@update');
 
+    // administration
+    Route::get('admin/doctors', 'Api\Admin\DoctorController@index');
+    Route::get('admin/doctor-status', 'Api\Admin\DoctorStatusController@index');
+
     // score
     Route::delete('score/{id}', 'Api\ScoreController@delete');
 });
