@@ -72,7 +72,7 @@ class DoctorController extends Controller
             )
 
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->where('doctors.state_id', [1]);
+            ->where('doctors.state_id', [DoctorStatus::PUBLISHED]);
 
 
         // add fulltext condition
@@ -86,10 +86,10 @@ class DoctorController extends Controller
                 ) AS relevance",
                 [$search_text, $search_text]
             );
-            $doctors->whereRaw(
-                "MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST (? IN BOOLEAN MODE)", $search_text);
-            $doctors->orwhereRaw(
-                "MATCH (email) AGAINST (? IN BOOLEAN MODE)", $search_text);
+            $doctors->whereRaw("(
+                    MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST (? IN BOOLEAN MODE)
+                    OR MATCH (email) AGAINST (? IN BOOLEAN MODE)
+                )", [$search_text, $search_text]);
         } else {
             $doctors->selectRaw('0 AS relevance');
         }
@@ -158,7 +158,7 @@ class DoctorController extends Controller
                   , false) AS open ")
             )
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->where('doctors.state_id', 1);
+            ->where('doctors.state_id', DoctorStatus::PUBLISHED);
 
         /*
          DB::raw("(
@@ -211,7 +211,7 @@ class DoctorController extends Controller
                     LIMIT 1)
                   , false) AS open ")
             )
-            ->whereIn('state_id', [1, 3])->get();
+            ->whereIn('state_id', [DoctorStatus::NEW, DoctorStatus::PUBLISHED])->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
@@ -251,7 +251,7 @@ class DoctorController extends Controller
                     LIMIT 1)
                   , false) AS open ")
             )
-            ->whereIn('state_id', [1, 3])
+            ->whereIn('state_id', [DoctorStatus::PUBLISHED])
             ->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
@@ -565,7 +565,7 @@ class DoctorController extends Controller
                 'name' => $data->name,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
-                'role_id' => UserRole::DOCTOR
+                'role_id' => DoctorStatus::DOCTOR
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
