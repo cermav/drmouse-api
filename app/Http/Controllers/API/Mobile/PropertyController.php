@@ -23,7 +23,9 @@ class PropertyController extends Controller
             $properties = Property::where([
                 ['property_category_id', '=', intval($categoryValidate['category'])],
                 ['is_approved', '=', 1]
-            ])->get();
+            ])
+            ->select('id', 'name')
+            ->get();
             return response()->json($properties);
 
         }
