@@ -33,7 +33,6 @@ Route::get('score', 'Api\ScoreController@index');
 Route::get('score/{id}', 'Api\ScoreController@show');
 Route::post('score', 'Api\ScoreController@store');
 Route::post('vote', 'Api\ScoreVoteController@store');
-Route::get('score-waiting', 'Api\ScoreController@waiting');
 
 Route::post('auth/login', 'Api\AuthController@login');
 Route::post('auth/forgot-password', 'Api\Auth\ForgotPasswordController')->name('forgot.password');
@@ -59,9 +58,6 @@ Route::group(['middleware' => ['jwt.auth']], function() {
     Route::put('service/{id}', 'Api\ServiceController@update');
     Route::put('gallery/{id}', 'Api\GalleryController@update');
 
-    // administration
-    Route::get('admin/doctors', 'Api\Admin\DoctorController@index');
-    Route::get('admin/doctor-status', 'Api\Admin\DoctorStatusController@index');
 
     // score
     Route::delete('score/{id}', 'Api\ScoreController@delete');
@@ -76,6 +72,15 @@ Route::group(['prefix' => 'mobile'], function() {
     Route::apiResource('score-category', 'Api\Mobile\ScoreCategoryController');
     Route::apiResource('services', 'Api\Mobile\ServiceController');
     Route::apiResource('opening-hours', 'Api\Mobile\OpeningHoursController');
+
+});
+
+// administration
+Route::group(['prefix' => 'admin', 'middleware' => ['jwt.auth']], function() {
+
+    Route::apiResource('doctors', 'Api\Admin\DoctorController');
+    Route::apiResource('doctor-status', 'Api\Admin\DoctorStatusController');
+    Route::apiResource('score', 'Api\Admin\ScoreController');
 
 });
 

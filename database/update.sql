@@ -145,3 +145,5 @@ UPDATE doctors SET state_id = 3 WHERE state_id = 1;
 UPDATE doctors SET state_id = 6 WHERE id IN (SELECT id FROM doctors_old_state WHERE state_id = 3)
 
 
+ALTER TABLE `scores` ADD `status_id` INT UNSIGNED NOT NULL DEFAULT '10' AFTER `author_id`;
+

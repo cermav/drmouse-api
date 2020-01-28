@@ -4,7 +4,7 @@ namespace App\Http\Resources\Mobile;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ScoreResource extends JsonResource
+class ScoreDetailResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,9 +16,8 @@ class ScoreResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_id' => $this->user_id,
-            'comment' => $this->comment,
-            'details' => ScoreDetailResource::collection($this->details),
+            'score_category' => $this->score_item_id,
+            'points' => $this->points
         ];
     }
 }

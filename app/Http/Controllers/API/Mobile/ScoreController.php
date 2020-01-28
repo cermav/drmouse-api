@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Mobile;
 
 use App\Http\Resources\Mobile\ScoreResource;
 use App\Score;
+use App\Types\ScoreStatus;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -16,7 +17,7 @@ class ScoreController extends Controller
      */
     public function index(Request $request)
     {
-        $whereArray = [];
+        $whereArray = [['status_id', ScoreStatus::APPROVED]];
 
         // add update condition
         $validatedDate = $request->validate(['updated' => 'date']);

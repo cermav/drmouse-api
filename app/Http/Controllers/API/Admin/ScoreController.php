@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\ScoreItem;
-use App\Types\ScoreStatus;
-use Illuminate\Http\JsonResponse;
+use App\Types\UserRole;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use App\Score;
@@ -17,16 +18,26 @@ use Illuminate\Support\Facades\Validator;
 
 class ScoreController extends Controller {
 
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(
-            ScoreItem::where('status_id', ScoreStatus::APPROVED)->get()
-        );
+        if (Auth::User()->role_id != UserRole::ADMINISTRATOR) {
+            throw new AuthenticationException();
+        }
+
+        // search by status
+        if ($request->has('status') && intval($request->input('status')) > 0) {
+            $result = ScoreItem::where('status_id', intval($request->input('status')))->get();
+        } else {
+            return response()->json(
+                ScoreResource::collection(ScoreItem::where('status_id', 10))
+            );
+        }
     }
 
     /**
@@ -50,50 +61,38 @@ class ScoreController extends Controller {
         )->where($whereArray)->get());
     }
 
+
     /**
-     * Store a newly created resource in storage.
+     * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function update(Request $request, int $id) {
         $input = json_decode($request->getContent());
 
         // validate input
         $validator = Validator::make((array)$input, [
-            'user_id' => 'required|integer',
-            'author_id' => 'integer',
-            'comment' => 'string|required'
+            'is_approved' => 'boolean',
+            'comment' => 'string'
         ]);
         if($validator->fails()){
-            return response()->json($validator->errors(), JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json($validator->errors(), 422);
         }
 
-        // store score
-        $score = Score::create([
-            'user_id' => $input->user_id,
-            'author_id' => (property_exists($input, 'author_id') ? $input->author_id : null),
-            'comment' => $input->comment,
-            'ip_address' => $_SERVER['REMOTE_ADDR'],
-            'is_approved' => 0
-        ]);
+        $score = Score::find($id);
 
-        // store score items
-        foreach ($input->score_item as $item) {
-            $validator = Validator::make((array)$item, [
-               'id' => 'required|integer',
-                'points' => 'required|integer',
-            ]);
-            if ($validator->validate()) {
-                ScoreDetail::create([
-                    'score_id' => $score->id,
-                    'score_item_id' => $item->id,
-                    'points' => $item->points
-                ]);
-            }
+        if (property_exists($input, 'is_approved') && $input->is_approved === true) {
+           $score->is_approved = true;
         }
-        return new ScoreResource($score);
+
+        if (property_exists($input, 'comment') && !empty($input->comment)) {
+            $score->comment = $input->comment;
+        }
+        $score->update();
+
+        return $score;
     }
 
 }
