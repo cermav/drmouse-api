@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\ScoreItem;
 use App\Types\UserRole;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -30,14 +31,22 @@ class ScoreController extends Controller {
             throw new AuthenticationException();
         }
 
+        $whereArray = [];
+
         // search by status
         if ($request->has('status') && intval($request->input('status')) > 0) {
-            $result = ScoreItem::where('status_id', intval($request->input('status')))->get();
-        } else {
-            return response()->json(
-                ScoreResource::collection(ScoreItem::where('status_id', 10))
-            );
+            $whereArray[] = ['status_id', intval($request->input('status'))];
         }
+
+        // add fulltext condition
+        if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
+            $whereArray[] = ['comment', 'LIKE', '%' . trim($request->input('fulltext')) . '%'];
+        }
+
+        return response()->json(
+            ScoreResource::collection(
+                Score::where($whereArray)->get()
+        ));
     }
 
     /**
@@ -74,17 +83,17 @@ class ScoreController extends Controller {
 
         // validate input
         $validator = Validator::make((array)$input, [
-            'is_approved' => 'boolean',
+            'status_id' => 'int',
             'comment' => 'string'
         ]);
         if($validator->fails()){
-            return response()->json($validator->errors(), 422);
+            return response()->json($validator->errors(), JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $score = Score::find($id);
 
-        if (property_exists($input, 'is_approved') && $input->is_approved === true) {
-           $score->is_approved = true;
+        if (property_exists($input, 'status_id') && intval($input->status_id) > 0) {
+           $score->status_id = intval($input->status_id);
         }
 
         if (property_exists($input, 'comment') && !empty($input->comment)) {
