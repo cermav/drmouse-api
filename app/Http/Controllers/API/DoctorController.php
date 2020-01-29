@@ -441,7 +441,7 @@ class DoctorController extends Controller
         // prepare validator
         $validator = Validator::make((array) $input, [
             'name' => 'required|max:255',
-            'slug' => 'max:191|unique:doctors,slug,'.$user_id.',id',
+            'slug' => 'max:191|unique:doctors,slug,'.$user_id.',user_id',
             'email' => 'required|email|unique:users,email,'.$user_id.',id',
             'description' => 'string',
             'speaks_english' => 'required'
