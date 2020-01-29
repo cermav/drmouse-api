@@ -124,18 +124,18 @@ INNER JOIN doctors AS d2 ON d.latitude = d2.latitude AND d.longitude = d2.longit
 
 
 
-ALTER TABLE doctors DROP INDEX search_data;
-ALTER TABLE `doctors` CHANGE `description` `description` TEXT CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL;
-ALTER TABLE `doctors` CHANGE `phone` `phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL ;
-ALTER TABLE `doctors` CHANGE `second_phone` `second_phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
-ALTER TABLE `doctors` CHANGE `website` `website` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
-ALTER TABLE `doctors` CHANGE `street` `street` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
-ALTER TABLE `doctors` CHANGE `city` `city` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
-ALTER TABLE `doctors` CHANGE `country` `country` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
-ALTER TABLE `doctors` CHANGE `working_doctors_names` `working_doctors_names` TEXT CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
-ALTER TABLE `doctors` CHANGE `search_name` `search_name` varchar(191) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ;
-
-ALTER TABLE `doctors` ADD FULLTEXT(search_name, description, street, city, country, working_doctors_names);
+ALTER TABLE doctors DROP INDEX doctor_text;
+ALTER TABLE `doctors` CHANGE `description` `description` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `doctors` CHANGE `slug` `slug` varchar(191) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `doctors` CHANGE `phone` `phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
+ALTER TABLE `doctors` CHANGE `second_phone` `second_phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `website` `website` varchar(191) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `street` `street` varchar(191) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `city` `city` varchar(191) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `country` `country` varchar(191) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `working_doctors_names` `working_doctors_names` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ;
+ALTER TABLE `doctors` CHANGE `search_name` `search_name` varchar(191) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ;
+CREATE FULLTEXT INDEX doctor_text ON doctors (search_name, description, street, city, country, working_doctors_names);
 
 CREATE TABLE doctors_old_state
 SELECT id, state_id FROM doctors;
@@ -146,4 +146,9 @@ UPDATE doctors SET state_id = 6 WHERE id IN (SELECT id FROM doctors_old_state WH
 
 
 ALTER TABLE `scores` ADD `status_id` INT UNSIGNED NOT NULL DEFAULT '10' AFTER `author_id`;
+
+
+
+
+SELECT * FROM doctors WHERE MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST ('*kosar*' IN BOOLEAN MODE)
 

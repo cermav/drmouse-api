@@ -441,6 +441,7 @@ class DoctorController extends Controller
         // prepare validator
         $validator = Validator::make((array) $input, [
             'name' => 'required|max:255',
+            'slug' => 'max:191|unique:doctors,slug,'.$user_id.',id',
             'email' => 'required|email|unique:users,email,'.$user_id.',id',
             'description' => 'string',
             'speaks_english' => 'required'
@@ -455,7 +456,7 @@ class DoctorController extends Controller
         $this->validateAddress($input->address);
         $this->validateStaffInfo($input->staff_info);
 
-        return [
+        $data = [
             'user' => [
                 'name' => $input->name,
                 'email' => $input->email
@@ -478,6 +479,10 @@ class DoctorController extends Controller
             ],
             'avatar' => $input->avatar
         ];
+        if (!empty($input->slug)) {
+            $data['doctor']['slug'] = $input->slug;
+        }
+        return $data;
     }
 
     /**
