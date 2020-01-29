@@ -20,7 +20,7 @@ class Doctor extends Model {
         'user_id', 'state_id',
         'description', 'slug', 'speaks_english',
         'search_name',
-        'phone', 'second_phone', 'second_phone',
+        'phone', 'second_phone', 'second_phone', 'website',
         'street', 'city', 'country', 'post_code', 'latitude', 'longitude',
         'working_doctors_count', 'working_doctors_names', 'nurses_count', 'other_workers_count',
         'gdpr_agreed', 'gdpr_agreed_date', 'gdpr_agreed_ip', 'profile_completedness',

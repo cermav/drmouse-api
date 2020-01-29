@@ -215,7 +215,7 @@ class DoctorController extends Controller
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
-        return response()->json(['message' => 'Not Found!'], 404);
+        return response()->json(['message' => 'Not Found!'], JsonResponse::HTTP_NOT_FOUND);
     }
 
     /**
@@ -256,7 +256,7 @@ class DoctorController extends Controller
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
-        return response()->json(['message' => 'Not Found!'], 404);
+        return response()->json(['message' => 'Not Found!'], JsonResponse::HTTP_NOT_FOUND);
     }
 
     /**
