@@ -12,5 +12,5 @@ class UserRole
 {
     public const ADMINISTRATOR = 1;
     public const DOCTOR = 2;
-    public const VISITOR = 3;
+    public const MEMBER = 3;
 }

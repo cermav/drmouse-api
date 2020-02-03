@@ -26,6 +26,8 @@ Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 Route::post('doctors', 'Api\DoctorController@store');
 Route::post('doctor-suggestion', 'Api\DoctorSuggestionController@store');
 
+Route::post('members', 'Api\MemberController@store');
+
 
 // score
 Route::put('score/{id}', 'Api\ScoreController@update'); // should be under auth, but it is not working now

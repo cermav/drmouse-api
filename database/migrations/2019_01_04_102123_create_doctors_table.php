@@ -43,7 +43,7 @@ class CreateDoctorsTable extends Migration {
             $table->timestamps();
         });
 
-        DB::statement('ALTER TABLE doctors ADD FULLTEXT search_data(search_name, description, street, city, country)');
+        DB::statement('ALTER TABLE doctors ADD FULLTEXT doctor_text(search_name, description, street, city, country, working_doctors_names)');
     }
 
     /**
