@@ -56,8 +56,10 @@ class VerifyEmail extends VerifyEmailBase
      */
     protected function verificationUrl($notifiable)
     {
+        $user = User::findOrFail($notifiable->getKey());
+
         // create token
-        $token = app(PasswordBroker::class)->createToken(User::findOrFail($notifiable->getKey()));
+        $token = app(PasswordBroker::class)->createToken($user);
 
         // prepare signed link
         $link = URL::temporarySignedRoute(
@@ -68,7 +70,11 @@ class VerifyEmail extends VerifyEmailBase
         );
 
         // prepare remote link
-        $remoteLink = config('frontend.url') . 'vet/verify?link=' . base64_encode($link);
+        if ($user->role_id == 3) {
+            $remoteLink = config('frontend.url') . 'my/verify?link=' . base64_encode($link);
+        } else {
+            $remoteLink = config('frontend.url') . 'vet/verify?link=' . base64_encode($link);
+        }
 
 //        $remoteLink = config('frontend.url') . 'vet/verify?id=' . $notifiable->getKey() . parse_url($link, PHP_URL_QUERY );
 

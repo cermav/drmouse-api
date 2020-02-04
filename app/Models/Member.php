@@ -15,11 +15,9 @@ class Member extends Model
      * @var array
      */
     protected $fillable = [
-
         'user_id', 'state_id',
         'description', 'slug',
         'gdpr_agreed', 'gdpr_agreed_date',
-
     ];
 
 

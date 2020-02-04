@@ -211,7 +211,7 @@ class DoctorController extends Controller
                     LIMIT 1)
                   , false) AS open ")
             )
-            ->whereIn('state_id', [DoctorStatus::NEW, DoctorStatus::PUBLISHED])->get();
+            ->whereIn('state_id', [DoctorStatus::NEW, DoctorStatus::UNPUBLISHED, DoctorStatus::INCOMPLETE, DoctorStatus::PUBLISHED])->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
