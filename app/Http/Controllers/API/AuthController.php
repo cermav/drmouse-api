@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Validator, DB, Hash, Mail, Illuminate\Support\Facades\Password;
@@ -50,6 +51,11 @@ class AuthController extends Controller
     public function refresh()
     {
         return $this->respondWithToken(auth('api')->refresh());
+    }
+
+    public function info()
+    {
+        return Auth::user();
     }
 
     /**

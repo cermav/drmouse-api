@@ -48,6 +48,7 @@ Route::get('newsletter/verify/{id}', 'Api\NewsletterUserController@verify')->nam
 Route::group(['middleware' => ['jwt.auth']], function() {
 
     // auth
+    Route::get('auth/info', 'Api\AuthController@info');
     Route::get('auth/refresh', 'Api\AuthController@refresh');
     Route::get('auth/logout', 'Api\AuthController@logout');
     Route::put('auth/change-password/{id}', 'Api\Auth\ChangePasswordController@update');
