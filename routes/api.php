@@ -61,6 +61,9 @@ Route::group(['middleware' => ['jwt.auth']], function() {
     Route::put('service/{id}', 'Api\ServiceController@update');
     Route::put('gallery/{id}', 'Api\GalleryController@update');
 
+    Route::get('members/{id}', 'Api\MemberController@show');
+    Route::put('members/{id}', 'Api\MemberController@update');
+
 
     // score
     Route::delete('score/{id}', 'Api\ScoreController@delete');
