@@ -63,7 +63,7 @@ class ScoreController extends Controller {
         // validate input
         $validator = Validator::make((array)$input, [
             'user_id' => 'required|integer',
-            'author_id' => 'integer',
+            'author_id' => 'integer|nullable',
             'comment' => 'string|required'
         ]);
         if($validator->fails()){
@@ -73,7 +73,7 @@ class ScoreController extends Controller {
         // store score
         $score = Score::create([
             'user_id' => $input->user_id,
-            'author_id' => (property_exists($input, 'author_id') ? $input->author_id : null),
+            'author_id' => (property_exists($input, 'author_id') ? (intval($input->author_id) > 0 ? intval($input->author_id) : null) : null),
             'comment' => $input->comment,
             'ip_address' => $_SERVER['REMOTE_ADDR'],
             'is_approved' => 0
