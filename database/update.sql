@@ -150,7 +150,10 @@ ALTER TABLE `scores` ADD `status_id` INT UNSIGNED NOT NULL DEFAULT '10' AFTER `a
 
 
 
-SELECT * FROM doctors WHERE MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST ('*kosar*' IN BOOLEAN MODE)
+SELECT * FROM doctors WHERE MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST ('*kosar*' IN BOOLEAN MODE);
 
 INSERT INTO `roles` (`id`, `name`, `display_name`, `created_at`, `updated_at`) VALUES ('3', 'member', 'Paníček', CURRENT_TIME(), CURRENT_TIME());
 
+
+SELECT * FROM users WHERE id IN (SELECT user_id FROM  doctors WHERE state_id = 5) AND email NOT LIKE '%deleted%';
+UPDATE users SET email = CONCAT('deleted_', LEFT(UUID(), 8), '_', email) WHERE id IN (SELECT user_id FROM  doctors WHERE state_id = 5) AND email NOT LIKE '%deleted%';
