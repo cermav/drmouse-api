@@ -64,4 +64,31 @@ class GalleryController extends Controller
             throw new AuthenticationException();
         }
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function delete(Request $request, int $id)
+    {
+        // verify user
+        $loggedUser = Auth::User();
+
+        $photo = Photo::findOrFail($id);
+
+        if ($photo->user_id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
+
+            $photo->delete();
+
+            return response()->json("Deleted", JsonResponse::HTTP_OK);
+
+        } else {
+            // return unauthorized
+            throw new AuthenticationException();
+        }
+    }
+
 }

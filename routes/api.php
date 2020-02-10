@@ -60,6 +60,7 @@ Route::group(['middleware' => ['jwt.auth']], function() {
     Route::put('property/{id}', 'Api\PropertyController@update');
     Route::put('service/{id}', 'Api\ServiceController@update');
     Route::put('gallery/{id}', 'Api\GalleryController@update');
+    Route::delete('gallery/{id}', 'Api\GalleryController@delete');
 
     Route::get('members/{id}', 'Api\MemberController@show');
     Route::put('members/{id}', 'Api\MemberController@update');
