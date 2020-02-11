@@ -44,6 +44,7 @@ class DoctorController extends Controller
         $doctors = DB::table('doctors')
             ->select(
                 'users.id',
+                'doctors.state_id',
                 DB::raw("(SELECT name FROM states WHERE id = doctors.state_id) AS state_name"),
                 'name',
                 'slug',
@@ -94,5 +95,66 @@ class DoctorController extends Controller
 
         return $doctors->paginate($this->pageLimit);
     }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, int $id)
+    {
+        $loggedUser = Auth::User();
+
+        if ($loggedUser->role_id === UserRole::ADMINISTRATOR) {
+
+            // get data from json
+            $input = json_decode($request->getContent());
+
+            // find doctor
+            $doctor = Doctor::where(['user_id' => $id])->get()->first();
+
+            // get new state
+            $status = intval($input->status);
+
+            if ($status > 0) {
+                // add search name
+                $doctor->update(['state_id' => $status]);
+            }
+
+            return response()->json(DoctorResource::make($doctor), JsonResponse::HTTP_OK);
+
+        } else {
+            // return unauthorized
+            throw new AuthenticationException();
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request, int $id)
+    {
+        // verify user
+        $loggedUser = Auth::User();
+
+        if ($loggedUser->role_id === UserRole::ADMINISTRATOR) {
+
+            $doctor = Doctor::where(['user_id' => $id])->get()->first();
+            $doctor->update(['state_id' => DoctorStatus::DELETED]);
+
+            return response()->json(DoctorResource::make($doctor), JsonResponse::HTTP_OK);
+
+        } else {
+            // return unauthorized
+            throw new AuthenticationException();
+        }
+    }
+
 
 }

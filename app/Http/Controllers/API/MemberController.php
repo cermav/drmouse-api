@@ -16,12 +16,64 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class MemberController extends Controller
 {
+
+    private $pageLimit = 30;
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        if (Auth::User()->role_id != UserRole::ADMINISTRATOR) {
+            throw new AuthenticationException();
+        }
+
+        // prepare basic select
+        $members = DB::table('members')
+            ->select(
+                'users.id',
+                'members.state_id',
+                DB::raw("(SELECT name FROM states WHERE id = members.state_id) AS state_name"),
+                'name',
+                'users.email',
+                'avatar',
+                'members.created_at'
+            )
+            ->join('users', 'members.user_id', '=', 'users.id')
+            ->whereIn('members.state_id', [
+                MemberStatus::NEW,
+                MemberStatus::VALID,
+                MemberStatus::BLOCKED
+            ]);
+
+        // add fulltext condition
+        if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
+            // split words and add wildcard
+            $search_text = '*' . implode('* *', explode(' ', urldecode(trim($request->input('fulltext'))))) . '*';
+            $members->whereRaw("(MATCH (email) AGAINST (? IN BOOLEAN MODE)", $search_text);
+        }
+
+        // search by status
+        if ($request->has('status') && intval($request->input('status')) > 0) {
+            $members->where('members.state_id', intval($request->input('status')));
+        }
+
+        // sorting
+        $members->orderBy('name', 'ASC');
+        $members->paginate($this->pageLimit);
+
+        return $members->paginate($this->pageLimit);
+    }
+
     /**
      * Display the specified resource.
      *

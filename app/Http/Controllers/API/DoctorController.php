@@ -373,34 +373,6 @@ class DoctorController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function delete(Request $request, int $id)
-    {
-        // verify user
-        $requestUser = User::find($id);
-        $loggedUser = Auth::User();
-
-        if ($requestUser->id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
-
-            $doctor = Doctor::where(['user_id' => $id])->get()->first();
-            $doctor->update(['state_id' => DoctorStatus::DELETED]);
-
-            return response()->json(DoctorResource::make($doctor), JsonResponse::HTTP_OK);
-
-        } else {
-            // return unauthorized
-            throw new AuthenticationException();
-        }
-    }
-
-
-
-    /**
      * Validate Input
      * @param Request $request
      * @return \Illuminate\Contracts\Validation\Validator

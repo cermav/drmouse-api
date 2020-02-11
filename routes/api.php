@@ -55,7 +55,6 @@ Route::group(['middleware' => ['jwt.auth']], function() {
 
     // doctor profile
     Route::put('doctors/{id}', 'Api\DoctorController@update');
-    Route::delete('doctors/{id}', 'Api\DoctorController@delete');
     Route::put('opening-hours/{id}', 'Api\OpeningHoursController@update');
     Route::put('property/{id}', 'Api\PropertyController@update');
     Route::put('service/{id}', 'Api\ServiceController@update');
@@ -64,6 +63,8 @@ Route::group(['middleware' => ['jwt.auth']], function() {
 
     Route::get('members/{id}', 'Api\MemberController@show');
     Route::put('members/{id}', 'Api\MemberController@update');
+
+
 
 
     // score
@@ -85,6 +86,7 @@ Route::group(['prefix' => 'mobile'], function() {
 // administration
 Route::group(['prefix' => 'admin', 'middleware' => ['jwt.auth']], function() {
 
+    Route::apiResource('members', 'Api\MemberController');
     Route::apiResource('doctors', 'Api\Admin\DoctorController');
     Route::apiResource('doctor-status', 'Api\Admin\DoctorStatusController');
     Route::apiResource('score', 'Api\Admin\ScoreController');
