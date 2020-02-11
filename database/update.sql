@@ -157,3 +157,5 @@ INSERT INTO `roles` (`id`, `name`, `display_name`, `created_at`, `updated_at`) V
 
 SELECT * FROM users WHERE id IN (SELECT user_id FROM  doctors WHERE state_id = 5) AND email NOT LIKE '%deleted%';
 UPDATE users SET email = CONCAT('deleted_', LEFT(UUID(), 8), '_', email) WHERE id IN (SELECT user_id FROM  doctors WHERE state_id = 5) AND email NOT LIKE '%deleted%';
+
+ALTER TABLE `scores` ADD `verified_by` INT UNSIGNED NULL DEFAULT NULL AFTER `is_approved`, ADD `verify_date` DATETIME NULL DEFAULT NULL AFTER `verified_by`;

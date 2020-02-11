@@ -57,6 +57,10 @@ class ScoreController extends Controller {
      */
     public function show(int $id)
     {
+        if (Auth::User()->role_id != UserRole::ADMINISTRATOR) {
+            throw new AuthenticationException();
+        }
+
         $dateFrom = Input::get('date_from');
         $whereArray = [['is_approved', '=', 1]];
         array_push($whereArray, ['user_id', '=', $id]);
@@ -78,7 +82,13 @@ class ScoreController extends Controller {
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, int $id) {
+    public function update(Request $request, int $id)
+    {
+
+        if (Auth::User()->role_id != UserRole::ADMINISTRATOR) {
+            throw new AuthenticationException();
+        }
+
         $input = json_decode($request->getContent());
 
         // validate input
@@ -94,11 +104,19 @@ class ScoreController extends Controller {
 
         if (property_exists($input, 'status_id') && intval($input->status_id) > 0) {
            $score->status_id = intval($input->status_id);
+
+            // add validation info
+            $score->verify_date = date('Y-m-d H:i:s');
+            $score->verified_by = Auth::User()->id;
         }
 
         if (property_exists($input, 'comment') && !empty($input->comment)) {
             $score->comment = $input->comment;
         }
+
+
+
+
         $score->update();
 
         return $score;

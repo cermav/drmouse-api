@@ -13,7 +13,7 @@ class Score extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'author_id', 'comment', 'ip_address', 'is_approved'
+        'user_id', 'author_id', 'comment', 'ip_address', 'is_approved', 'verified_by', 'verify_date'
     ];
 
     /*

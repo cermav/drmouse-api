@@ -22,7 +22,8 @@ class CreateScoresTable extends Migration
                     ->on('users')->onDelete('cascade');
             $table->text('comment')->collation('utf8_general_ci')->nullable(true);
             $table->string('ip_address', 39)->nullable(true);
-            $table->dateTime('score_date')->nullable(true);
+            $table->integer('verified_by')->unsigned()->nullable(true);
+            $table->dateTime('verify_date')->nullable(true);
             $table->timestamps();
         });
     }

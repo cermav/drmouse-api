@@ -22,6 +22,7 @@ class ScoreResource extends JsonResource
             'ip_address' => $this->ip_address,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'verify_date' => $this->verify_date,
             'voting' => $this->voting,
         ];
     }
