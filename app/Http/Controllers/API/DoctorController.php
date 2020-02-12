@@ -543,7 +543,7 @@ class DoctorController extends Controller
                 'name' => $data->name,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
-                'role_id' => DoctorStatus::DOCTOR
+                'role_id' => UserRole::DOCTOR
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
