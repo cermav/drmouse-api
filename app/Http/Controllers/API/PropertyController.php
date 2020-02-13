@@ -25,24 +25,43 @@ class PropertyController extends Controller
     public function index(Request $request)
     {
         try {
+            $categoryId = intval($request->get('category'));
 
-            $categoryValidate = $request->validate(['category' => 'required|integer|min:1|max:3']);
-
-            $properties = Property::select(
+            if ($categoryId > 0) {
+                $properties = Property::select(
                     'id', 'name',
                     DB::raw("(SELECT COUNT(user_id) FROM doctors_properties WHERE property_id = properties.id) AS doctor_count")
                 )
-                ->where([
-                    ['property_category_id', '=', intval($categoryValidate['category'])],
-                    ['is_approved', '=', 1]
-                ])
-                ->orderBy('doctor_count', 'desc')
-                ->get();
-            return response()->json($properties);
+                    ->where([
+                        ['property_category_id', '=', $categoryId],
+                        ['is_approved', '=', 1]
+                    ])
+                    ->orderBy('doctor_count', 'desc')
+                    ->get();
+            } else {
+                $properties = [];
+                $all = Property::select(
+                    'id', 'property_category_id',  'name',
+                    DB::raw("(SELECT COUNT(user_id) FROM doctors_properties WHERE property_id = properties.id) AS doctor_count")
+                )
+                    ->where([
+                        ['is_approved', '=', 1]
+                    ])
+                    ->orderBy('doctor_count', 'desc')
+                    ->get();
+                foreach ($all as $item) {
+                    $properties[$item->property_category_id][] = (object)[
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'doctor_count' => $item->doctor_count
+                    ];
+                }
+            }
 
+            return response()->json($properties);
         }
-        catch (ValidationException $ex) {
-            return response()->json($ex->errors(), 400);
+        catch (\Exception $ex) {
+            return response()->json($ex->getMessage(), 400);
         }
     }
 
