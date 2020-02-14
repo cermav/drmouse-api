@@ -44,14 +44,9 @@ class ResetPasswordEmail extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-            ->subject("Obnovení hesla")
-            ->line('Pro obnovení hesla pokračujte níže uvedeným odkazem')
-            ->action(
-                "Obnovit heslo",
-                $this->resetUrl($notifiable)
-            )
-            ->line('Thank you for using our application!');
+        return (new MailMessage())
+            ->subject('Obnovení hesla')
+            ->view('emails.reset-password', ['reset_link' => $this->resetUrl($notifiable)]);
     }
 
     /**

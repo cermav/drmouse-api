@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Doctor;
 use App\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Passwords\PasswordBroker;
@@ -24,28 +25,15 @@ class VerifyEmail extends VerifyEmailBase
         if (static::$toMailCallback) {
             return call_user_func(static::$toMailCallback, $notifiable);
         }
-
-        /*
-        $email = $user->email;
-        $data = [
-            'doctor' => $doctor,
-            'user' => $user
-        ];
-        Mail::send('emails/registration', $data, function ($message) use ($email) {
-            $message->to($email)
-                ->subject('Dr.Mouse ověření emailu');
-        });
-        */
-
+        $user = User::findOrFail($notifiable->getKey());
+        $doctor = Doctor::where('user_id', $user->id)->firstOrFail();
         return (new MailMessage())
-            ->subject(Lang::getFromJson('Oveření registračního emailu'))
-            ->greeting("Dobrý den,")
-            ->line("prosím, potvrďte níže uvedeným linkem vaši emailovou adresu")
-            ->action(
-                "Ověřit emailovou adresu",
-                $this->verificationUrl($notifiable)
-            )
-            ->line("Pokud jste nežádali o registraci v databazi veterinářů Dr. Mouse, pak tento email prosím ignorujte.");
+            ->subject('Oveření registračního emailu')
+            ->view('emails.registration', [
+                'user' => $user,
+                'doctor' => $doctor,
+                'verify_link' => $this->verificationUrl($notifiable)
+            ]);
     }
 
     /**

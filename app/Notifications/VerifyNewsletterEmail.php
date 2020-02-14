@@ -25,14 +25,8 @@ class VerifyNewsletterEmail extends VerifyEmailBase
         }
 
         return (new MailMessage())
-            ->subject(Lang::getFromJson('Oveření registrace k newsletteru'))
-            ->greeting("Dobrý den,")
-            ->line("prosím, potvrďte níže uvedeným linkem vaši emailovou adresu")
-            ->action(
-                "Ověřit emailovou adresu",
-                $this->verificationUrl($notifiable)
-            )
-            ->line(Lang::getFromJson('If you did not create an account, no further action is required.'));
+            ->subject('Oveření registrace k newsletteru')
+            ->view('emails.verify-newsletter', ['verify_link' => $this->verificationUrl($notifiable)]);
     }
 
     /**
