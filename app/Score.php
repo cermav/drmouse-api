@@ -41,4 +41,12 @@ class Score extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+    /**
+     * Get user who added the score
+     */
+    public function author()
+    {
+        return $this->belongsTo('App\User');
+    }
 }

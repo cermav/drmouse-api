@@ -38,14 +38,14 @@ class ScoreController extends Controller {
     public function show(int $id)
     {
         $dateFrom = Input::get('date_from');
-        $whereArray = [['is_approved', '=', 1]];
+        $whereArray = [['status_id', '=', ScoreStatus::APPROVED]];
         array_push($whereArray, ['user_id', '=', $id]);
         if ($dateFrom) {
             array_push($whereArray, ['created_at', '>', $dateFrom]);
         }
         //var_dump(Score::where($whereArray));die;
         return ScoreResource::collection(Score::select(
-            'id', 'user_id', 'comment', 'ip_address', 'created_at', 'updated_at',
+            'id', 'user_id', 'author_id', 'comment', 'ip_address', 'created_at', 'updated_at',
             DB::raw("(SELECT SUM(value) FROM score_votes WHERE score_id = scores.id) AS voting")
         )->where($whereArray)->get());
     }

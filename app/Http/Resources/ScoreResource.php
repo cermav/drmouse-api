@@ -17,6 +17,7 @@ class ScoreResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'author' => $this->author,
             'comment' => $this->comment,
             'details' => ScoreDetailResource::collection($this->details),
             'ip_address' => $this->ip_address,
