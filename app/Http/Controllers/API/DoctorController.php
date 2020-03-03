@@ -354,9 +354,19 @@ class DoctorController extends Controller
             $user->update($input['user']);
 
             $doctor = Doctor::where(['user_id' => $id])->get()->first();
+
+            try {
+                // get location
+                $location = $this->getDoctorLocation((object)$input['doctor']);
+            } catch (\Exception $ex) {
+                return response()->json(['error' => ['location' => $ex->getMessage()]], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
             // add search name
             $input['doctor']['search_name'] = HelperController::parseName($input['user']['name']);
             $input['doctor']['profile_completedness'] = HelperController::calculateProfileCompletedness($doctor);
+            $input['doctor']['latitude'] = $location['latitude'];
+            $input['doctor']['longitude'] = $location['longitude'];
             $doctor->update($input['doctor']);
 
             // store image
