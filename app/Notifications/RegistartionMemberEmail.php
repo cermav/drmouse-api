@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailBase;
 
-class VerifyEmail extends VerifyEmailBase
+class RegistartionMemberEmail extends VerifyEmailBase
 {
     /**
      * Build the mail representation of the notification.
@@ -26,12 +26,10 @@ class VerifyEmail extends VerifyEmailBase
             return call_user_func(static::$toMailCallback, $notifiable);
         }
         $user = User::findOrFail($notifiable->getKey());
-        $doctor = Doctor::where('user_id', $user->id)->firstOrFail();
         return (new MailMessage())
             ->subject('Oveření registračního emailu')
-            ->view('emails.registration', [
+            ->view('emails.registration-member', [
                 'user' => $user,
-                'doctor' => $doctor,
                 'verify_link' => $this->verificationUrl($notifiable)
             ]);
     }

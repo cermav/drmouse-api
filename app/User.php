@@ -3,6 +3,8 @@
 namespace App;
 
 
+use App\Notifications\RegistartionMemberEmail;
+use App\Notifications\RegistrationDoctorEmail;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\VerifyEmail;
 use App\Notifications\ResetPasswordEmail;
@@ -93,9 +95,19 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject {
      *
      * @return void
      */
-    public function sendEmailVerificationNotification()
+    public function sendDoctorRegistrationEmailNotification()
     {
-        $this->notify(new VerifyEmail); // my notification
+        $this->notify(new RegistrationDoctorEmail()); // my notification
+    }
+
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendMemberRegistrationEmailNotification()
+    {
+        $this->notify(new RegistartionMemberEmail()); // my notification
     }
 
     /**

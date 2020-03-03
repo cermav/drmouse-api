@@ -318,7 +318,7 @@ class DoctorController extends Controller
         $doctor->save();
 
         // send registration email
-        $user->sendEmailVerificationNotification();
+        $user->sendDoctorRegistrationEmailNotification();
 
         /* Create a record in log table */
         DoctorsLog::create([
