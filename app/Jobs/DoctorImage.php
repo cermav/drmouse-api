@@ -35,7 +35,7 @@ class DoctorImage implements ShouldQueue
         foreach (Doctor::all() as $doctor) {
             try {
 
-                $imageLink = 'https://api.drmouse.code8.link/storage/profile/' . $doctor->user->avatar;
+                $imageLink = 'https://api.drmouse.cz/storage/profile/' . $doctor->user->avatar;
 
                 // Open file
                 $handle = @fopen($imageLink, 'r');
