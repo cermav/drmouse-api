@@ -413,6 +413,7 @@
                             <tr>
                                 <td class="content-block">
                                     <span class="apple-link"><a href="https://www.drmouse.cz">www.drmouse.cz</a></span>
+                                    <br>
                                 </td>
                             </tr>
                         </table>
