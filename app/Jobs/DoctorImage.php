@@ -63,6 +63,7 @@ class DoctorImage implements ShouldQueue
             catch (\Exception $ex) {
                 dd($ex);
             }
+
         }
     }
 }
