@@ -55,5 +55,5 @@
 
 <br>
 <p>Pokud jste nežádali o registraci v databazi veterinářů Dr. Mouse, pak tento email prosím ignorujte.</p>
-<p>Pac a pusu,<br>DrMouse</p>
+<p>Pac a pusu,<br>Dr.Mouse</p>
 @endsection
