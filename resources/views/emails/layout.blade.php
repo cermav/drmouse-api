@@ -367,7 +367,7 @@
 
 
                     <!-- START CENTERED WHITE CONTAINER -->
-                    <table role="presentation" style="margin:-30px 0 -50px;position:relative;z-index:999;">
+                    <table role="presentation" style="margin:-30px 0 -30px;position:relative;z-index:999;">
                         <!-- START MAIN CONTENT AREA -->
                         <tr>
                             <td class="wrapper" style="align:center;" align="center">
