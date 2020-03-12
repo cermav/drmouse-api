@@ -260,6 +260,18 @@
     /* -------------------------------------
             RESPONSIVE AND MOBILE FRIENDLY STYLES
         ------------------------------------- */
+    #imageHead {
+        margin: -30px 0 -50px;
+        position: relative;
+        z-index: 999;
+    }
+
+    @media only screen and (max-width: 480px) {
+        #imageHead {
+            margin-bottom: -30px;
+        }
+    }
+
     @media only screen and (max-width: 620px) {
         table[class=body] h1 {
             font-size: 28px !important;
@@ -367,7 +379,7 @@
 
 
                     <!-- START CENTERED WHITE CONTAINER -->
-                    <table role="presentation" style="margin:-30px 0 -50px;position:relative;z-index:999;">
+                    <table role="presentation" id="imageHead">
                         <!-- START MAIN CONTENT AREA -->
                         <tr>
                             <td class="wrapper" style="align:center;" align="center">
@@ -401,6 +413,8 @@
                             <tr>
                                 <td class="content-block">
                                     <span class="apple-link"><a href="https://www.drmouse.cz">www.drmouse.cz</a></span>
+                                    <br>
+                                    <br>
                                 </td>
                             </tr>
                         </table>

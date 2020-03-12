@@ -1127,8 +1127,8 @@ var rateDoctor = function rateDoctor() {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/olga/htdocs/drmouse/resources/assets/js/main.js */"./resources/assets/js/main.js");
-module.exports = __webpack_require__(/*! /Users/olga/htdocs/drmouse/resources/assets/sass/main.scss */"./resources/assets/sass/main.scss");
+__webpack_require__(/*! /Users/lukasvacovsky/Htdocs/drmouse-api/resources/assets/js/main.js */"./resources/assets/js/main.js");
+module.exports = __webpack_require__(/*! /Users/lukasvacovsky/Htdocs/drmouse-api/resources/assets/sass/main.scss */"./resources/assets/sass/main.scss");
 
 
 /***/ })
