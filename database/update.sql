@@ -159,3 +159,15 @@ SELECT * FROM users WHERE id IN (SELECT user_id FROM  doctors WHERE state_id = 5
 UPDATE users SET email = CONCAT('deleted_', LEFT(UUID(), 8), '_', email) WHERE id IN (SELECT user_id FROM  doctors WHERE state_id = 5) AND email NOT LIKE '%deleted%';
 
 ALTER TABLE `scores` ADD `verified_by` INT UNSIGNED NULL DEFAULT NULL AFTER `is_approved`, ADD `verify_date` DATETIME NULL DEFAULT NULL AFTER `verified_by`;
+
+-- clear doctor_properties
+INSERT INTO doctors_properties_remove (remove_id)
+  SELECT DISTINCT IF(dp_orig.id < dp_dupl.id, dp_dupl.id, dp_orig.id) AS remove_id
+  FROM doctors_properties AS dp_orig
+    INNER JOIN  doctors_properties AS dp_dupl
+      ON dp_orig.user_id = dp_dupl.user_id AND dp_orig.property_id = dp_dupl.property_id AND dp_orig.id != dp_dupl.id
+
+
+DELETE FROM doctors_properties WHERE id IN (SELECT remove_id FROM doctors_properties_remove)
+
+
