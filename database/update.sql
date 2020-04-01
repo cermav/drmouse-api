@@ -159,3 +159,15 @@ SELECT * FROM users WHERE id IN (SELECT user_id FROM  doctors WHERE state_id = 5
 UPDATE users SET email = CONCAT('deleted_', LEFT(UUID(), 8), '_', email) WHERE id IN (SELECT user_id FROM  doctors WHERE state_id = 5) AND email NOT LIKE '%deleted%';
 
 ALTER TABLE `scores` ADD `verified_by` INT UNSIGNED NULL DEFAULT NULL AFTER `is_approved`, ADD `verify_date` DATETIME NULL DEFAULT NULL AFTER `verified_by`;
+
+
+
+SELECT u.id, u.name, d.street, d.city, d.post_code, d.phone, u.email
+FROM users AS u
+INNER JOIN doctors AS d ON u.id = d.user_id
+WHERE u.role_id = 2
+  AND d.state_id = 3
+
+
+
+Super. Ideálně jméno, adresa, telefon, email, to by mělo stačit.
