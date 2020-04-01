@@ -33,12 +33,24 @@ class DoctorIndex implements ShouldQueue
     {
         // go throught all doctors
         foreach (Doctor::all() as $doctor) {
-            // update doctor
-            $doctor->update([
-                'search_name' => HelperController::parseName( preg_replace('/\x93/', '', iconv("UTF-8", "UTF-8//IGNORE",  $doctor->user->name) ) ),
-                'profile_completedness' => HelperController::calculateProfileCompletedness($doctor)
-            ]);
-            info($doctor->user->name);
+            // get location
+            try {
+                $location =  HelperController::getLatLngFromAddress(
+                    trim($doctor->street) . " " . trim($doctor->city) . " CZ " . trim($doctor->post_code)
+                );
+
+                // update doctor
+                $doctor->update([
+                    'search_name' => HelperController::parseName( preg_replace('/\x93/', '', iconv("UTF-8", "UTF-8//IGNORE",  $doctor->user->name) ) ),
+                    'profile_completedness' => HelperController::calculateProfileCompletedness($doctor),
+                    'latitude' => $location['latitude'],
+                    'longitude' => $location['longitude'],
+                ]);
+                info($doctor->user->name);
+            }
+            catch (\Exception $ex) {
+                info($ex);
+            }
         }
     }
 }

@@ -36,7 +36,7 @@ class PropertyController extends Controller
                         ['property_category_id', '=', $categoryId],
                         ['is_approved', '=', 1]
                     ])
-                    ->orderBy('doctor_count', 'desc')
+                    ->orderBy('name', 'asc')
                     ->get();
             } else {
                 $properties = [];
@@ -47,7 +47,7 @@ class PropertyController extends Controller
                     ->where([
                         ['is_approved', '=', 1]
                     ])
-                    ->orderBy('doctor_count', 'desc')
+                    ->orderBy('name', 'asc')
                     ->get();
                 foreach ($all as $item) {
                     $properties[$item->property_category_id][] = (object)[

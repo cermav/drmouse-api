@@ -16,7 +16,7 @@ class DoctorResource extends JsonResource
     public function toArray($request)
     {
         $openingHours = $this->user->openingHours;
-        $all_properties = $this->user->properties()->where('is_approved', 1)->get();
+        $all_properties = $this->user->properties()->where('is_approved', 1)->orderBy('name', 'desc')->get();
         $services = $this->user->services()->where('is_approved', 1)->get();
         $photos = $this->user->photos;
 

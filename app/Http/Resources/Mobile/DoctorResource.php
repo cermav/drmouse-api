@@ -57,7 +57,7 @@ class DoctorResource extends JsonResource
 
             'staff_info' => [
                 'doctors_count' => $this->working_doctors_count,
-                'doctors_names' => $this->working_doctors_names,
+                'doctors_names' => nl2br( $this->working_doctors_names ),
                 'nurses_count' => $this->nurses_count,
                 'others_count' => $this->other_workers_count,
             ],

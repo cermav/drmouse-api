@@ -17,9 +17,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->describe('Display an inspiring quote');
 
-
 Artisan::command('reindex', function () {
-
     \App\Jobs\DoctorIndex::dispatch();
-
 })->describe('Reindex all search names a completednes');
+
+Artisan::command('doctorImages', function () {
+    \App\Jobs\DoctorImage::dispatch();
+})->describe('Check doctor images');
+

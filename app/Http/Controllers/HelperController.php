@@ -12,10 +12,10 @@ class HelperController extends Controller
     /* Get latitude and longitude from the address string */
     public static function getLatLngFromAddress($address)
     {
-        $address = str_replace(" ", "+", $address);
+        // $address = str_replace(" ", "+", $address);
 
         $mapResponse = file_get_contents(
-            "https://maps.google.com/maps/api/geocode/json?address=" . $address . "&sensor=false&key=" . Config::get('google.gmap_key')
+            "https://maps.google.com/maps/api/geocode/json?address=" . urlencode($address) . "&sensor=false&key=" . Config::get('google.gmap_key')
         );
         $mapResponseJson = json_decode($mapResponse);
 
@@ -25,7 +25,7 @@ class HelperController extends Controller
             return compact('latitude', 'longitude');
         }
 
-        throw new \Exception($mapResponseJson->status . ': ' . $mapResponseJson->error_message);
+        throw new \Exception($mapResponseJson->status );
     }
 
     /* Parse name from input - remove degree and move first name to the end of the name */

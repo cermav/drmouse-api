@@ -136,7 +136,7 @@ class MemberController extends Controller
         $member->save();
 
         // send registration email
-        $user->sendEmailVerificationNotification();
+        $user->sendMemberRegistrationEmailNotification();
 
         return response()->json($member, JsonResponse::HTTP_CREATED);
     }
