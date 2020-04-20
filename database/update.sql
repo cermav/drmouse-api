@@ -162,15 +162,6 @@ ALTER TABLE `scores` ADD `verified_by` INT UNSIGNED NULL DEFAULT NULL AFTER `is_
 
 
 
-SELECT u.id, u.name, d.street, d.city, d.post_code, d.phone, u.email
-FROM users AS u
-INNER JOIN doctors AS d ON u.id = d.user_id
-WHERE u.role_id = 2
-  AND d.state_id = 3
-
-
-
-Super. Ideálně jméno, adresa, telefon, email, to by mělo stačit.
 -- clear doctor_properties
 INSERT INTO doctors_properties_remove (remove_id)
   SELECT DISTINCT IF(dp_orig.id < dp_dupl.id, dp_dupl.id, dp_orig.id) AS remove_id
@@ -180,5 +171,19 @@ INSERT INTO doctors_properties_remove (remove_id)
 
 
 DELETE FROM doctors_properties WHERE id IN (SELECT remove_id FROM doctors_properties_remove)
+
+
+
+
+SELECT u.id, u.name, d.street, d.city, d.post_code, d.phone, u.email
+FROM users AS u
+INNER JOIN doctors AS d ON u.id = d.user_id
+WHERE u.role_id = 2
+  AND d.state_id = 3
+  AND (d.city LIKE 'Praha' OR d.city LIKE 'Brno')
+
+
+
+
 
 

@@ -32,7 +32,7 @@ class DoctorController extends Controller {
 
     public function createDoctor(Request $request) {
 
-        $request->validate([
+        $request->validdate([
             'name' => 'required|max:255',
             'email' => 'unique:users|required|email',
             'password' => 'required|min:6|confirmed',

@@ -32,13 +32,20 @@ class AuthController extends Controller
 
         // attempt to verify the credentials
         $user = User::where('email', $credentials['email'])->first();
-        if ($user == null || !Hash::check($credentials['password'], $user->password)) {
+        if ( $user == null || !Hash::check($credentials['password'], $user->password)  || $user->email_verified_at === null ) {
             return response()->json(['error' => 'We cant find an account with this credentials.'], 401);
         }
 
         try {
             // create a token for the user
             $token = JWTAuth::fromUser($user);
+
+            // check user wheter it is first login
+            if ($user->activated_at === null) {
+                $user->activated_at = date('Y-m-d H:i:s');
+                $user->save();
+            }
+
 
         } catch (JWTException $e) {
             // something went wrong whilst attempting to encode the token
