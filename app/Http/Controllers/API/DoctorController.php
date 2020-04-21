@@ -77,8 +77,9 @@ class DoctorController extends Controller
 
         // add fulltext condition
         if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
+
             // split words and add wildcard
-            $search_text = '*' . implode('* *', explode(' ', urldecode(trim($request->input('fulltext'))))) . '*';
+            $search_text = '*' . implode('* *', explode(' ', trim(urldecode($request->input('fulltext'))))) . '*';
             $doctors->selectRaw(
                 "(
                     MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST (? IN BOOLEAN MODE) +
