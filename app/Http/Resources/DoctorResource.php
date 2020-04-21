@@ -96,6 +96,8 @@ class DoctorResource extends JsonResource
 
             'created_at' => $this->user->created_at,
             'updated_at' => $this->user->updated_at,
+            'email_verified_at' => $this->user->email_verified_at,
+            'activated_at' => $this->user->activated_at,
         ];
     }
 }
