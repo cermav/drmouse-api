@@ -60,6 +60,7 @@ class DoctorController extends Controller
                 DoctorStatus::NEW,
                 DoctorStatus::DRAFT,
                 DoctorStatus::PUBLISHED,
+                DoctorStatus::ACTIVE,
                 DoctorStatus::UNPUBLISHED,
                 DoctorStatus::INCOMPLETE
             ]);

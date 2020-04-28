@@ -72,8 +72,7 @@ class DoctorController extends Controller
             )
 
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->where('doctors.state_id', DoctorStatus::PUBLISHED);
-
+            ->whereIn('doctors.state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE])->get();
 
         // add fulltext condition
         if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
@@ -160,7 +159,7 @@ class DoctorController extends Controller
                   , false) AS open ")
             )
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->where('doctors.state_id', DoctorStatus::PUBLISHED);
+            ->whereIn('doctors.state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE])->get();
 
         /*
          DB::raw("(
@@ -213,7 +212,7 @@ class DoctorController extends Controller
                     LIMIT 1)
                   , false) AS open ")
             )
-            ->whereIn('state_id', [DoctorStatus::NEW, DoctorStatus::UNPUBLISHED, DoctorStatus::INCOMPLETE, DoctorStatus::PUBLISHED])->get();
+            ->whereIn('state_id', [DoctorStatus::NEW, DoctorStatus::UNPUBLISHED, DoctorStatus::INCOMPLETE, DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE])->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
@@ -253,7 +252,7 @@ class DoctorController extends Controller
                     LIMIT 1)
                   , false) AS open ")
             )
-            ->whereIn('state_id', [DoctorStatus::PUBLISHED])
+            ->whereIn('state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE])
             ->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();

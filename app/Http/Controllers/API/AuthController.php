@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Types\DoctorStatus;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,7 @@ class AuthController extends Controller
             // check user wheter it is first login
             if ($user->activated_at === null) {
                 $user->activated_at = date('Y-m-d H:i:s');
+                $user->status_id = DoctorStatus::ACTIVE;
                 $user->save();
             }
 
