@@ -159,7 +159,7 @@ class DoctorController extends Controller
                   , false) AS open ")
             )
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->whereIn('doctors.state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE])->get();
+            ->whereIn('doctors.state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE]);
 
         /*
          DB::raw("(
