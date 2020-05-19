@@ -72,7 +72,7 @@ class DoctorController extends Controller
             )
 
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->whereIn('doctors.state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE])->get();
+            ->whereIn('doctors.state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE]);
 
         // add fulltext condition
         if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
