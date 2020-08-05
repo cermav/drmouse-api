@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Pets;
+use App\Models\Member;
 use App\DoctorsLog;
 use App\Http\Controllers\HelperController;
 use App\ScoreItem;
@@ -47,6 +48,11 @@ class PetsController extends Controller
         return response()->json($pet);
     }
             
+    public function PetsByMember($id)
+    {
+        $pets = DB::select("SELECT * FROM pets WHERE owners_id = $id");
+        return response()->json($pets);
+    }
             
 
     /**
