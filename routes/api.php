@@ -20,11 +20,14 @@ Route::apiResource('properties', 'Api\PropertyController');
 Route::apiResource('services', 'Api\ServiceController');
 
 Route::get('doctors', 'Api\DoctorController@index');
+Route::get('pets', 'Api\PetsController@showall');
+Route::get('pets/{id}', 'Api\PetsController@showById');
 Route::get('all-doctors', 'Api\DoctorController@showAll');
 Route::get('doctors/{id}', 'Api\DoctorController@show');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 Route::post('doctors', 'Api\DoctorController@store');
 Route::post('doctor-suggestion', 'Api\DoctorSuggestionController@store');
+Route::post('pets', 'Api\PetsController@store');
 
 Route::post('members', 'Api\MemberController@store');
 
