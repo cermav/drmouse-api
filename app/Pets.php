@@ -17,5 +17,6 @@ class Pets extends Model
         'chip_number',
         'bg',
         'profile_completedness',      
+        'avatar',     
     ];
 }

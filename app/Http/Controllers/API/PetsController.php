@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use JWTAuth;
 use App\Pets;
 use App\Models\Member;
 use App\DoctorsLog;
@@ -26,7 +27,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
 
-
 class PetsController extends Controller
 {
     /**
@@ -35,43 +35,44 @@ class PetsController extends Controller
      * @return \Illuminate\Http\Response
      */
     //GET pets list
-     public function showAll()
+    public function showAll()
     {
         $Pets = Pets::all();
         return response()->json($Pets);
     }
+    public function index()
+    {
+        $loggedUser = Auth::user()->id;
+        $pets = DB::select("SELECT * FROM pets WHERE owners_id = $loggedUser");
+        return response()->json($pets);
+    }
     //GET pets detail
     public function showById($id)
     {
+        // get owners_id
+        $owners_id = DB::table('pets')
+            ->where('id', "$id")
+            ->first()->owners_id;
+        //authorize owners_id vs logged in user
+        $this->AuthUser($owners_id);
+
         $pet = Pets::find($id);
 
         return response()->json($pet);
     }
-            
-    public function PetsByMember($id)
-    {
-        $pets = DB::select("SELECT * FROM pets WHERE owners_id = $id");
-        return response()->json($pets);
-    }
-            
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     //create pet for POST pet
-     public function createpet(object $data)
+    public function createpet(object $data)
     {
         return Pets::create([
-        'owners_id' => $data->owners_id,
-        'pet_name' => $data->pet_name,
-        'birth_date' => $data->birth_date,
-        'kind' => $data->kind,
-        'breed' => $data->breed,
-        'gender' => $data->gender,
-        'chip_number' => $data->chip_number,
-        'bg' => $data->bg,
+            'owners_id' => $data->owners_id,
+            'pet_name' => $data->pet_name,
+            'birth_date' => $data->birth_date,
+            'kind' => $data->kind,
+            'breed' => $data->breed,
+            'gender' => $data->gender,
+            'chip_number' => $data->chip_number,
+            'bg' => $data->bg,
         ]);
     }
 
@@ -84,99 +85,65 @@ class PetsController extends Controller
     // POST pet
     public function store(Request $request)
     {
-        /*$request->validate([
-        'owners_id'=>'required',
-        'pet_name'=>'required',
-        'birth_date'=>'required',
-        'kind'=>'required',
-        'breed'=>'required',
-        'gender'=>'required',
-        'chip_number'=>'required',
-        'bg'=>'required',
-        'profile_completedness'=>'required',
-        ]);*/
-
         // validate input
         $input = $this->validateRegistration($request);
-        
+
         $pet = $this->createpet($input);
 
-
-            /*
-        $Pets = new Pets ([
-            'owners_id'=> $request->get('owners_id'),
-            'pet_name'=> $request->get('pet_name'),
-            'birth_date'=> $request->get('birth_date'),
-            'kind'=> $request->get('kind'),
-            'breed'=> $request->get('breed'),
-            'gender'=> $request->get('gender'),
-            'chip_number'=> $request->get('chip_number'),
-            'bg'=> $request->get('bg'),
-            'profile_completedness'=> $request->get('profile_completedness'),
-        ]);
-        $Pets->save();
-        return redirect('/pets')->with('success','Pets saved!');
-    }*/
-    
-        
         $pet->save();
-
-        /* Create a record in log table
-        DoctorsLog::create([
-            'user_id' => $user->id,
-            'state_id' => UserState::NEW,
-            'email_sent' => true,
-            'doctor_object' => serialize($doctor)
-        ]);*/
 
         return response()->json($pet, JsonResponse::HTTP_CREATED);
     }
- 
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    // DEL remove pet
+    //TODO Authentication
+    public function remove(request $request, int $id)
     {
-        //
+        $this->AuthPet($id);
+
+        $pet = Pets::findOrFail($id);
+        $pet = DB::delete("DELETE FROM pets WHERE id = $id");
+        return response()->json("Deleted", JsonResponse::HTTP_OK);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    // PUT Update pet
+    public function update(Request $request, int $id)
     {
-        $Pets = Pets::find($id);
-        return view('Pets.edit', compact('Pets'));
-    }
+        $this->AuthUser();
+        // get data from json
+        $input = json_decode($request->getContent());
+        // prepare validator
+        $validator = Validator::make((array) $input, [
+            'pet_name' => 'nullable|string|max:50',
+            'birth_date' => 'nullable|date',
+            'kind' => 'nullable|string|max:50',
+            'breed' => 'nullable|string|max:50',
+            'gender' => 'nullable|string|max:50',
+            'chip_number' => 'nullable|int',
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        if ($validator->fails()) {
+            throw new HttpResponseException(
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
+            );
+        }
+        //$this->validateAddress($input->address);
+        //$this->validateStaffInfo($input->staff_info);
+        $data = [
+            'pet' => [
+                'pet_name' => $input->pet_name,
+                'birth_date' => $input->birth_date,
+                'kind' => $input->kind,
+                'breed' => $input->breed,
+                'gender' => $input->gender,
+                'chip_number' => $input->chip_number,
+                'bg' => $input->bg,
+                'avatar' => $input->avatar,
+            ],
+        ];
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return $data;
     }
     protected function validateRegistration(Request $request)
     {
@@ -184,7 +151,7 @@ class PetsController extends Controller
         $input = json_decode($request->getContent());
         // prepare validator
         $validator = Validator::make((array) $input, [
-            'owners_id' => 'required',
+            //'owners_id' => 'required',
             'pet_name' => 'required',
             'birth_date' => 'required',
             'kind' => 'required',
@@ -195,10 +162,45 @@ class PetsController extends Controller
 
         if ($validator->fails()) {
             throw new HttpResponseException(
-                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
             );
         }
 
         return $input;
+    }
+    public function AuthPet(int $pet_id)
+    {
+        $requestUser = Pets::Find($pet_id);
+        $loggedUser = Auth::User();
+
+        if (
+            $requestUser->owners_id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            //logged user is authorized
+            return;
+        } else {
+            // return unauthorized
+            throw new AuthenticationException();
+        }
+    }
+    public function AuthUser(int $id)
+    {
+        $requestUser = User::Find($id);
+        $loggedUser = Auth::User();
+
+        if (
+            $requestUser->id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            //logged user is authorized
+            return;
+        } else {
+            // return unauthorized
+            throw new AuthenticationException();
+        }
     }
 }

@@ -20,11 +20,12 @@ class CreatePetsTable extends Migration
             $table->string('pet_name');
             $table->date('birth_date');
             $table->string('kind');
-            $table->string('breed');   
-            $table->string('gender'); 
+            $table->string('breed');
+            $table->string('gender');
             $table->integer('chip_number');
             $table->string('bg');
-            $table->integer('profile_completedness')->default('1');    
+            $table->integer('profile_completedness')->default('1');
+            $table->string('avatar');
         });
     }
 
