@@ -15,6 +15,7 @@ class CreateScoreItemsTable extends Migration
     {
         Schema::create('score_items', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('status_id')->unsigned();
             $table->string('title')->nulable(false);
             $table->timestamps();
         });
