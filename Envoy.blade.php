@@ -23,8 +23,7 @@
 @endstory
 
 @task('test')
-    echo 'Branch'
-    echo $branch
+    echo "Deploy branch ({{ $branch }})"
 @endtask
 
 
