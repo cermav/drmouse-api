@@ -23,8 +23,8 @@
 @endstory
 
 @task('test')
-    echo 'Environment'
-    echo $environment
+    echo 'Branch'
+    echo $branch
 @endtask
 
 
