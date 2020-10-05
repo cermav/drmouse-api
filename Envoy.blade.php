@@ -6,14 +6,28 @@
     $app_dir = '/var/www/drmouse-api';
     $release = date('YmdHis');
     $new_release_dir = $releases_dir .'/'. $release;
+
+    $branch = isset($branch) ? $branch : "master";
+
 @endsetup
 
 @story('deploy')
+    test
+@endstory
+
+@story('deploy_master')
     clone_repository
     run_composer
     update_symlinks
     migrate
 @endstory
+
+@task('test')
+    echo 'Environment'
+    echo $environment
+@endtask
+
+
 
 @task('clone_repository')
     echo 'Cloning repository'
