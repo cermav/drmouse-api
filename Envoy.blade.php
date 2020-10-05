@@ -13,7 +13,6 @@
 
     $releases_dir = $app_dir . '/releases';
     $new_release_dir = $releases_dir .'/'. $release;
-
 @endsetup
 
 @story('deploy')
