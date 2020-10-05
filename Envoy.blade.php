@@ -20,7 +20,6 @@
     clone_repository
     run_composer
     update_symlinks
-    #migrate
 @endstory
 
 @task('clone_repository')
