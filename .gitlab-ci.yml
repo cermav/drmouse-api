@@ -13,8 +13,8 @@ deploy_master:
       - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
       - ~/.composer/vendor/bin/envoy run deploy --branch=master --commit="$CI_COMMIT_SHA"
-    only:
-      - master
+  only:
+    - master
 
 deploy_develop:
   stage: deploy
@@ -26,5 +26,5 @@ deploy_develop:
       - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
       - ~/.composer/vendor/bin/envoy run deploy --branch=develop --commit="$CI_COMMIT_SHA"
-    only:
-      - develop
+  only:
+    - develop
