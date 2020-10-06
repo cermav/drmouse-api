@@ -16,7 +16,8 @@ class Pets extends Model
         'gender',
         'chip_number',
         'bg',
-        'profile_completedness',      
-        'avatar',     
+        'profile_completedness',
+        'avatar',
+        'last_used',
     ];
 }
