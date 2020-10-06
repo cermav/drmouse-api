@@ -3,7 +3,7 @@ image: burten/laravel-envoy
 stages:
   - deploy
 
-deploy_testing:
+deploy_master:
   stage: deploy
   script:
       - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
@@ -12,4 +12,19 @@ deploy_testing:
       - mkdir -p ~/.ssh
       - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
-      - ~/.composer/vendor/bin/envoy run deploy --commit="$CI_COMMIT_SHA"
+      - ~/.composer/vendor/bin/envoy run deploy --branch=master --commit="$CI_COMMIT_SHA"
+  only:
+    - master
+
+deploy_develop:
+  stage: deploy
+  script:
+      - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+      - eval $(ssh-agent -s)
+      - ssh-add <(echo "$SSH_PRIVATE_KEY")
+      - mkdir -p ~/.ssh
+      - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+      - ~/.composer/vendor/bin/envoy run deploy --branch=develop --commit="$CI_COMMIT_SHA"
+  only:
+    - develop
