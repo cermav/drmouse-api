@@ -108,7 +108,7 @@ class PetsController extends Controller
     //done and working
     public function createpet(object $data)
     {
-        $date = DateTime::createFromFormat('d.m.Y', $data->birth_date);
+        $date = DateTime::createFromFormat('j. n. Y', $data->birth_date);
         return Pets::create([
             'owners_id' => Auth::user()->id,
             'pet_name' => $data->pet_name,
@@ -117,8 +117,6 @@ class PetsController extends Controller
             'breed' => $data->breed,
             'gender_state_id' => $data->gender_state_id,
             'chip_number' => $data->chip_number,
-            'background' => $data->background, //todo
-            'avatar' => $data->avatar,
         ]);
     }
 
@@ -138,6 +136,20 @@ class PetsController extends Controller
         $pet = $this->createpet($input);
 
         $pet->save();
+
+        $ids = DB::table('pets')
+            ->where('owners_id', Auth::user()->id)
+            ->pluck('id')
+            ->toArray();
+        $temp = $ids[0];
+        foreach ($ids as $id) {
+            if ($id > $temp) {
+                $temp = $id;
+            }
+        }
+        DB::table('users')
+            ->where('id', Auth::user()->id)
+            ->update(['last_pet' => $temp]);
 
         return response()->json($pet, JsonResponse::HTTP_CREATED);
     }
@@ -256,7 +268,6 @@ class PetsController extends Controller
             'kind' => 'required',
             'breed' => 'required',
             'gender_state_id' => 'required',
-            'chip_number' => 'required',
         ]);
 
         if ($validator->fails()) {
