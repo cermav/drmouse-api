@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pets extends Model
 {
-    public $table = "Pets";
     protected $fillable = [
         'id',
         'owners_id',
@@ -14,7 +13,7 @@ class Pets extends Model
         'birth_date',
         'kind',
         'breed',
-        'gender',
+        'gender_state_id',
         'chip_number',
         'bg',
         'profile_completedness',
