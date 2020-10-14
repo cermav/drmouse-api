@@ -175,11 +175,11 @@ class PetsController extends Controller
         $input = json_decode($request->getContent());
         // prepare validator
         $validator = Validator::make((array) $input, [
-            'pet_name' => 'string|max:50',
-            'birth_date' => 'date',
-            'kind' => 'string|max:50',
-            'breed' => 'string|max:50',
-            'gender_state_id' => 'int',
+            'pet_name' => 'required|string|max:50',
+            'birth_date' => 'required|date_format:j. n. Y',
+            'kind' => 'required|string|max:50',
+            'breed' => 'required|string|max:50',
+            'gender_state_id' => 'required|int',
             'chip_number' => 'nullable|int',
         ]);
         if ($validator->fails()) {
@@ -190,7 +190,7 @@ class PetsController extends Controller
                 )
             );
         }
-        $date = DateTime::createFromFormat('d.m.Y', $input->birth_date);
+        $date = DateTime::createFromFormat('j. n. Y', $input->birth_date);
         pets::where('id', $id)->update([
             'pet_name' => $input->pet_name,
             'birth_date' => $date,

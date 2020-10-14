@@ -98,7 +98,7 @@ class AppointmentController extends Controller
     //done
     public function createAppointment(object $data, int $pet_id)
     {
-        $date = DateTime::createFromFormat('d.m.Y', $data->date);
+        $date = DateTime::createFromFormat('j. n. Y', $data->date);
         try {
             return Pets_appointments::create([
                 'pet_id' => $pet_id,
