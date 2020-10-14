@@ -36,7 +36,7 @@ class PetsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    //GET all pets as administrator
+    //GET all Pets as administrator
     //done and working
     public function showAll()
     {
@@ -48,28 +48,28 @@ class PetsController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
-    //GET pets list
+    //GET Pets list
     //done and working
     public function index()
     {
-        $pets = DB::table('pets')
+        $Pets = DB::table('Pets')
             ->where('owners_id', Auth::user()->id)
             ->get();
         // todo catch?
-        return response()->json($pets);
+        return response()->json($Pets);
     }
-    //GET pets detail
+    //GET Pets detail
     //done and working
     public function detail($id)
     {
         // get owners_id
-        $owners_id = DB::table('pets')
+        $owners_id = DB::table('Pets')
             ->where('id', $id)
             ->first()->owners_id;
         //authorize owners_id vs logged in user
         $this->AuthUser($owners_id);
 
-        $pet = DB::table('pets')->where('id', $id);
+        $pet = DB::table('Pets')->where('id', $id);
         //Pets::find($id);
         DB::table('users')
             ->where('id', Pets::where('id', $id)->first()->owners_id)
@@ -88,7 +88,7 @@ class PetsController extends Controller
                 Pets::where('id', $last->last_pet)->first()
             );
         }
-        $ids = DB::table('pets')
+        $ids = DB::table('Pets')
             ->where('owners_id', Auth::user()->id)
             ->pluck('id')
             ->toArray();
@@ -137,7 +137,7 @@ class PetsController extends Controller
 
         $pet->save();
 
-        $ids = DB::table('pets')
+        $ids = DB::table('Pets')
             ->where('owners_id', Auth::user()->id)
             ->pluck('id')
             ->toArray();
@@ -160,7 +160,7 @@ class PetsController extends Controller
     {
         $this->AuthPet($id);
 
-        DB::table('pets')
+        DB::table('Pets')
             ->where('id', $id)
             ->where('owners_id', Auth::User()->id)
             ->delete();
@@ -191,7 +191,7 @@ class PetsController extends Controller
             );
         }
         $date = DateTime::createFromFormat('j. n. Y', $input->birth_date);
-        pets::where('id', $id)->update([
+        Pets::where('id', $id)->update([
             'pet_name' => $input->pet_name,
             'birth_date' => $date,
             'kind' => $input->kind,
@@ -318,12 +318,12 @@ class PetsController extends Controller
         $this->AuthPet($pet_id);
         $input = json_decode($request->getContent());
         if ($input->avatar !== null) {
-            pets::where('id', $pet_id)->update([
+            Pets::where('id', $pet_id)->update([
                 'avatar' => $this->saveAvatar($pet_id, $input->avatar),
             ]);
         }
         return response()->json(
-            pets::where('id', $pet_id)->first()->avatar,
+            Pets::where('id', $pet_id)->first()->avatar,
             JsonResponse::HTTP_OK
         );
     }
@@ -332,7 +332,7 @@ class PetsController extends Controller
         $this->AuthPet($pet_id);
         $input = json_decode($request->getContent());
         if ($input->background !== null) {
-            pets::where('id', $pet_id)->update([
+            Pets::where('id', $pet_id)->update([
                 'background' => $this->saveBackground(
                     $pet_id,
                     $input->background
@@ -340,7 +340,7 @@ class PetsController extends Controller
             ]);
         }
         return response()->json(
-            pets::where('id', $pet_id)->first()->background,
+            Pets::where('id', $pet_id)->first()->background,
             JsonResponse::HTTP_OK
         );
     }
