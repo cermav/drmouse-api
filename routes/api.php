@@ -29,7 +29,6 @@ Route::post('doctor-suggestion', 'Api\DoctorSuggestionController@store');
 Route::get('pets', 'Api\PetsController@showall');
 Route::get('pets/{id}', 'Api\PetsController@showById');
 Route::post('pets', 'Api\PetsController@store');
-Route::get('members/{id}/pets', 'Api\PetsController@PetsByMember');
 
 Route::post('members', 'Api\MemberController@store');
 

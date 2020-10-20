@@ -13,7 +13,7 @@ class ChangePetsToPets extends Migration
      */
     public function up()
     {
-        Schema::rename($Pets, $pets);
+        Schema::rename("Pets", "pets");
     }
 
     /**
@@ -23,6 +23,6 @@ class ChangePetsToPets extends Migration
      */
     public function down()
     {
-        Schema::rename($ets, $Pets);
+        Schema::rename("pets", "Pets");
     }
 }
