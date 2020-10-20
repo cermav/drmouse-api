@@ -93,7 +93,7 @@ class PetsController extends Controller
             ->pluck('id')
             ->toArray();
         if (empty($ids)) {
-            return null;
+            return new exception();
         } else {
             $temp = $ids[0];
             foreach ($ids as $id) {
