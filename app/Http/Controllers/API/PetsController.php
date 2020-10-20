@@ -52,7 +52,7 @@ class PetsController extends Controller
     //done and working
     public function index()
     {
-        $Pets = DB::table('Pets')
+        $Pets = DB::table('pets')
             ->where('owners_id', Auth::user()->id)
             ->get();
         // todo catch?
@@ -63,13 +63,13 @@ class PetsController extends Controller
     public function detail($id)
     {
         // get owners_id
-        $owners_id = DB::table('Pets')
+        $owners_id = DB::table('pets')
             ->where('id', $id)
             ->first()->owners_id;
         //authorize owners_id vs logged in user
         $this->AuthUser($owners_id);
 
-        $pet = DB::table('Pets')->where('id', $id);
+        $pet = DB::table('pets')->where('id', $id);
         //Pets::find($id);
         DB::table('users')
             ->where('id', Pets::where('id', $id)->first()->owners_id)
@@ -88,7 +88,7 @@ class PetsController extends Controller
                 Pets::where('id', $last->last_pet)->first()
             );
         }
-        $ids = DB::table('Pets')
+        $ids = DB::table('pets')
             ->where('owners_id', Auth::user()->id)
             ->pluck('id')
             ->toArray();
@@ -137,7 +137,7 @@ class PetsController extends Controller
 
         $pet->save();
 
-        $ids = DB::table('Pets')
+        $ids = DB::table('pets')
             ->where('owners_id', Auth::user()->id)
             ->pluck('id')
             ->toArray();
@@ -160,7 +160,7 @@ class PetsController extends Controller
     {
         $this->AuthPet($id);
 
-        DB::table('Pets')
+        DB::table('pets')
             ->where('id', $id)
             ->where('owners_id', Auth::User()->id)
             ->delete();
