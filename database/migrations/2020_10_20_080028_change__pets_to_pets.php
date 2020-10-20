@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLastPetToUsers extends Migration
+class ChangePetsToPets extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,7 @@ class AddLastPetToUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('last_pet');
-
-            //
-        });
+        Schema::rename($Pets, $pets);
     }
 
     /**
@@ -27,8 +23,6 @@ class AddLastPetToUsers extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('last_pet');
-        });
+        Schema::rename($ets, $Pets);
     }
 }

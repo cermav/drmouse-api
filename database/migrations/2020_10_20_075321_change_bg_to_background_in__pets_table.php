@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLastPetToUsers extends Migration
+class ChangeBgToBackgroundInPetsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,8 @@ class AddLastPetToUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('last_pet');
-
-            //
+        Schema::table('Pets', function (Blueprint $table) {
+            $table->renameColumn("bg", "background");
         });
     }
 
@@ -27,8 +25,8 @@ class AddLastPetToUsers extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('last_pet');
+        Schema::table('Pets', function (Blueprint $table) {
+            $table->renameColumn("background", "bg");
         });
     }
 }

@@ -16,7 +16,7 @@ class Pets extends Model
         'breed',
         'gender_state_id',
         'chip_number',
-        'bg',
+        'background',
         'profile_completedness',
         'avatar',
         'last_used',

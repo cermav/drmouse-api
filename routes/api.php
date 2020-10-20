@@ -101,6 +101,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         'pets/{pet_id}/appointment/{id}',
         'Api\AppointmentController@detail'
     );
+    Route::put(
+        'pets/{id}/appointment/{term_id}',
+        'Api\AppointmentController@update'
+    );
     Route::post(
         'pets/{pet_id}/appointment/',
         'Api\AppointmentController@store'

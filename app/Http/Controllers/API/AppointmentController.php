@@ -141,23 +141,23 @@ class AppointmentController extends Controller
     // PUT Update appointment
     //TODO Authentication
     //done
-    public function update(Request $request, int $pet_id, int $id)
+    public function update(Request $request, int $pet_id, int $term_id)
     {
         // verify user
         $this->AuthPet($pet_id);
         Pets_appointments::where('pet_id', $pet_id)
-            ->where('id', $id)
+            ->where('id', $term_id)
             ->FirstOrFail();
-        $input = $this->validateRegistration($request, $id);
-        $date = DateTime::createFromFormat('d.m.Y', $request->date);
-        pets_appointments::where('id', $id)
+        $input = $this->validateRegistration($request, $term_id);
+        $date = DateTime::createFromFormat('j. n. Y', $request->date);
+        pets_appointments::where('id', $term_id)
             ->where('pet_id', $pet_id)
             ->update([
                 'date' => $date,
                 'description' => $request->description,
             ]);
         return response()->json(
-            Pets_appointments::find($id),
+            Pets_appointments::find($term_id),
             JsonResponse::HTTP_OK
         );
     }
