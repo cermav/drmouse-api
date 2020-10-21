@@ -93,7 +93,9 @@ class PetsController extends Controller
             ->pluck('id')
             ->toArray();
         if (empty($ids)) {
-            return new exception();
+            return response()->json(
+                Pets::where('id', $last->last_pet)->first()
+            );
         } else {
             $temp = $ids[0];
             foreach ($ids as $id) {
