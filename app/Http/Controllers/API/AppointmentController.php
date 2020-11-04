@@ -98,11 +98,10 @@ class AppointmentController extends Controller
     //done
     public function createAppointment(object $data, int $pet_id)
     {
-        $date = DateTime::createFromFormat('j. n. Y', $data->date);
         try {
             return Pets_appointments::create([
                 'pet_id' => $pet_id,
-                'date' => $date,
+                'date' => $data->date,
                 'description' => $data->description,
             ]);
         } catch (\Exception $ex) {
@@ -149,11 +148,10 @@ class AppointmentController extends Controller
             ->where('id', $term_id)
             ->FirstOrFail();
         $input = $this->validateRegistration($request, $term_id);
-        $date = DateTime::createFromFormat('j. n. Y', $request->date);
         pets_appointments::where('id', $term_id)
             ->where('pet_id', $pet_id)
             ->update([
-                'date' => $date,
+                'date' => $request->date,
                 'description' => $request->description,
             ]);
         return response()->json(
