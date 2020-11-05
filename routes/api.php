@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-use app\Http\API\DoctorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +20,7 @@ Route::apiResource('properties', 'Api\PropertyController');
 Route::apiResource('services', 'Api\ServiceController');
 
 Route::get('doctors', 'Api\DoctorController@index');
-//Route::get('all-doctors', 'Api\DoctorController@showAll');
-Route::get('all-doctors', [DoctorController::class, 'showAll']);
+Route::get('all-doctors', 'Api\DoctorController@showAll');
 Route::get('doctors/{id}', 'Api\DoctorController@show');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 Route::post('doctors', 'Api\DoctorController@store');
