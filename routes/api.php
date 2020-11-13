@@ -84,40 +84,40 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::put('members/{id}', 'Api\MemberController@update');
 
     // My Pet
-    Route::get('pets', 'Api\PetsController@index');
-    Route::get('all-pets', 'Api\PetsController@showAll');
-    Route::get('pets/{id}', 'Api\PetsController@detail');
-    Route::get('latest', 'Api\PetsController@latest');
-    Route::post('pets', 'Api\PetsController@store');
-    Route::put('pets/{id}', 'Api\PetsController@update');
-    Route::delete('pets/{id}', 'Api\PetsController@remove');
-    Route::put('pets/{id}/avatar', 'Api\PetsController@avatar');
-    Route::put('pets/{id}/background', 'Api\PetsController@background');
+    Route::get('pets/list', 'Api\PetController@index');
+    Route::get('all-pets', 'Api\PetController@showAll');
+    Route::get('pets/{id}', 'Api\PetController@detail')->where('id', '[0-9]+');
+    Route::get('pets/latest', 'Api\PetController@latest');
+    Route::post('pets/store', 'Api\PetController@store');
+    Route::put('pets/{id}/update', 'Api\PetController@update');
+    Route::put('pets/{id}/avatar', 'Api\PetController@avatar');
+    Route::put('pets/{id}/background', 'Api\PetController@background');
+    Route::delete('pets/{id}/remove', 'Api\PetController@remove');
     // Appointments
-    Route::get('pets/{id}/appointments', 'Api\AppointmentController@index');
-    Route::get('pets/appointments/', 'Api\AppointmentController@showAll');
     Route::get(
-        'pets/{pet_id}/appointment/{id}',
-        'Api\AppointmentController@detail'
+        'pets/{pet_id}/appointments/list',
+        'Api\AppointmentController@index'
     );
+    Route::get('pets/appointments-all', 'Api\AppointmentController@showAll');
+    Route::get(
+        'pets/{pet_id}/appointment/{term_id}',
+        'Api\AppointmentController@detail'
+    )->where('term_id', '[0-9]+');
     Route::put(
-        'pets/{id}/appointment/{term_id}',
+        'pets/{pet_id}/appointment/{term_id}/update',
         'Api\AppointmentController@update'
     );
     Route::post(
-        'pets/{pet_id}/appointment/',
+        'pets/{pet_id}/appointment/store',
         'Api\AppointmentController@store'
     );
-    Route::put(
-        'pets/{pet_id}/appointment/{id}',
-        'Api\AppointmentController@update'
-    );
     Route::delete(
-        'pets/{pet_id}/appointment/{id}',
+        'pets/{pet_id}/appointment/{term_id}/remove',
         'Api\AppointmentController@remove'
     );
-    //favorite vets
-    Route::get('pets/{pet_id}/fav_vets', 'Api\PetsController@getVet');
+    //favorite vets TODO
+    /*
+    Route::get('pets/{pet_id}/fav_vets', 'Api\PetsController@getVets');
     Route::post('pets/{pet_id}/fav_vets/{vet_id}', 'Api\PetsController@addVet');
     Route::delete(
         'pets/{pet_id}/fav_vets/{vet_id}',
@@ -125,7 +125,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     );
     // Vaccines
     Route::get('pets/{pet_id}/vaccines', 'Api\VaccineController@index');
-    Route::get('pets/{pet_id}/vaccines/{id}', 'Api\VaccineController@detail');
+    Route::get('pets/{pet_id}/vaccines/{vac_id}', 'Api\VaccineController@detail');
     Route::get('all-vaccines', 'Api\VaccineController@showAll');
     Route::post('pets/{pet_id}/vaccines', 'Api\VaccineController@store');
     Route::put(
@@ -136,7 +136,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         'pets/{pet_id}/vaccines/{vac_id}',
         'Api\VaccineController@remove'
     );
-
+*/
     // score
     Route::delete('score/{id}', 'Api\ScoreController@delete');
 });
