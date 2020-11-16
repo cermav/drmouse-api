@@ -13,14 +13,21 @@ class Score extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'author_id', 'comment', 'ip_address', 'is_approved', 'verified_by', 'verify_date'
+        'user_id',
+        'author_id',
+        'comment',
+        'ip_address',
+        'is_approved',
+        'verified_by',
+        'verify_date',
     ];
 
     /*
      * Specify default order
      * Use Score::withoutGlobalScope('order')->get() if you don't want to apply default order rules
      */
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
         static::addGlobalScope('order', function (Builder $builder) {
             $builder->orderBy('created_at', 'desc');
@@ -30,7 +37,8 @@ class Score extends Model
     /**
      * Get score details
      */
-    public function details() {
+    public function details()
+    {
         return $this->hasMany('App\ScoreDetail');
     }
 
@@ -39,7 +47,7 @@ class Score extends Model
      */
     public function user()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Models\User');
     }
 
     /**
@@ -47,6 +55,6 @@ class Score extends Model
      */
     public function author()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Models\User');
     }
 }
