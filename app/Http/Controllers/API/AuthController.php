@@ -3,7 +3,7 @@ namespace app\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Types\DoctorStatus;
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use JWTAuth;

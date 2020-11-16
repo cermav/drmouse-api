@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;

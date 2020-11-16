@@ -5,7 +5,7 @@ namespace app\Http\Controllers\API;
 use App\Models\DoctorsProperty;
 use app\Models\Property;
 use App\Types\UserRole;
-use app\Models\User;
+use App\Models\User;
 use App\Validators\PropertyValidator;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;

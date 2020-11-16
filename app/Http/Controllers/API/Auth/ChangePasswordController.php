@@ -4,7 +4,7 @@ namespace app\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Types\UserRole;
-use app\Models\User;
+use App\Models\User;
 use App\Validators\PasswordValidator;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Exceptions\HttpResponseException;

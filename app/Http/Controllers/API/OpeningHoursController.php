@@ -5,7 +5,7 @@ namespace app\Http\Controllers\API;
 use App\Http\Resources\OpeningHoursResource;
 use App\Models\OpeningHour;
 use App\Types\UserRole;
-use app\Models\User;
+use App\Models\User;
 use App\Validators\OpeningHoursValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Database\Eloquent\Model;
 

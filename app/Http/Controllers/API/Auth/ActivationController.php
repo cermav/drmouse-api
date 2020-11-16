@@ -5,7 +5,7 @@ namespace app\Http\Controllers\API\Auth;
 use App\Http\Controllers\Controller;
 use App\Notifications\ActivationDoctorEmail;
 use App\Types\UserRole;
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

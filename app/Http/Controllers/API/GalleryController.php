@@ -6,7 +6,7 @@ use App\Models\Doctor;
 use App\Http\Resources\PhotoResource;
 use App\Models\Photo;
 use App\Types\UserRole;
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

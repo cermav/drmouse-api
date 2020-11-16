@@ -6,7 +6,7 @@ use App\Http\Resources\ServiceResource;
 use App\Models\DoctorsService;
 use app\Models\Service;
 use App\Types\UserRole;
-use app\Models\User;
+use App\Models\User;
 use App\Validators\ServiceValidator;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Exceptions\HttpResponseException;

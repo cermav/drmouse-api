@@ -3,7 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Doctor;
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Notifications\Messages\MailMessage;

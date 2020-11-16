@@ -9,7 +9,7 @@ use App\Types\DoctorStatus;
 use App\Types\MemberStatus;
 use App\Types\UserRole;
 use App\Types\UserState;
-use app\Models\User;
+use App\Models\User;
 use App\Utils\ImageHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;

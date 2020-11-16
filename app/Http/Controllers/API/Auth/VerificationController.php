@@ -3,7 +3,7 @@
 namespace app\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;

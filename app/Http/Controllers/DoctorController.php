@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use app\Models\User;
+use App\Models\User;
 use App\Models\Doctor;
 use App\Models\DoctorsLog;
 use app\Models\Weekday;

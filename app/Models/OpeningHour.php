@@ -29,32 +29,32 @@ use Reliese\Database\Eloquent\Model as Eloquent;
  */
 class OpeningHour extends Eloquent
 {
-	protected $casts = [
-		'weekday_id' => 'int',
-		'user_id' => 'int',
-		'opening_hours_state_id' => 'int'
-	];
+    protected $casts = [
+        'weekday_id' => 'int',
+        'user_id' => 'int',
+        'opening_hours_state_id' => 'int',
+    ];
 
-	protected $fillable = [
-		'weekday_id',
-		'user_id',
-		'opening_hours_state_id',
-		'open_at',
-		'close_at'
-	];
+    protected $fillable = [
+        'weekday_id',
+        'user_id',
+        'opening_hours_state_id',
+        'open_at',
+        'close_at',
+    ];
 
-	public function opening_hours_state()
-	{
-		return $this->belongsTo(\App\Models\OpeningHoursState::class);
-	}
+    public function opening_hours_state()
+    {
+        return $this->belongsTo(\App\Models\OpeningHoursState::class);
+    }
 
-	public function user()
-	{
-		return $this->belongsTo(\App\Models\User::class);
-	}
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
 
-	public function weekday()
-	{
-		return $this->belongsTo(\App\Models\Weekday::class);
-	}
+    public function weekday()
+    {
+        return $this->belongsTo(\App\Models\Weekday::class);
+    }
 }

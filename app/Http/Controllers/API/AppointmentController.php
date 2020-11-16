@@ -10,7 +10,7 @@ use App\Models\DoctorsLog;
 use App\Http\Controllers\HelperController;
 use app\Models\ScoreItem;
 use App\Types\DoctorStatus;
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
