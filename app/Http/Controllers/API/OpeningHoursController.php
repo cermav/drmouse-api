@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\OpeningHoursResource;
 use App\Models\OpeningHour;
 use App\Types\UserRole;
-use App\User;
+use app\Models\User;
 use App\Validators\OpeningHoursValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -28,8 +28,10 @@ class OpeningHoursController extends Controller
         $requestUser = User::find($id);
         $loggedUser = Auth::User();
 
-        if ($requestUser->id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
-
+        if (
+            $requestUser->id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
             // remove all records
             OpeningHour::where('user_id', $requestUser->id)->delete();
 
@@ -37,7 +39,7 @@ class OpeningHoursController extends Controller
             $input = json_decode($request->getContent());
             foreach ($input as $day) {
                 foreach ($day as $item) {
-                    $validator = OpeningHoursValidator::create((array)$item);
+                    $validator = OpeningHoursValidator::create((array) $item);
                     if ($validator->fails()) {
                         /*
                         throw new HttpResponseException(
@@ -51,7 +53,7 @@ class OpeningHoursController extends Controller
                             'user_id' => $requestUser->id,
                             'opening_hours_state_id' => $item->state_id,
                             'open_at' => $item->open_at,
-                            'close_at' => $item->close_at
+                            'close_at' => $item->close_at,
                         ]);
                     }
                 }
@@ -61,11 +63,9 @@ class OpeningHoursController extends Controller
                 OpeningHoursResource::collection($requestUser->openingHours),
                 JsonResponse::HTTP_OK
             );
-
         } else {
             // return unauthorized
             throw new AuthenticationException();
         }
-
     }
 }

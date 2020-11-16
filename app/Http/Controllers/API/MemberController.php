@@ -9,7 +9,7 @@ use App\Types\DoctorStatus;
 use App\Types\MemberStatus;
 use App\Types\UserRole;
 use App\Types\UserState;
-use App\User;
+use app\Models\User;
 use App\Utils\ImageHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Validator;
 
 class MemberController extends Controller
 {
-
     private $pageLimit = 30;
 
     /**
@@ -42,7 +41,9 @@ class MemberController extends Controller
             ->select(
                 'users.id',
                 'members.state_id',
-                DB::raw("(SELECT name FROM states WHERE id = members.state_id) AS state_name"),
+                DB::raw(
+                    "(SELECT name FROM states WHERE id = members.state_id) AS state_name"
+                ),
                 'name',
                 'users.email',
                 'avatar',
@@ -52,19 +53,34 @@ class MemberController extends Controller
             ->whereIn('members.state_id', [
                 MemberStatus::NEW,
                 MemberStatus::VALID,
-                MemberStatus::BLOCKED
+                MemberStatus::BLOCKED,
             ]);
 
         // add fulltext condition
-        if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
+        if (
+            $request->has('fulltext') &&
+            strlen(trim($request->input('fulltext'))) > 2
+        ) {
             // split words and add wildcard
-            $search_text = '*' . implode('* *', explode(' ', urldecode(trim($request->input('fulltext'))))) . '*';
-            $members->whereRaw("(MATCH (email) AGAINST (? IN BOOLEAN MODE)", $search_text);
+            $search_text =
+                '*' .
+                implode(
+                    '* *',
+                    explode(' ', urldecode(trim($request->input('fulltext'))))
+                ) .
+                '*';
+            $members->whereRaw(
+                "(MATCH (email) AGAINST (? IN BOOLEAN MODE)",
+                $search_text
+            );
         }
 
         // search by status
         if ($request->has('status') && intval($request->input('status')) > 0) {
-            $members->where('members.state_id', intval($request->input('status')));
+            $members->where(
+                'members.state_id',
+                intval($request->input('status'))
+            );
         }
 
         // sorting
@@ -83,14 +99,20 @@ class MemberController extends Controller
     public function show($id)
     {
         $member = Member::where('user_id', $id)
-            ->select(
-                'members.*'
-            )
-            ->whereIn('state_id', [MemberStatus::NEW, MemberStatus::VALID, MemberStatus::BLOCKED])->get();
+            ->select('members.*')
+            ->whereIn('state_id', [
+                MemberStatus::NEW,
+                MemberStatus::VALID,
+                MemberStatus::BLOCKED,
+            ])
+            ->get();
         if (sizeof($member) > 0) {
             return MemberResource::collection($member)->first();
         }
-        return response()->json(['message' => 'Not Found!'], JsonResponse::HTTP_NOT_FOUND);
+        return response()->json(
+            ['message' => 'Not Found!'],
+            JsonResponse::HTTP_NOT_FOUND
+        );
     }
 
     /**
@@ -114,7 +136,7 @@ class MemberController extends Controller
             'description' => "",
             'slug' => $this->getSlug($input->name),
             'gdpr_agreed' => true,
-            'gdpr_agreed_date' => date('Y-m-d H:i:s')
+            'gdpr_agreed_date' => date('Y-m-d H:i:s'),
         ]);
 
         // TODO: predelat
@@ -154,8 +176,10 @@ class MemberController extends Controller
         $requestUser = User::find($id);
         $loggedUser = Auth::User();
 
-        if ($requestUser->id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
-
+        if (
+            $requestUser->id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
             // validate input
             $data = $this->validateProfile($request, $id);
 
@@ -165,19 +189,24 @@ class MemberController extends Controller
 
             // store image
             if ($data['avatar'] !== null) {
-                $user->update(['avatar' => $this->saveProfileImage($id, $data['avatar'])]);
+                $user->update([
+                    'avatar' => $this->saveProfileImage($id, $data['avatar']),
+                ]);
             }
 
-            $member = Member::where(['user_id' => $id])->get()->first();
+            $member = Member::where(['user_id' => $id])
+                ->get()
+                ->first();
 
-            return response()->json(MemberResource::make($member), JsonResponse::HTTP_OK);
-
+            return response()->json(
+                MemberResource::make($member),
+                JsonResponse::HTTP_OK
+            );
         } else {
             // return unauthorized
             throw new AuthenticationException();
         }
     }
-
 
     /**
      * Validate Input
@@ -193,12 +222,15 @@ class MemberController extends Controller
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'gdpr' => 'required'
+            'gdpr' => 'required',
         ]);
 
         if ($validator->fails()) {
             throw new HttpResponseException(
-                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
             );
         }
 
@@ -217,21 +249,24 @@ class MemberController extends Controller
         // prepare validator
         $validator = Validator::make((array) $input, [
             'name' => 'required|max:255',
-            'email' => 'required|email|unique:users,email,'.$user_id.',id',
+            'email' => 'required|email|unique:users,email,' . $user_id . ',id',
         ]);
 
         if ($validator->fails()) {
             throw new HttpResponseException(
-                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
             );
         }
 
         $data = [
             'user' => [
                 'name' => $input->name,
-                'email' => $input->email
+                'email' => $input->email,
             ],
-            'avatar' => $input->avatar
+            'avatar' => $input->avatar,
         ];
         return $data;
     }
@@ -243,12 +278,12 @@ class MemberController extends Controller
      */
     protected function createUser(object $data)
     {
-        try{
+        try {
             return User::create([
                 'name' => $data->name,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
-                'role_id' => UserRole::MEMBER
+                'role_id' => UserRole::MEMBER,
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
@@ -269,14 +304,18 @@ class MemberController extends Controller
         $image = ImageHandler::splitEncodedData($data);
 
         // prepare file name
-        $fileName = strtolower($member->slug . '.' . ImageHandler::getExtensionByType($image->type));
+        $fileName = strtolower(
+            $member->slug . '.' . ImageHandler::getExtensionByType($image->type)
+        );
 
         // save file to local storage
-        Storage::disk('public')->put('member' . DIRECTORY_SEPARATOR . $fileName, base64_decode($image->content));
+        Storage::disk('public')->put(
+            'member' . DIRECTORY_SEPARATOR . $fileName,
+            base64_decode($image->content)
+        );
 
         return $fileName;
     }
-
 
     /**
      * Create slug - if already exists, add the number at the end
@@ -285,10 +324,20 @@ class MemberController extends Controller
      */
     protected function getSlug(string $name)
     {
-        $slug = strtolower(str_replace(" ", "-", preg_replace("/[^A-Za-z0-9 ]/", '', HelperController::replaceAccents($name))));
+        $slug = strtolower(
+            str_replace(
+                " ",
+                "-",
+                preg_replace(
+                    "/[^A-Za-z0-9 ]/",
+                    '',
+                    HelperController::replaceAccents($name)
+                )
+            )
+        );
         $existingCount = Member::where('slug', 'like', $slug . '%')->count();
         if ($existingCount > 0) {
-            $slug = $slug . '-' . ($existingCount);
+            $slug = $slug . '-' . $existingCount;
         }
         return $slug;
     }

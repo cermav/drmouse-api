@@ -3,7 +3,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Types\DoctorStatus;
-use App\User;
+use app\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use JWTAuth;
@@ -27,14 +27,21 @@ class AuthController extends Controller
             'password' => 'required',
         ];
         $validator = Validator::make($credentials, $rules);
-        if($validator->fails()) {
-            return response()->json(['error'=> $validator->messages()], 400);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->messages()], 400);
         }
 
         // attempt to verify the credentials
         $user = User::where('email', $credentials['email'])->first();
-        if ( $user == null || !Hash::check($credentials['password'], $user->password)  || $user->email_verified_at === null ) {
-            return response()->json(['error' => 'We cant find an account with this credentials.'], 401);
+        if (
+            $user == null ||
+            !Hash::check($credentials['password'], $user->password) ||
+            $user->email_verified_at === null
+        ) {
+            return response()->json(
+                ['error' => 'We cant find an account with this credentials.'],
+                401
+            );
         }
 
         try {
@@ -47,11 +54,12 @@ class AuthController extends Controller
                 $user->status_id = DoctorStatus::ACTIVE;
                 $user->save();
             }
-
-
         } catch (JWTException $e) {
             // something went wrong whilst attempting to encode the token
-            return response()->json(['error' => 'Failed to login, please try again.'], 500);
+            return response()->json(
+                ['error' => 'Failed to login, please try again.'],
+                500
+            );
         }
         // all good so return the token
         return $this->respondWithToken($token);
@@ -76,15 +84,19 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-
         $this->validate($request, ['token' => 'required']);
         try {
             JWTAuth::invalidate($request->input('token'));
             auth()->logout();
-            return response()->json(['message'=> "You have successfully logged out."]);
+            return response()->json([
+                'message' => "You have successfully logged out.",
+            ]);
         } catch (JWTException $e) {
             // something went wrong whilst attempting to encode the token
-            return response()->json(['error' => 'Failed to logout, please try again.'], 500);
+            return response()->json(
+                ['error' => 'Failed to logout, please try again.'],
+                500
+            );
         }
     }
 
@@ -92,8 +104,11 @@ class AuthController extends Controller
     {
         return response()->json([
             'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => auth('api')->factory()->getTTL() * 60
+            'token_type' => 'bearer',
+            'expires_in' =>
+                auth('api')
+                    ->factory()
+                    ->getTTL() * 60,
         ]);
     }
 }

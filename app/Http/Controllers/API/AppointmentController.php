@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Pets;
-use App\Pets_appointments;
+use App\Models\Pet;
+use App\Models\PetAppointment;
 use App\Models\Member;
-use App\DoctorsLog;
+use App\Models\DoctorsLog;
 use App\Http\Controllers\HelperController;
-use App\ScoreItem;
+use app\Models\ScoreItem;
 use App\Types\DoctorStatus;
-use App\User;
+use app\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Doctor;
+use App\Models\Doctor;
 use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +32,7 @@ class AppointmentController extends Controller
     public function index($pet_id)
     {
         if (
-            Auth::user()->id ==
+            Auth::user()->id ===
             DB::table('pets')
                 ->where('id', $pet_id)
                 ->first()->owners_id
@@ -50,7 +50,7 @@ class AppointmentController extends Controller
     {
         $loggedUser = Auth::User();
         if ($loggedUser->role_id === UserRole::ADMINISTRATOR) {
-            $appointment = Pets_appointments::all();
+            $appointment = PetAppointment::all();
             return response()->json($appointment);
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -60,7 +60,7 @@ class AppointmentController extends Controller
     //done
     public function detail(int $pet_id, int $id)
     {
-        $appointment = DB::table('Pets_appointments')
+        $appointment = DB::table('pets_appointments')
             ->where('pet_id', $pet_id)
             ->where('id', $id)
             ->get();
@@ -99,7 +99,7 @@ class AppointmentController extends Controller
     public function createAppointment(object $data, int $pet_id)
     {
         try {
-            return Pets_appointments::create([
+            return PetAppointment::create([
                 'pet_id' => $pet_id,
                 'date' => $data->date,
                 'description' => $data->description,
@@ -144,18 +144,18 @@ class AppointmentController extends Controller
     {
         // verify user
         $this->AuthPet($pet_id);
-        Pets_appointments::where('pet_id', $pet_id)
+        PetAppointment::where('pet_id', $pet_id)
             ->where('id', $term_id)
             ->FirstOrFail();
         $input = $this->validateRegistration($request, $term_id);
-        pets_appointments::where('id', $term_id)
+        PetAppointment::where('id', $term_id)
             ->where('pet_id', $pet_id)
             ->update([
                 'date' => $request->date,
                 'description' => $request->description,
             ]);
         return response()->json(
-            Pets_appointments::find($term_id),
+            PetAppointment::find($term_id),
             JsonResponse::HTTP_OK
         );
     }
@@ -198,7 +198,7 @@ class AppointmentController extends Controller
     }
     public function AuthPet(int $pet_id)
     {
-        $requestUser = Pets::Find($pet_id);
+        $requestUser = Pet::Find($pet_id);
         $loggedUser = Auth::User();
 
         if (

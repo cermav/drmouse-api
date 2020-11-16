@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
-use App\User;
+use app\Models\User;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
-
 
 class VerificationController extends Controller
 {
@@ -51,8 +50,12 @@ class VerificationController extends Controller
         $user = User::findOrFail($request->route('id'));
 
         // verify reset token
-        if (app(PasswordBroker::class)->tokenExists( $user, $request->get('token'))) {
-
+        if (
+            app(PasswordBroker::class)->tokenExists(
+                $user,
+                $request->get('token')
+            )
+        ) {
             // mark as verified
             if ($user->markEmailAsVerified()) {
                 event(new Verified($request->user()));
@@ -71,13 +74,13 @@ class VerificationController extends Controller
     {
         if ($request->user()->hasVerifiedEmail()) {
             return response()->json('User already have verified email!', 422);
-//            return redirect($this->redirectPath());
+            //            return redirect($this->redirectPath());
         }
 
         $request->user()->sendEmailVerificationNotification();
 
         return response()->json('The notification has been resubmitted');
-//        return back()->with('resent', true);
+        //        return back()->with('resent', true);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Notifications\ActivationDoctorEmail;
 use App\Types\UserRole;
-use App\User;
+use app\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +34,6 @@ class ActivationController extends Controller
             $requestUser->activated_at === null &&
             strtolower($requestUser->email) === strtolower($this->email)
         ) {
-
             // generate new password
             $newPassword = Str::random(rand(10, 12));
 
@@ -46,15 +45,21 @@ class ActivationController extends Controller
             // email user with new password
             $this->notify(new ActivationDoctorEmail($newPassword)); // my notification
 
-            return response()->json('Account activated.', JsonResponse::HTTP_OK);
-
+            return response()->json(
+                'Account activated.',
+                JsonResponse::HTTP_OK
+            );
         } else {
             // return unauthorized
             throw new HttpResponseException(
-                response()->json(['errors' => 'Account is not found or has been already activated'], JsonResponse::HTTP_UNAUTHORIZED)
+                response()->json(
+                    [
+                        'errors' =>
+                            'Account is not found or has been already activated',
+                    ],
+                    JsonResponse::HTTP_UNAUTHORIZED
+                )
             );
         }
-
     }
-
 }

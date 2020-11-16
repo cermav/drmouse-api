@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Mobile;
 
-use App\Service;
+use app\Models\Service;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -15,9 +15,7 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $services = Service::where([
-            ['is_approved', '=', 1]
-        ])->get();
+        $services = Service::where([['is_approved', '=', 1]])->get();
         return response()->json($services);
     }
 }

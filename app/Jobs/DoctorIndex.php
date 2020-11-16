@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Doctor;
+use App\Models\Doctor;
 use App\Http\Controllers\HelperController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -35,20 +35,31 @@ class DoctorIndex implements ShouldQueue
         foreach (Doctor::all() as $doctor) {
             // get location
             try {
-                $location =  HelperController::getLatLngFromAddress(
-                    trim($doctor->street) . " " . trim($doctor->city) . " CZ " . trim($doctor->post_code)
+                $location = HelperController::getLatLngFromAddress(
+                    trim($doctor->street) .
+                        " " .
+                        trim($doctor->city) .
+                        " CZ " .
+                        trim($doctor->post_code)
                 );
 
                 // update doctor
                 $doctor->update([
-                    'search_name' => HelperController::parseName( preg_replace('/\x93/', '', iconv("UTF-8", "UTF-8//IGNORE",  $doctor->user->name) ) ),
-                    'profile_completedness' => HelperController::calculateProfileCompletedness($doctor),
+                    'search_name' => HelperController::parseName(
+                        preg_replace(
+                            '/\x93/',
+                            '',
+                            iconv("UTF-8", "UTF-8//IGNORE", $doctor->user->name)
+                        )
+                    ),
+                    'profile_completedness' => HelperController::calculateProfileCompletedness(
+                        $doctor
+                    ),
                     'latitude' => $location['latitude'],
                     'longitude' => $location['longitude'],
                 ]);
                 info($doctor->user->name);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 info($ex);
             }
         }

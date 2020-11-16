@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
-use App\Doctor;
-use App\User;
+use App\Models\Doctor;
+use app\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -32,7 +32,7 @@ class RegistrationDoctorEmail extends VerifyEmailBase
             ->view('emails.registration-doctor', [
                 'user' => $user,
                 'doctor' => $doctor,
-                'verify_link' => $this->verificationUrl($notifiable)
+                'verify_link' => $this->verificationUrl($notifiable),
             ]);
     }
 
@@ -51,20 +51,28 @@ class RegistrationDoctorEmail extends VerifyEmailBase
 
         // prepare signed link
         $link = URL::temporarySignedRoute(
-            'verification.verify', Carbon::now()->addMinutes(60), [
+            'verification.verify',
+            Carbon::now()->addMinutes(60),
+            [
                 'id' => $notifiable->getKey(),
-                'token' => $token
+                'token' => $token,
             ]
         );
 
         // prepare remote link
         if ($user->role_id == 3) {
-            $remoteLink = config('frontend.url') . 'my/verify?link=' . base64_encode($link);
+            $remoteLink =
+                config('frontend.url') .
+                'my/verify?link=' .
+                base64_encode($link);
         } else {
-            $remoteLink = config('frontend.url') . 'vet/verify?link=' . base64_encode($link);
+            $remoteLink =
+                config('frontend.url') .
+                'vet/verify?link=' .
+                base64_encode($link);
         }
 
-//        $remoteLink = config('frontend.url') . 'vet/verify?id=' . $notifiable->getKey() . parse_url($link, PHP_URL_QUERY );
+        //        $remoteLink = config('frontend.url') . 'vet/verify?id=' . $notifiable->getKey() . parse_url($link, PHP_URL_QUERY );
 
         return $remoteLink;
     }

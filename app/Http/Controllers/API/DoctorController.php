@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DoctorsLog;
+use App\Models\DoctorsLog;
 use App\Http\Controllers\HelperController;
-use App\ScoreItem;
+use app\Models\ScoreItem;
 use App\Types\DoctorStatus;
 use App\Types\UserRole;
 use App\Types\UserState;
-use App\User;
+use app\Models\User;
 use App\Utils\ImageHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Doctor;
+use App\Models\Doctor;
 use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +26,6 @@ use Intervention\Image\ImageManager;
 
 class DoctorController extends Controller
 {
-
     private $pageLimit = 30;
 
     /**
@@ -61,24 +60,41 @@ class DoctorController extends Controller
                       )
                     LIMIT 1)
                   , false) AS open "),
-                DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
+                DB::raw(
+                    "(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score "
+                )
             )
             ->selectRaw(
                 "(SELECT ST_Distance_Sphere(point(?, ?), point(longitude, latitude)) ) AS distance",
                 [
-                    $request->has('long') ? floatval($request->input('long')) : 15.7,
-                    $request->has('lat') ? floatval($request->input('lat')) : 49.8
+                    $request->has('long')
+                        ? floatval($request->input('long'))
+                        : 15.7,
+                    $request->has('lat')
+                        ? floatval($request->input('lat'))
+                        : 49.8,
                 ]
             )
 
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->whereIn('doctors.state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE]);
+            ->whereIn('doctors.state_id', [
+                DoctorStatus::PUBLISHED,
+                DoctorStatus::ACTIVE,
+            ]);
 
         // add fulltext condition
-        if ($request->has('fulltext') && strlen(trim($request->input('fulltext'))) > 2) {
-
+        if (
+            $request->has('fulltext') &&
+            strlen(trim($request->input('fulltext'))) > 2
+        ) {
             // split words and add wildcard
-            $search_text = '*' . implode('* *', explode(' ', trim(urldecode($request->input('fulltext'))))) . '*';
+            $search_text =
+                '*' .
+                implode(
+                    '* *',
+                    explode(' ', trim(urldecode($request->input('fulltext'))))
+                ) .
+                '*';
             $doctors->selectRaw(
                 "(
                     MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST (? IN BOOLEAN MODE) +
@@ -86,10 +102,13 @@ class DoctorController extends Controller
                 ) AS relevance",
                 [$search_text, $search_text]
             );
-            $doctors->whereRaw("(
+            $doctors->whereRaw(
+                "(
                     MATCH (search_name, description, street, city, country, working_doctors_names) AGAINST (? IN BOOLEAN MODE)
                     OR MATCH (email) AGAINST (? IN BOOLEAN MODE)
-                )", [$search_text, $search_text]);
+                )",
+                [$search_text, $search_text]
+            );
         } else {
             $doctors->selectRaw('0 AS relevance');
         }
@@ -97,30 +116,50 @@ class DoctorController extends Controller
         // add specialization condition - condition has to be RAW, otherwhise not working
         if ($request->has('spec') && intval($request->input('spec')) > 0) {
             $doctors->whereExists(function ($query) use ($request) {
-                $query->select(DB::raw(1))
+                $query
+                    ->select(DB::raw(1))
                     ->from('doctors_properties')
-                    ->whereRaw('doctors_properties.user_id = users.id AND doctors_properties.property_id = ?', intval($request->input('spec')));
+                    ->whereRaw(
+                        'doctors_properties.user_id = users.id AND doctors_properties.property_id = ?',
+                        intval($request->input('spec'))
+                    );
             });
         }
 
         // add experience condition - condition has to be RAW, otherwhise not working
         if ($request->has('exp') && intval($request->input('exp')) > 0) {
             $doctors->whereExists(function ($query) use ($request) {
-                $query->select(DB::raw(1))
+                $query
+                    ->select(DB::raw(1))
                     ->from('doctors_properties')
-                    ->whereRaw('doctors_properties.user_id = users.id AND doctors_properties.property_id = ?', intval($request->input('exp')));
+                    ->whereRaw(
+                        'doctors_properties.user_id = users.id AND doctors_properties.property_id = ?',
+                        intval($request->input('exp'))
+                    );
             });
         }
 
         // sorting
-        $order_fields = ['rank' => 'total_score' , 'dist' => 'distance', 'rel' => 'relevance'];
-        if ($request->has('order') && array_key_exists(trim($request->input('order')), $order_fields)) {
-            $direction = $request->has('dir') && strtolower(trim($request->input('dir') == 'desc')) ? 'desc' : 'asc';
+        $order_fields = [
+            'rank' => 'total_score',
+            'dist' => 'distance',
+            'rel' => 'relevance',
+        ];
+        if (
+            $request->has('order') &&
+            array_key_exists(trim($request->input('order')), $order_fields)
+        ) {
+            $direction =
+                $request->has('dir') &&
+                strtolower(trim($request->input('dir') == 'desc'))
+                    ? 'desc'
+                    : 'asc';
             // some exception
             if (in_array($request->input('order'), ['rank', 'rel'])) {
                 $direction = 'desc';
             }
-            $doctors->orderBy($order_fields[$request->input('order')], $direction)
+            $doctors
+                ->orderBy($order_fields[$request->input('order')], $direction)
                 ->orderBy('name', 'ASC');
         }
 
@@ -130,9 +169,9 @@ class DoctorController extends Controller
     }
 
     /**
- * Return all doctors, for homepage
- * @return \Illuminate\Support\Collection
- */
+     * Return all doctors, for homepage
+     * @return \Illuminate\Support\Collection
+     */
     public function showAll()
     {
         // prepare basic select
@@ -159,7 +198,10 @@ class DoctorController extends Controller
                   , false) AS open ")
             )
             ->join('users', 'doctors.user_id', '=', 'users.id')
-            ->whereIn('doctors.state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE]);
+            ->whereIn('doctors.state_id', [
+                DoctorStatus::PUBLISHED,
+                DoctorStatus::ACTIVE,
+            ]);
 
         /*
          DB::raw("(
@@ -212,11 +254,21 @@ class DoctorController extends Controller
                     LIMIT 1)
                   , false) AS open ")
             )
-            ->whereIn('state_id', [DoctorStatus::NEW, DoctorStatus::UNPUBLISHED, DoctorStatus::INCOMPLETE, DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE])->get();
+            ->whereIn('state_id', [
+                DoctorStatus::NEW,
+                DoctorStatus::UNPUBLISHED,
+                DoctorStatus::INCOMPLETE,
+                DoctorStatus::PUBLISHED,
+                DoctorStatus::ACTIVE,
+            ])
+            ->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
-        return response()->json(['message' => 'Not Found!'], JsonResponse::HTTP_NOT_FOUND);
+        return response()->json(
+            ['message' => 'Not Found!'],
+            JsonResponse::HTTP_NOT_FOUND
+        );
     }
 
     /**
@@ -252,12 +304,18 @@ class DoctorController extends Controller
                     LIMIT 1)
                   , false) AS open ")
             )
-            ->whereIn('state_id', [DoctorStatus::PUBLISHED, DoctorStatus::ACTIVE])
+            ->whereIn('state_id', [
+                DoctorStatus::PUBLISHED,
+                DoctorStatus::ACTIVE,
+            ])
             ->get();
         if (sizeof($doctor) > 0) {
             return DoctorResource::collection($doctor)->first();
         }
-        return response()->json(['message' => 'Not Found!'], JsonResponse::HTTP_NOT_FOUND);
+        return response()->json(
+            ['message' => 'Not Found!'],
+            JsonResponse::HTTP_NOT_FOUND
+        );
     }
 
     /**
@@ -275,7 +333,10 @@ class DoctorController extends Controller
             // get location
             $location = $this->getDoctorLocation($input);
         } catch (\Exception $ex) {
-            return response()->json(['error' => ['location' => $ex->getMessage()]], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(
+                ['error' => ['location' => $ex->getMessage()]],
+                JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+            );
         }
 
         // Create user
@@ -295,7 +356,7 @@ class DoctorController extends Controller
             'longitude' => $location['longitude'],
             'phone' => $input->phone,
             'gdpr_agreed' => true,
-            'gdpr_agreed_date' => date('Y-m-d H:i:s')
+            'gdpr_agreed_date' => date('Y-m-d H:i:s'),
         ]);
 
         // TODO: predelat
@@ -314,7 +375,9 @@ class DoctorController extends Controller
             $user->save();
         }
 
-        $doctor->profile_completedness = HelperController::calculateProfileCompletedness($doctor);
+        $doctor->profile_completedness = HelperController::calculateProfileCompletedness(
+            $doctor
+        );
         $doctor->save();
 
         // send registration email
@@ -325,7 +388,7 @@ class DoctorController extends Controller
             'user_id' => $user->id,
             'state_id' => UserState::NEW,
             'email_sent' => true,
-            'doctor_object' => serialize($doctor)
+            'doctor_object' => serialize($doctor),
         ]);
 
         return response()->json($doctor, JsonResponse::HTTP_CREATED);
@@ -344,8 +407,10 @@ class DoctorController extends Controller
         $requestUser = User::find($id);
         $loggedUser = Auth::User();
 
-        if ($requestUser->id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
-
+        if (
+            $requestUser->id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
             // validate input
             $input = $this->validateProfile($request, $id);
 
@@ -353,29 +418,42 @@ class DoctorController extends Controller
             $user = User::find($id);
             $user->update($input['user']);
 
-            $doctor = Doctor::where(['user_id' => $id])->get()->first();
+            $doctor = Doctor::where(['user_id' => $id])
+                ->get()
+                ->first();
 
             try {
                 // get location
-                $location = $this->getDoctorLocation((object)$input['doctor']);
+                $location = $this->getDoctorLocation((object) $input['doctor']);
             } catch (\Exception $ex) {
-                return response()->json(['error' => ['location' => $ex->getMessage()]], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+                return response()->json(
+                    ['error' => ['location' => $ex->getMessage()]],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                );
             }
 
             // add search name
-            $input['doctor']['search_name'] = HelperController::parseName($input['user']['name']);
-            $input['doctor']['profile_completedness'] = HelperController::calculateProfileCompletedness($doctor);
+            $input['doctor']['search_name'] = HelperController::parseName(
+                $input['user']['name']
+            );
+            $input['doctor'][
+                'profile_completedness'
+            ] = HelperController::calculateProfileCompletedness($doctor);
             $input['doctor']['latitude'] = $location['latitude'];
             $input['doctor']['longitude'] = $location['longitude'];
             $doctor->update($input['doctor']);
 
             // store image
             if ($input['avatar'] !== null) {
-                $user->update(['avatar' => $this->saveProfileImage($id, $input['avatar'])]);
+                $user->update([
+                    'avatar' => $this->saveProfileImage($id, $input['avatar']),
+                ]);
             }
 
-            return response()->json(DoctorResource::make($doctor), JsonResponse::HTTP_OK);
-
+            return response()->json(
+                DoctorResource::make($doctor),
+                JsonResponse::HTTP_OK
+            );
         } else {
             // return unauthorized
             throw new AuthenticationException();
@@ -400,12 +478,15 @@ class DoctorController extends Controller
             'post_code' => 'required|max:6',
             'city' => 'required|max:255',
             'phone' => 'required|max:20',
-            'gdpr' => 'required'
+            'gdpr' => 'required',
         ]);
 
         if ($validator->fails()) {
             throw new HttpResponseException(
-                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
             );
         }
 
@@ -424,15 +505,18 @@ class DoctorController extends Controller
         // prepare validator
         $validator = Validator::make((array) $input, [
             'name' => 'required|max:255',
-            'slug' => 'max:191|unique:doctors,slug,'.$user_id.',user_id',
-            'email' => 'required|email|unique:users,email,'.$user_id.',id',
+            'slug' => 'max:191|unique:doctors,slug,' . $user_id . ',user_id',
+            'email' => 'required|email|unique:users,email,' . $user_id . ',id',
             'description' => 'string',
-            'speaks_english' => 'required'
+            'speaks_english' => 'required',
         ]);
 
         if ($validator->fails()) {
             throw new HttpResponseException(
-                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
             );
         }
 
@@ -442,7 +526,7 @@ class DoctorController extends Controller
         $data = [
             'user' => [
                 'name' => $input->name,
-                'email' => $input->email
+                'email' => $input->email,
             ],
             'doctor' => [
                 'description' => $input->description,
@@ -458,9 +542,9 @@ class DoctorController extends Controller
                 'working_doctors_count' => $input->staff_info->doctors_count,
                 'working_doctors_names' => $input->staff_info->doctors_names,
                 'nurses_count' => $input->staff_info->nurses_count,
-                'other_workers_count' => $input->staff_info->others_count
+                'other_workers_count' => $input->staff_info->others_count,
             ],
-            'avatar' => $input->avatar
+            'avatar' => $input->avatar,
         ];
         if (!empty($input->slug)) {
             $data['doctor']['slug'] = $input->slug;
@@ -482,12 +566,15 @@ class DoctorController extends Controller
             'city' => 'required|max:255',
             'phone' => 'required|max:20',
             'second_phone' => 'string|max:20',
-            'website' => 'string|max:150'
+            'website' => 'string|max:150',
         ]);
 
         if ($validator->fails()) {
             throw new HttpResponseException(
-                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
             );
         }
     }
@@ -504,12 +591,15 @@ class DoctorController extends Controller
             'doctors_count' => 'required|integer',
             'nurses_count' => 'required|integer',
             'others_count' => 'required|integer',
-            'doctors_names' => 'string|max:1000'
+            'doctors_names' => 'string|max:1000',
         ]);
 
         if ($validator->fails()) {
             throw new HttpResponseException(
-                response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
             );
         }
     }
@@ -521,10 +611,20 @@ class DoctorController extends Controller
      */
     protected function getDoctorSlug(string $name)
     {
-        $slug = strtolower(str_replace(" ", "-", preg_replace("/[^A-Za-z0-9 ]/", '', HelperController::replaceAccents($name))));
+        $slug = strtolower(
+            str_replace(
+                " ",
+                "-",
+                preg_replace(
+                    "/[^A-Za-z0-9 ]/",
+                    '',
+                    HelperController::replaceAccents($name)
+                )
+            )
+        );
         $existingCount = Doctor::where('slug', 'like', $slug . '%')->count();
         if ($existingCount > 0) {
-            $slug = $slug . '-' . ($existingCount);
+            $slug = $slug . '-' . $existingCount;
         }
         return $slug;
     }
@@ -537,7 +637,11 @@ class DoctorController extends Controller
     protected function getDoctorLocation(object $data)
     {
         return HelperController::getLatLngFromAddress(
-            trim($data->street) . " " . trim($data->city) . " CZ " . trim($data->post_code)
+            trim($data->street) .
+                " " .
+                trim($data->city) .
+                " CZ " .
+                trim($data->post_code)
         );
     }
 
@@ -548,12 +652,12 @@ class DoctorController extends Controller
      */
     protected function createUser(object $data)
     {
-        try{
+        try {
             return User::create([
                 'name' => $data->name,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
-                'role_id' => UserRole::DOCTOR
+                'role_id' => UserRole::DOCTOR,
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
@@ -574,10 +678,15 @@ class DoctorController extends Controller
         $image = ImageHandler::splitEncodedData($data);
 
         // prepare file name
-        $fileName = strtolower($doctor->slug . '.' . ImageHandler::getExtensionByType($image->type));
+        $fileName = strtolower(
+            $doctor->slug . '.' . ImageHandler::getExtensionByType($image->type)
+        );
 
         // save file to local storage
-        Storage::disk('public')->put('profile' . DIRECTORY_SEPARATOR . $fileName, base64_decode($image->content));
+        Storage::disk('public')->put(
+            'profile' . DIRECTORY_SEPARATOR . $fileName,
+            base64_decode($image->content)
+        );
 
         return $fileName;
     }
@@ -587,12 +696,12 @@ class DoctorController extends Controller
         $email = $user->email;
         $data = [
             'doctor' => $doctor,
-            'user' => $user
+            'user' => $user,
         ];
-        Mail::send('emails/registration', $data, function ($message) use ($email) {
-            $message->to($email)
-                ->subject('Dr.Mouse ověření emailu');
+        Mail::send('emails/registration', $data, function ($message) use (
+            $email
+        ) {
+            $message->to($email)->subject('Dr.Mouse ověření emailu');
         });
     }
-
 }

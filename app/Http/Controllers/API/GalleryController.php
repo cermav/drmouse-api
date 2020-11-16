@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Doctor;
+use App\Models\Doctor;
 use App\Http\Resources\PhotoResource;
 use App\Models\Photo;
 use App\Types\UserRole;
-use App\User;
+use app\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,8 +30,10 @@ class GalleryController extends Controller
         $requestUser = User::find($id);
         $loggedUser = Auth::User();
 
-        if ($requestUser->id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
-
+        if (
+            $requestUser->id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
             // validate input
             $input = json_decode($request->getContent());
 
@@ -40,25 +42,38 @@ class GalleryController extends Controller
             $result = [];
 
             foreach ($input as $picture) {
-
                 // prepare file name
-                $fileName = strtolower($doctor->slug . '-' . Str::random(4) .  '-' . $picture->name);
+                $fileName = strtolower(
+                    $doctor->slug . '-' . Str::random(4) . '-' . $picture->name
+                );
 
                 // save file to local storage
-                Storage::disk('public')->put('doctors' . DIRECTORY_SEPARATOR . $fileName, base64_decode($picture->content));
+                Storage::disk('public')->put(
+                    'doctors' . DIRECTORY_SEPARATOR . $fileName,
+                    base64_decode($picture->content)
+                );
 
-                $position = intval(Photo::where('user_id', $requestUser->id)->max('position')) + 1;
+                $position =
+                    intval(
+                        Photo::where('user_id', $requestUser->id)->max(
+                            'position'
+                        )
+                    ) + 1;
 
                 // store it in database
                 $result[] = Photo::create([
                     'user_id' => $requestUser->id,
                     'path' => 'doctors/' . $fileName,
-                    'position' => $position
+                    'position' => $position,
                 ]);
             }
 
-            return response()->json(PhotoResource::collection(Photo::where('user_id', $requestUser->id)->get()), JsonResponse::HTTP_OK);
-
+            return response()->json(
+                PhotoResource::collection(
+                    Photo::where('user_id', $requestUser->id)->get()
+                ),
+                JsonResponse::HTTP_OK
+            );
         } else {
             // return unauthorized
             throw new AuthenticationException();
@@ -79,16 +94,16 @@ class GalleryController extends Controller
 
         $photo = Photo::findOrFail($id);
 
-        if ($photo->user_id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
-
+        if (
+            $photo->user_id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
             $photo->delete();
 
             return response()->json("Deleted", JsonResponse::HTTP_OK);
-
         } else {
             // return unauthorized
             throw new AuthenticationException();
         }
     }
-
 }

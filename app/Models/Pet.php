@@ -4,12 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Pets extends Model
+class Pet extends Model
 {
-    public $table = "pets";
     protected $fillable = [
-        'id',
-        'owners_id',
         'pet_name',
         'birth_date',
         'kind',
@@ -17,8 +14,6 @@ class Pets extends Model
         'gender_state_id',
         'chip_number',
         'background',
-        'profile_completedness',
         'avatar',
-        'last_used',
     ];
 }

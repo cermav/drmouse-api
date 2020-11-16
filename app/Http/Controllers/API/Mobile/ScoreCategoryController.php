@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Mobile;
 
-use App\ScoreItem;
+use app\Models\ScoreItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 

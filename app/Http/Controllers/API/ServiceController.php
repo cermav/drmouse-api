@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\ServiceResource;
 use App\Models\DoctorsService;
-use App\Service;
+use app\Models\Service;
 use App\Types\UserRole;
-use App\User;
+use app\Models\User;
 use App\Validators\ServiceValidator;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -24,9 +24,7 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $services = Service::where([
-            ['is_approved', '=', 1]
-        ])
+        $services = Service::where([['is_approved', '=', 1]])
             ->select(['id', 'name', 'show_on_registration', 'show_in_search'])
             ->get();
         return response()->json($services);
@@ -45,16 +43,21 @@ class ServiceController extends Controller
         $requestUser = User::find($id);
         $loggedUser = Auth::User();
 
-        if ($requestUser->id === $loggedUser->id || $loggedUser->role_id === UserRole::ADMINISTRATOR) {
-
+        if (
+            $requestUser->id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
             // validate input
             $input = json_decode($request->getContent());
             foreach ($input as $item) {
-                $validator = ServiceValidator::create((array)$item);
+                $validator = ServiceValidator::create((array) $item);
                 if ($validator->fails()) {
                     var_dump($item);
                     throw new HttpResponseException(
-                        response()->json(['errors' => $validator->errors()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+                        response()->json(
+                            ['errors' => $validator->errors()],
+                            JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                        )
                     );
                 }
             }
@@ -64,20 +67,24 @@ class ServiceController extends Controller
 
             // save each new record
             foreach ($input as $item) {
-                if (property_exists($item, 'price')  && $item->price > 0) {
+                if (property_exists($item, 'price') && $item->price > 0) {
                     DoctorsService::create([
                         'user_id' => $requestUser->id,
                         'service_id' => $item->id,
-                        'price' => $item->price
+                        'price' => $item->price,
                     ]);
                 }
             }
 
             return response()->json(
-                ServiceResource::collection($requestUser->services()->where('is_approved', 1)->get()),
+                ServiceResource::collection(
+                    $requestUser
+                        ->services()
+                        ->where('is_approved', 1)
+                        ->get()
+                ),
                 JsonResponse::HTTP_OK
             );
-
         } else {
             // return unauthorized
             throw new AuthenticationException();

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Mobile;
 
-use App\Doctor;
+use App\Models\Doctor;
 use App\Http\Resources\Mobile\DoctorResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -18,23 +18,26 @@ class DoctorController extends Controller
      */
     public function index(Request $request)
     {
-        $whereArray = [
-            ['state_id', '=', 3],
-        ];
+        $whereArray = [['state_id', '=', 3]];
 
         // add update condition
         $validatedDate = $request->validate(['updated' => 'date']);
         if (array_key_exists('updated', $validatedDate)) {
-            $whereArray[] = ['doctors.updated_at', '>', $validatedDate['updated']];
+            $whereArray[] = [
+                'doctors.updated_at',
+                '>',
+                $validatedDate['updated'],
+            ];
         }
         return DoctorResource::collection(
             Doctor::where($whereArray)
                 ->select(
                     'doctors.*',
-                    DB::raw("(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score ")
+                    DB::raw(
+                        "(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score "
+                    )
                 )
                 ->get()
-
         );
     }
 
