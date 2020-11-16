@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace app\Http\Controllers\API;
 
 use App\Models\DoctorsLog;
 use App\Http\Controllers\HelperController;

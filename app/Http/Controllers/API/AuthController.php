@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\Api;
+namespace app\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Types\DoctorStatus;

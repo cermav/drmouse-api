@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace app\Http\Controllers\API\Admin;
 
 use App\Types\UserRole;
 use Illuminate\Auth\AuthenticationException;
@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class DoctorStatusController extends Controller
 {
-
     /*
      * Display a listing of the resource.
      *
@@ -28,11 +27,12 @@ class DoctorStatusController extends Controller
             ->select(
                 'id',
                 'name',
-                DB::raw("(SELECT COUNT(id) FROM doctors WHERE state_id = states.id) AS doctor_count")
+                DB::raw(
+                    "(SELECT COUNT(id) FROM doctors WHERE state_id = states.id) AS doctor_count"
+                )
             )
             ->orderBy('id', 'ASC');
 
         return $states->get();
     }
-
 }

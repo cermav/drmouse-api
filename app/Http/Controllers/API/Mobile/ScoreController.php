@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Mobile;
+namespace app\Http\Controllers\API\Mobile;
 
 use App\Http\Resources\Mobile\ScoreResource;
 use app\Models\Score;

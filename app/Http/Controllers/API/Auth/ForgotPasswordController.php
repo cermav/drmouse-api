@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace app\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
@@ -40,13 +40,19 @@ class ForgotPasswordController extends Controller
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
-        $response = $this->broker()->sendResetLink(
-            $request->only('email')
-        );
-
+        $response = $this->broker()->sendResetLink($request->only('email'));
 
         return $response == Password::RESET_LINK_SENT
-            ? response()->json(['message' => 'Reset link sent to your email.', 'status' => true], JsonResponse::HTTP_CREATED)
-            : response()->json(['message' => 'Unable to send reset link', 'status' => false], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+            ? response()->json(
+                [
+                    'message' => 'Reset link sent to your email.',
+                    'status' => true,
+                ],
+                JsonResponse::HTTP_CREATED
+            )
+            : response()->json(
+                ['message' => 'Unable to send reset link', 'status' => false],
+                JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+            );
     }
 }

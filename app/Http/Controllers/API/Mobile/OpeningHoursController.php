@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Mobile;
+namespace app\Http\Controllers\API\Mobile;
 
 use App\Http\Controllers\Controller;
 use App\Models\OpeningHour;
@@ -20,10 +20,21 @@ class OpeningHoursController extends Controller
         // add update condition
         $validatedDate = $request->validate(['updated' => 'date']);
         if (array_key_exists('updated', $validatedDate)) {
-            $whereArray[] = ['opening_hours.updated_at', '>', $validatedDate['updated']];
+            $whereArray[] = [
+                'opening_hours.updated_at',
+                '>',
+                $validatedDate['updated'],
+            ];
         }
         return OpeningHour::where($whereArray)
-            ->select('id', 'user_id', 'weekday_id', 'open_at', 'close_at', 'updated_at')
+            ->select(
+                'id',
+                'user_id',
+                'weekday_id',
+                'open_at',
+                'close_at',
+                'updated_at'
+            )
             ->get();
     }
 }

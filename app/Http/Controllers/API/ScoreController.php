@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace app\Http\Controllers\API;
 
 use app\Models\ScoreItem;
 use App\Types\ScoreStatus;

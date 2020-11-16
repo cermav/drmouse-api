@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace app\Http\Controllers\API;
 
 use App\Models\NewsletterUser;
 use Illuminate\Auth\Events\Verified;
@@ -22,17 +22,17 @@ class NewsletterUserController extends Controller
         $input = json_decode($request->getContent());
 
         // validate input
-        $validator = Validator::make((array)$input, [
-            'email' => 'required|email|unique:newsletter_users'
+        $validator = Validator::make((array) $input, [
+            'email' => 'required|email|unique:newsletter_users',
         ]);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
         // store user
         $newsletter_user = NewsletterUser::create([
             'email' => $input->email,
-            'ip_address' => $_SERVER['REMOTE_ADDR']
+            'ip_address' => $_SERVER['REMOTE_ADDR'],
         ]);
 
         $newsletter_user->sendEmailVerificationNotification();
@@ -57,8 +57,12 @@ class NewsletterUserController extends Controller
         $newsletter_user = NewsletterUser::findOrFail($request->route('id'));
 
         // verify reset token
-        if (app(PasswordBroker::class)->tokenExists( $newsletter_user, $request->get('token'))) {
-
+        if (
+            app(PasswordBroker::class)->tokenExists(
+                $newsletter_user,
+                $request->get('token')
+            )
+        ) {
             // mark as verified
             if ($newsletter_user->markEmailAsVerified()) {
                 event(new Verified($newsletter_user));
@@ -66,5 +70,4 @@ class NewsletterUserController extends Controller
         }
         return response()->json('Email verified!');
     }
-
 }

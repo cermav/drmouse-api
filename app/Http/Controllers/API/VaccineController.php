@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace app\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Vaccines;

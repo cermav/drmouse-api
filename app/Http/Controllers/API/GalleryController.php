@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace app\Http\Controllers\API;
 
 use App\Models\Doctor;
 use App\Http\Resources\PhotoResource;

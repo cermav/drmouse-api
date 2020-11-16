@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace app\Http\Controllers\API\Admin;
 
 use app\Models\ScoreItem;
 use App\Types\UserRole;

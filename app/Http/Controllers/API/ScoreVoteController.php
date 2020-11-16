@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace app\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScoreVote;
@@ -20,30 +20,36 @@ class ScoreVoteController extends Controller
         $input = json_decode($request->getContent());
 
         // validate input
-        $validator = Validator::make((array)$input, [
+        $validator = Validator::make((array) $input, [
             'score_id' => 'required|integer',
             'author_id' => 'integer',
             'value' => 'integer|required',
-            'ip_address' => []
+            'ip_address' => [],
         ]);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
         // validate ip address
-        if (ScoreVote::where([ ['score_id', $input->score_id], ['ip_address', $_SERVER['REMOTE_ADDR']] ])->exists()) {
+        if (
+            ScoreVote::where([
+                ['score_id', $input->score_id],
+                ['ip_address', $_SERVER['REMOTE_ADDR']],
+            ])->exists()
+        ) {
             return response()->json("Request from same IP.", 401);
         }
 
         // store score vote
         $vote = ScoreVote::create([
             'score_id' => $input->score_id,
-            'author_id' => (property_exists($input, 'author_id') ? $input->author_id : null),
+            'author_id' => property_exists($input, 'author_id')
+                ? $input->author_id
+                : null,
             'value' => $input->value,
-            'ip_address' => $_SERVER['REMOTE_ADDR']
+            'ip_address' => $_SERVER['REMOTE_ADDR'],
         ]);
 
         return $vote;
     }
-
 }

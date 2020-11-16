@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace app\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
@@ -45,15 +45,20 @@ class ResetPasswordController extends Controller
             return response()->json('Invalid signature', 403);
         }
 
-        $this->validate($request, $this->rules(), $this->validationErrorMessages());
+        $this->validate(
+            $request,
+            $this->rules(),
+            $this->validationErrorMessages()
+        );
 
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
         $response = $this->broker()->reset(
-            $this->credentials($request), function ($user, $password) {
-            $this->resetPassword($user, $password);
-        }
+            $this->credentials($request),
+            function ($user, $password) {
+                $this->resetPassword($user, $password);
+            }
         );
 
         if ($request->wantsJson()) {
