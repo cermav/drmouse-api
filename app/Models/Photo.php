@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +11,5 @@ class Photo extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'path', 'position', 'user_id'
-    ];
+    protected $fillable = ['path', 'position', 'user_id'];
 }

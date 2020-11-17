@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Notifications\RegistartionMemberEmail;
 use App\Notifications\RegistrationDoctorEmail;
