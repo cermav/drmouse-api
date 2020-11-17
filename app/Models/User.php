@@ -9,7 +9,7 @@ use App\Notifications\VerifyEmail;
 use App\Notifications\ResetPasswordEmail;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends \TCG\Voyager\User implements JWTSubject
+class User extends \TCG\Voyager\Models\User implements JWTSubject
 {
     use Notifiable;
 
