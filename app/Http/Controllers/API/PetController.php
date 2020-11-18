@@ -7,17 +7,17 @@ use JWTAuth;
 use App\Models\Pet;
 use App\Models\Member;
 use App\Models\DoctorsLog;
+use App\Models\ScoreItem;
+use App\Models\User;
+use App\Models\Doctor;
 use App\Http\Controllers\HelperController;
-use app\Models\ScoreItem;
 use App\Types\DoctorStatus;
 use App\Types\UserRole;
 use App\Types\UserState;
-use App\Models\User;
 use App\Utils\ImageHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Models\Doctor;
 use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
-use App\favorite_vets;
 use DateTime;
 
 class PetController extends Controller

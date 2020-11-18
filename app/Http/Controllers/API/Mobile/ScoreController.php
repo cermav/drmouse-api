@@ -3,7 +3,7 @@
 namespace app\Http\Controllers\API\Mobile;
 
 use App\Http\Resources\Mobile\ScoreResource;
-use app\Models\Score;
+use App\Models\Score;
 use App\Types\ScoreStatus;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;

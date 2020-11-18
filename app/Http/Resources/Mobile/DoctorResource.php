@@ -5,7 +5,7 @@ namespace App\Http\Resources\Mobile;
 use App\Http\Resources\OpeningHoursResource;
 use App\Http\Resources\PhotoResource;
 use App\Http\Resources\ServiceResource;
-use app\Models\ScoreItem;
+use App\Models\ScoreItem;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class DoctorResource extends JsonResource

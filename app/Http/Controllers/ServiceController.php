@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Input;
-use app\Models\Service;
+use App\Models\Service;
 
 class ServiceController extends Controller
 {

@@ -4,7 +4,7 @@ namespace app\Http\Controllers\API;
 
 use App\Http\Resources\ServiceResource;
 use App\Models\DoctorsService;
-use app\Models\Service;
+use App\Models\Service;
 use App\Types\UserRole;
 use App\Models\User;
 use App\Validators\ServiceValidator;

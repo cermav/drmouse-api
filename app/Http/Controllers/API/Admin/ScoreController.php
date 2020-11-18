@@ -2,7 +2,7 @@
 
 namespace app\Http\Controllers\API\Admin;
 
-use app\Models\ScoreItem;
+use App\Models\ScoreItem;
 use App\Types\UserRole;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
@@ -11,8 +11,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
-use app\Models\Score;
-use app\Models\ScoreDetail;
+use App\Models\Score;
+use App\Models\ScoreDetail;
 use App\Http\Resources\ScoreResource;
 use Illuminate\Support\Facades\Validator;
 

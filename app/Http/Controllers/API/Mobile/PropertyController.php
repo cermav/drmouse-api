@@ -2,7 +2,7 @@
 
 namespace app\Http\Controllers\API\Mobile;
 
-use app\Models\Property;
+use App\Models\Property;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;

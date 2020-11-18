@@ -4,7 +4,7 @@ namespace app\Http\Controllers\API\Admin;
 
 use App\Models\DoctorsLog;
 use App\Http\Controllers\HelperController;
-use app\Models\ScoreItem;
+use App\Models\ScoreItem;
 use App\Types\DoctorStatus;
 use App\Types\UserRole;
 use App\Types\UserState;

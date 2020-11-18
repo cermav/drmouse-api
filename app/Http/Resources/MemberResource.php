@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use app\Models\ScoreItem;
+use App\Models\ScoreItem;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MemberResource extends JsonResource

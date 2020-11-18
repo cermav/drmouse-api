@@ -2,15 +2,15 @@
 
 namespace app\Http\Controllers\API;
 
-use app\Models\ScoreItem;
+use App\Models\ScoreItem;
 use App\Types\ScoreStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
-use app\Models\Score;
-use app\Models\ScoreDetail;
+use App\Models\Score;
+use App\Models\ScoreDetail;
 use App\Http\Resources\ScoreResource;
 use Illuminate\Support\Facades\Validator;
 

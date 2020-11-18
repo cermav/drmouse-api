@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Input;
-use app\Models\Property;
+use App\Models\Property;
 
 class PropertyController extends Controller
 {

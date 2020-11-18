@@ -9,7 +9,7 @@ use App\Models\PetAppointment;
 use App\Models\Member;
 use App\Models\DoctorsLog;
 use App\Http\Controllers\HelperController;
-use app\Models\ScoreItem;
+use App\Models\ScoreItem;
 use App\Types\DoctorStatus;
 use App\Models\User;
 use App\Types\UserRole;

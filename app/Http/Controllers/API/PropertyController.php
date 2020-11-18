@@ -3,7 +3,7 @@
 namespace app\Http\Controllers\API;
 
 use App\Models\DoctorsProperty;
-use app\Models\Property;
+use App\Models\Property;
 use App\Types\UserRole;
 use App\Models\User;
 use App\Validators\PropertyValidator;
