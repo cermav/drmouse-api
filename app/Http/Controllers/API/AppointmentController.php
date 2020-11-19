@@ -37,9 +37,7 @@ class AppointmentController extends Controller
                 ->where('id', $pet_id)
                 ->first()->owners_id
         ) {
-            $appointment = DB::table('pets_appointments')
-                ->where('pet_id', $pet_id)
-                ->get();
+            $appointment = PetAppointment::where('pet_id', $pet_id)->get();
             return response()->json($appointment);
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
