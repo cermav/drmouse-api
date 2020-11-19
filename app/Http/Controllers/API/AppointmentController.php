@@ -58,8 +58,7 @@ class AppointmentController extends Controller
     //done
     public function detail(int $pet_id, int $id)
     {
-        $appointment = DB::table('pets_appointments')
-            ->where('pet_id', $pet_id)
+        $appointment = PetAppointment::where('pet_id', $pet_id)
             ->where('id', $id)
             ->get();
         return response()->json($appointment);
@@ -69,9 +68,7 @@ class AppointmentController extends Controller
     public function store(Request $request, int $pet_id)
     {
         //get id of pets owner
-        $owners_id = DB::table('pets')
-            ->where('id', $pet_id)
-            ->first()->owners_id;
+        $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
         //authorize user vs owner
         $this->AuthUser($owners_id);
         //validate input
@@ -129,8 +126,7 @@ class AppointmentController extends Controller
             return response()->json("non-existent pet or appointment", 404);
         }
 
-        DB::table('pets_appointments')
-            ->where('id', $id)
+        PetAppointment::where('id', $id)
             ->where('pet_id', $pet_id)
             ->delete();
         return response()->json("Deleted", JsonResponse::HTTP_OK);
