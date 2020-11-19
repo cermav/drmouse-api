@@ -32,10 +32,7 @@ class AppointmentController extends Controller
     public function index($pet_id)
     {
         if (
-            Auth::user()->id ===
-            DB::table('pets')
-                ->where('id', $pet_id)
-                ->first()->owners_id
+            Auth::user()->id === Pet::where('id', $pet_id)->first()->owners_id
         ) {
             $appointment = PetAppointment::where('pet_id', $pet_id)->get();
             return response()->json($appointment);
@@ -74,24 +71,19 @@ class AppointmentController extends Controller
         //validate input
         $input = $this->validateRegistration($request);
         //create input
-        if (
-            Pets::where('id', $pet_id)->first()->owners_id === Auth::User()->id
-        ) {
-            $object = json_decode(json_encode($input), false);
-            $appointment = $this->createAppointment($object, $pet_id);
-            //add input to database
-            $appointment->save();
-            //respond
-            return response()->json($appointment, JsonResponse::HTTP_CREATED);
-        } else {
-            return response()->json("Unauthorized", 401);
-        }
+        $object = json_decode(json_encode($input), false);
+        $appointment = $this->createAppointment($object, $pet_id);
+        //add input to database
+        $appointment->save();
+        //respond
+        return response()->json($appointment, JsonResponse::HTTP_CREATED);
     }
     //create Appointment for POST add appointment
     //done
     public function createAppointment(object $data, int $pet_id)
     {
         try {
+            $date = DateTime::createFromFormat('j. n. Y', $data->date);
             return PetAppointment::create([
                 'pet_id' => $pet_id,
                 'date' => $data->date,
@@ -115,11 +107,7 @@ class AppointmentController extends Controller
     public function remove(int $pet_id, int $id)
     {
         try {
-            $this->AuthUser(
-                DB::table('pets')
-                    ->where('id', $pet_id)
-                    ->first()->owners_id
-            );
+            $this->AuthUser(Pet::where('id', $pet_id)->first()->owners_id);
         } catch (\Exception $e) {
             return response()->json("non-existent pet or appointment", 404);
         }
