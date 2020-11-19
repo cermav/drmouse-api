@@ -75,9 +75,7 @@ class AppointmentController extends Controller
         $input = $this->validateRegistration($request);
         //create input
         if (
-            DB::table('pets')
-                ->where('id', $pet_id)
-                ->first()->owners_id === Auth::User()->id
+            Pets::where('id', $pet_id)->first()->owners_id === Auth::User()->id
         ) {
             $object = json_decode(json_encode($input), false);
             $appointment = $this->createAppointment($object, $pet_id);

@@ -13,14 +13,13 @@ class CreatePetsAppointmentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('pets_appointments', function (Blueprint $table) {
+        Schema::create('pet_appointments', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
-            $table->integer('owners_id');          
+            $table->integer('owners_id');
             $table->integer('pet_id');
             $table->date('date');
             $table->string('description');
-            
         });
     }
 
@@ -31,6 +30,6 @@ class CreatePetsAppointmentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pets_appointments');
+        Schema::dropIfExists('pet_appointments');
     }
 }
