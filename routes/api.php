@@ -16,145 +16,145 @@ use Illuminate\Http\Request;
 Auth::routes(['verify' => true]);
 
 /* Api for web */
-Route::apiResource('properties', 'API\PropertyController');
-Route::apiResource('services', 'API\ServiceController');
+Route::apiResource('properties', 'Api\PropertyController');
+Route::apiResource('services', 'Api\ServiceController');
 
-Route::get('doctors', 'API\DoctorController@index');
-Route::get('all-doctors', 'API\DoctorController@showAll');
-Route::get('doctors/{id}', 'API\DoctorController@show');
-Route::get('doctor-by-slug/{slug}', 'API\DoctorController@showBySlug');
-Route::post('doctors', 'API\DoctorController@store');
-Route::post('doctor-suggestion', 'API\DoctorSuggestionController@store');
+Route::get('doctors', 'Api\DoctorController@index');
+Route::get('all-doctors', 'Api\DoctorController@showAll');
+Route::get('doctors/{id}', 'Api\DoctorController@show');
+Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
+Route::post('doctors', 'Api\DoctorController@store');
+Route::post('doctor-suggestion', 'Api\DoctorSuggestionController@store');
 
-Route::get('pets', 'API\PetsController@showall');
-Route::get('pets/{id}', 'API\PetsController@showById');
-Route::post('pets', 'API\PetsController@store');
+Route::get('pets', 'Api\PetsController@showall');
+Route::get('pets/{id}', 'Api\PetsController@showById');
+Route::post('pets', 'Api\PetsController@store');
 
-Route::post('members', 'API\MemberController@store');
+Route::post('members', 'Api\MemberController@store');
 
 // score
-Route::put('score/{id}', 'API\ScoreController@update'); // should be under auth, but it is not working now
-Route::get('score', 'API\ScoreController@index');
-Route::get('score/{id}', 'API\ScoreController@show');
-Route::post('score', 'API\ScoreController@store');
-Route::post('vote', 'API\ScoreVoteController@store');
+Route::put('score/{id}', 'Api\ScoreController@update'); // should be under auth, but it is not working now
+Route::get('score', 'Api\ScoreController@index');
+Route::get('score/{id}', 'Api\ScoreController@show');
+Route::post('score', 'Api\ScoreController@store');
+Route::post('vote', 'Api\ScoreVoteController@store');
 
-Route::post('auth/login', 'API\AuthController@login');
-Route::post('auth/forgot-password', 'API\Auth\ForgotPasswordController')->name(
+Route::post('auth/login', 'Api\AuthController@login');
+Route::post('auth/forgot-password', 'Api\Auth\ForgotPasswordController')->name(
     'forgot.password'
 );
 Route::post(
     'auth/reset-password',
-    'API\Auth\ResetPasswordController@reset'
+    'Api\Auth\ResetPasswordController@reset'
 )->name('reset.password');
 Route::put(
     'auth/activation/{id}',
-    'API\Auth\ActivationController@activate'
+    'Api\Auth\ActivationController@activate'
 )->name('member.activation');
-Route::get('email/verify/{id}', 'API\Auth\VerificationController@verify')->name(
+Route::get('email/verify/{id}', 'Api\Auth\VerificationController@verify')->name(
     'verification.verify'
 );
 // Route::get('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
 
-Route::post('newsletter', 'API\NewsletterUserController@store');
+Route::post('newsletter', 'Api\NewsletterUserController@store');
 Route::get(
     'newsletter/verify/{id}',
-    'API\NewsletterUserController@verify'
+    'Api\NewsletterUserController@verify'
 )->name('newsletter.verify');
 
 Route::group(['middleware' => ['jwt.auth']], function () {
     // auth
-    Route::get('auth/info', 'API\AuthController@info');
-    Route::get('auth/refresh', 'API\AuthController@refresh');
-    Route::get('auth/logout', 'API\AuthController@logout');
+    Route::get('auth/info', 'Api\AuthController@info');
+    Route::get('auth/refresh', 'Api\AuthController@refresh');
+    Route::get('auth/logout', 'Api\AuthController@logout');
     Route::put(
         'auth/change-password/{id}',
-        'API\Auth\ChangePasswordController@update'
+        'Api\Auth\ChangePasswordController@update'
     );
 
     // doctor profile
-    Route::put('doctors/{id}', 'API\DoctorController@update');
-    Route::put('opening-hours/{id}', 'API\OpeningHoursController@update');
-    Route::put('property/{id}', 'API\PropertyController@update');
-    Route::put('service/{id}', 'API\ServiceController@update');
-    Route::put('gallery/{id}', 'API\GalleryController@update');
-    Route::delete('gallery/{id}', 'API\GalleryController@delete');
+    Route::put('doctors/{id}', 'Api\DoctorController@update');
+    Route::put('opening-hours/{id}', 'Api\OpeningHoursController@update');
+    Route::put('property/{id}', 'Api\PropertyController@update');
+    Route::put('service/{id}', 'Api\ServiceController@update');
+    Route::put('gallery/{id}', 'Api\GalleryController@update');
+    Route::delete('gallery/{id}', 'Api\GalleryController@delete');
 
-    Route::get('members/{id}', 'API\MemberController@show');
-    Route::put('members/{id}', 'API\MemberController@update');
+    Route::get('members/{id}', 'Api\MemberController@show');
+    Route::put('members/{id}', 'Api\MemberController@update');
 
     // My Pet
-    Route::get('pets/list', 'API\PetController@index');
-    Route::get('all-pets', 'API\PetController@showAll');
-    Route::get('pets/{id}', 'API\PetController@detail')->where('id', '[0-9]+');
-    Route::get('pets/latest', 'API\PetController@latest');
-    Route::post('pets/store', 'API\PetController@store');
-    Route::put('pets/{id}/update', 'API\PetController@update');
-    Route::put('pets/{id}/avatar', 'API\PetController@avatar');
-    Route::put('pets/{id}/background', 'API\PetController@background');
-    Route::delete('pets/{id}/remove', 'API\PetController@remove');
+    Route::get('pets/list', 'Api\PetController@index');
+    Route::get('all-pets', 'Api\PetController@showAll');
+    Route::get('pets/{id}', 'Api\PetController@detail')->where('id', '[0-9]+');
+    Route::get('pets/latest', 'Api\PetController@latest');
+    Route::post('pets/store', 'Api\PetController@store');
+    Route::put('pets/{id}/update', 'Api\PetController@update');
+    Route::put('pets/{id}/avatar', 'Api\PetController@avatar');
+    Route::put('pets/{id}/background', 'Api\PetController@background');
+    Route::delete('pets/{id}/remove', 'Api\PetController@remove');
     // Appointments
     Route::get(
         'pets/{pet_id}/appointments/list',
-        'API\AppointmentController@index'
+        'Api\AppointmentController@index'
     );
-    Route::get('pets/appointments-all', 'API\AppointmentController@showAll');
+    Route::get('pets/appointments-all', 'Api\AppointmentController@showAll');
     Route::get(
         'pets/{pet_id}/appointment/{term_id}',
-        'API\AppointmentController@detail'
+        'Api\AppointmentController@detail'
     )->where('term_id', '[0-9]+');
     Route::put(
         'pets/{pet_id}/appointment/{term_id}/update',
-        'API\AppointmentController@update'
+        'Api\AppointmentController@update'
     );
     Route::post(
         'pets/{pet_id}/appointment/store',
-        'API\AppointmentController@store'
+        'Api\AppointmentController@store'
     );
     Route::delete(
         'pets/{pet_id}/appointment/{term_id}/remove',
-        'API\AppointmentController@remove'
+        'Api\AppointmentController@remove'
     );
     //favorite vets TODO
     /*
-    Route::get('pets/{pet_id}/fav_vets', 'API\PetsController@getVets');
-    Route::post('pets/{pet_id}/fav_vets/{vet_id}', 'API\PetsController@addVet');
+    Route::get('pets/{pet_id}/fav_vets', 'Api\PetsController@getVets');
+    Route::post('pets/{pet_id}/fav_vets/{vet_id}', 'Api\PetsController@addVet');
     Route::delete(
         'pets/{pet_id}/fav_vets/{vet_id}',
-        'API\PetsController@deleteVet'
+        'Api\PetsController@deleteVet'
     );
     // Vaccines
-    Route::get('pets/{pet_id}/vaccines', 'API\VaccineController@index');
-    Route::get('pets/{pet_id}/vaccines/{vac_id}', 'API\VaccineController@detail');
-    Route::get('all-vaccines', 'API\VaccineController@showAll');
-    Route::post('pets/{pet_id}/vaccines', 'API\VaccineController@store');
+    Route::get('pets/{pet_id}/vaccines', 'Api\VaccineController@index');
+    Route::get('pets/{pet_id}/vaccines/{vac_id}', 'Api\VaccineController@detail');
+    Route::get('all-vaccines', 'Api\VaccineController@showAll');
+    Route::post('pets/{pet_id}/vaccines', 'Api\VaccineController@store');
     Route::put(
         'pets/{pet_id}/vaccines/{vac_id}',
-        'API\VaccineController@update'
+        'Api\VaccineController@update'
     );
     Route::delete(
         'pets/{pet_id}/vaccines/{vac_id}',
-        'API\VaccineController@remove'
+        'Api\VaccineController@remove'
     );
 */
     // score
-    Route::delete('score/{id}', 'API\ScoreController@delete');
+    Route::delete('score/{id}', 'Api\ScoreController@delete');
 });
 
 /* Api for mobile application */
 Route::group(['prefix' => 'mobile'], function () {
-    Route::apiResource('doctors', 'API\Mobile\DoctorController');
-    Route::apiResource('properties', 'API\Mobile\PropertyController');
-    Route::apiResource('score', 'API\Mobile\ScoreController');
-    Route::apiResource('score-category', 'API\Mobile\ScoreCategoryController');
-    Route::apiResource('services', 'API\Mobile\ServiceController');
-    Route::apiResource('opening-hours', 'API\Mobile\OpeningHoursController');
+    Route::apiResource('doctors', 'Api\Mobile\DoctorController');
+    Route::apiResource('properties', 'Api\Mobile\PropertyController');
+    Route::apiResource('score', 'Api\Mobile\ScoreController');
+    Route::apiResource('score-category', 'Api\Mobile\ScoreCategoryController');
+    Route::apiResource('services', 'Api\Mobile\ServiceController');
+    Route::apiResource('opening-hours', 'Api\Mobile\OpeningHoursController');
 });
 
 // administration
 Route::group(['prefix' => 'admin', 'middleware' => ['jwt.auth']], function () {
-    Route::apiResource('members', 'API\MemberController');
-    Route::apiResource('doctors', 'API\Admin\DoctorController');
-    Route::apiResource('doctor-status', 'API\Admin\DoctorStatusController');
-    Route::apiResource('score', 'API\Admin\ScoreController');
+    Route::apiResource('members', 'Api\MemberController');
+    Route::apiResource('doctors', 'Api\Admin\DoctorController');
+    Route::apiResource('doctor-status', 'Api\Admin\DoctorStatusController');
+    Route::apiResource('score', 'Api\Admin\ScoreController');
 });

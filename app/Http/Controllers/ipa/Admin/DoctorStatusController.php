@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Http\Controllers\API\Admin;
+namespace app\Http\Controllers\Api\Admin;
 
 use App\Types\UserRole;
 use Illuminate\Auth\AuthenticationException;
