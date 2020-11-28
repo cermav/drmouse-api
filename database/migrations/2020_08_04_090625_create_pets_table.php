@@ -21,7 +21,7 @@ class CreatePetsTable extends Migration
             $table->date('birth_date');
             $table->string('kind');
             $table->string('breed');
-            $table->string('gender_state_id')->default('0');
+            $table->integer('gender_state_id')->default('0');
             $table->integer('chip_number');
             $table->string('bg');
             $table->integer('profile_completedness')->default('1');
