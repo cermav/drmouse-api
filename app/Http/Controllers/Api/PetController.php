@@ -148,11 +148,11 @@ class PetController extends Controller
         // prepare validator
         $validator = Validator::make((array) $input, [
             'pet_name' => 'required|string|max:50',
-            'birth_date' => 'required|date_format:j. n. Y',
+            'birth_date' => 'required',
             'kind' => 'required|string|max:50',
             'breed' => 'required|string|max:50',
             'gender_state_id' => 'required|int',
-            'chip_number' => 'nullable|int|max:20',
+            'chip_number' => 'nullable|int|max_length:20',
         ]);
         if ($validator->fails()) {
             throw new HttpResponseException(
