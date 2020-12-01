@@ -162,10 +162,10 @@ class PetController extends Controller
                 )
             );
         }
-        $date = DateTime::createFromFormat('j. n. Y', $input->birth_date);
+        //$date = DateTime::createFromFormat('j. n. Y', $input->birth_date);
         Pet::where('id', $id)->update([
             'pet_name' => $input->pet_name,
-            'birth_date' => $date,
+            'birth_date' => $intput->birth_date,
             'kind' => $input->kind,
             'breed' => $input->breed,
             'gender_state_id' => $input->gender_state_id,
