@@ -128,10 +128,11 @@ class AppointmentController extends Controller
             ->where('id', $term_id)
             ->FirstOrFail();
         $input = $this->validateRegistration($request, $term_id);
+        $date = DateTime::createFromFormat('j. n. Y', $request->date);
         PetAppointment::where('id', $term_id)
             ->where('pet_id', $pet_id)
             ->update([
-                'date' => $request->date,
+                'date' => $date,
                 'description' => $request->description,
             ]);
         return response()->json(
