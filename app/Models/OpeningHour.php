@@ -45,16 +45,16 @@ class OpeningHour extends Eloquent
 
     public function opening_hours_state()
     {
-        return $this->belongsTo(OpeningHoursState::class);
+        return $this->belongsTo(\App\Models\OpeningHoursState::class);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Models\User::class);
     }
 
     public function weekday()
     {
-        return $this->belongsTo(Weekday::class);
+        return $this->belongsTo(\App\Models\Weekday::class);
     }
 }
