@@ -24,6 +24,9 @@ class Property extends Model
      */
     public function category()
     {
-        return $this->belongsTo('App\PropertyCategory', 'property_category_id');
+        return $this->belongsTo(
+            'App\Models\PropertyCategory',
+            'property_category_id'
+        );
     }
 }

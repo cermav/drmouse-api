@@ -39,7 +39,7 @@ class Score extends Model
      */
     public function details()
     {
-        return $this->hasMany('App\ScoreDetail');
+        return $this->hasMany('App\Models\ScoreDetail');
     }
 
     /**

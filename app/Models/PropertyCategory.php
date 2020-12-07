@@ -11,6 +11,6 @@ class PropertyCategory extends Model
      */
     public function properties()
     {
-        return $this->hasMany('App\Property')->orderBy('name');
+        return $this->hasMany('App\Models\Property')->orderBy('name');
     }
 }

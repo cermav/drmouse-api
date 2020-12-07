@@ -26,6 +26,6 @@ class ScoreDetail extends Model
      */
     public function score()
     {
-        return $this->belongsTo('App\Score');
+        return $this->belongsTo('App\Models\Score');
     }
 }
