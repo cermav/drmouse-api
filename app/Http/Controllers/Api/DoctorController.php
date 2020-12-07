@@ -3,18 +3,18 @@
 namespace app\Http\Controllers\Api;
 
 use App\Models\DoctorsLog;
-use App\Http\Controllers\HelperController;
 use App\Models\ScoreItem;
+use App\Models\User;
+use App\Models\Doctor;
+use App\Http\Controllers\HelperController;
 use App\Types\DoctorStatus;
 use App\Types\UserRole;
 use App\Types\UserState;
-use App\Models\User;
 use App\Utils\ImageHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Doctor;
 use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

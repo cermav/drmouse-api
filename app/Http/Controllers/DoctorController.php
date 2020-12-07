@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Doctor;
 use App\Models\DoctorsLog;
 use App\Models\Weekday;
-use App\OpeningHour;
+use App\Models\OpeningHour;
 use App\Models\OpeningHoursState;
 use App\Models\PropertyCategory;
 use App\Models\Property;
