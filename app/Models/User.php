@@ -39,7 +39,7 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      */
     public function doctor()
     {
-        return $this->hasOne('App\Doctor');
+        return $this->hasOne('App\Models\Doctor');
     }
 
     /**
@@ -47,7 +47,7 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      */
     public function openingHours()
     {
-        return $this->hasMany('App\OpeningHour');
+        return $this->hasMany('App\Models\OpeningHour');
     }
 
     /**
@@ -55,7 +55,10 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      */
     public function properties()
     {
-        return $this->belongsToMany('App\Property', 'doctors_properties');
+        return $this->belongsToMany(
+            'App\Models\Property',
+            'doctors_properties'
+        );
     }
 
     /**
@@ -64,7 +67,7 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
     public function services()
     {
         return $this->belongsToMany(
-            'App\Service',
+            'App\Models\Service',
             'doctors_services'
         )->withPivot('price');
     }
@@ -74,7 +77,7 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      */
     public function photos()
     {
-        return $this->hasMany('App\Photo');
+        return $this->hasMany('App\Models\Photo');
     }
 
     /**
@@ -82,7 +85,10 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      */
     public function scores()
     {
-        return $this->hasMany('App\Score')->orderBy('created_at', 'desc');
+        return $this->hasMany('App\Models\Score')->orderBy(
+            'created_at',
+            'desc'
+        );
     }
 
     public function getJWTIdentifier()
