@@ -32,6 +32,6 @@ class OpeningHour extends Model
      */
     public function openingHoursState()
     {
-        return $this->belongsTo('App\Models\OpeningHoursState');
+        return $this->belongsTo('ihaha');
     }
 }
