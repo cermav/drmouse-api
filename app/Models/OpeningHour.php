@@ -43,7 +43,7 @@ class OpeningHour extends Eloquent
         'close_at',
     ];
 
-    public function opening_hours_state()
+    public function openingHoursState()
     {
         return $this->belongsTo('App\Models\OpeningHoursState');
     }
