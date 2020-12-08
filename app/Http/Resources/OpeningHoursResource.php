@@ -18,8 +18,8 @@ class OpeningHoursResource extends JsonResource
             'id' => $this->id,
             'weekday_id' => $this->weekday->id,
             'weekday' => $this->weekday->name,
-            'state_id' => $this->opening_Hours_State->id,
-            'state' => $this->opening_Hours_State->name,
+            'state_id' => $this->openingHoursState->id,
+            'state' => $this->openingHoursState->name,
             'open_at' => $this->open_at,
             'close_at' => $this->close_at,
         ];
