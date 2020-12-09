@@ -131,11 +131,14 @@ class PetController extends Controller
     public function remove(int $id)
     {
         $this->AuthPet($id);
-
-        DB::table('pets')
-            ->where('id', $id)
-            ->where('owners_id', Auth::User()->id)
+        $user_id = Auth::user()->id;
+        Pet::where('id', $id)
+            ->where('owners_id', $user_id)
             ->delete();
+        $last = Pet::where('owners_id', $user_id)->first()->id;
+        User::where('id', $user_id)->update([
+            'last_pet' => $last,
+        ]);
         return response()->json("Deleted", JsonResponse::HTTP_OK);
     }
     // PUT Update pet
@@ -255,11 +258,10 @@ class PetController extends Controller
     } //done and working
     public function AuthPet(int $pet_id)
     {
-        $requestUser = Pet::Find($pet_id);
+        $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
         $loggedUser = Auth::User();
-
         if (
-            $requestUser->owners_id === $loggedUser->id ||
+            $owners_id === $loggedUser->id ||
             $loggedUser->role_id === UserRole::ADMINISTRATOR
         ) {
             //logged user is authorized

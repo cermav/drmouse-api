@@ -92,7 +92,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::put('pets/{id}/update', 'Api\PetController@update');
     Route::put('pets/{id}/avatar', 'Api\PetController@avatar');
     Route::put('pets/{id}/background', 'Api\PetController@background');
-    Route::delete('pets/{id}/remove', 'Api\PetController@remove');
+    Route::delete('pets/{id}/remove', 'Api\PetController@remove')->where(
+        'id',
+        '[0-9]+'
+    );
     // Appointments
     Route::get(
         'pets/{pet_id}/appointments/list',
