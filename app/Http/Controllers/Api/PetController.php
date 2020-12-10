@@ -155,7 +155,7 @@ class PetController extends Controller
             'kind' => 'required|string|max:50',
             'breed' => 'required|string|max:50',
             'gender_state_id' => 'required|int',
-            'chip_number' => 'nullable|int|max_length:20',
+            'chip_number' => 'nullable|int',
         ]);
         if ($validator->fails()) {
             throw new HttpResponseException(
