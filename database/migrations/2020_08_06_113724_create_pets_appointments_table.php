@@ -15,7 +15,6 @@ class CreatePetsAppointmentsTable extends Migration
     {
         Schema::create('pet_appointments', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
             $table->integer('owners_id');
             $table->integer('pet_id');
             $table->date('date');

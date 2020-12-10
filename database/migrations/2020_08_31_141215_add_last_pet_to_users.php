@@ -14,7 +14,7 @@ class AddLastPetToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('last_pet');
+            $table->integer('last_pet')->default(0);
 
             //
         });
