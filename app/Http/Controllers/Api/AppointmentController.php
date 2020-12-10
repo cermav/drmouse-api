@@ -50,7 +50,7 @@ class AppointmentController extends Controller
     {
         $loggedUser = Auth::User();
         if ($loggedUser->role_id === UserRole::ADMINISTRATOR) {
-            $appointment = Pets_appointments::all();
+            $appointment = PetAppointment::all();
             return response()->json($appointment);
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -60,7 +60,7 @@ class AppointmentController extends Controller
     //done
     public function detail(int $pet_id, int $id)
     {
-        $appointment = DB::table('Pets_appointments')
+        $appointment = DB::table('PetAppointment')
             ->where('pet_id', $pet_id)
             ->where('id', $id)
             ->get();
@@ -100,7 +100,7 @@ class AppointmentController extends Controller
     {
         $date = DateTime::createFromFormat('d.m.Y', $data->date);
         try {
-            return Pets_appointments::create([
+            return PetAppointment::create([
                 'pet_id' => $pet_id,
                 'date' => $date,
                 'description' => $data->description,
@@ -145,7 +145,7 @@ class AppointmentController extends Controller
     {
         // verify user
         $this->AuthPet($pet_id);
-        Pets_appointments::where('pet_id', $pet_id)
+        PetAppointment::where('pet_id', $pet_id)
             ->where('id', $id)
             ->FirstOrFail();
         $input = $this->validateRegistration($request, $id);
@@ -157,7 +157,7 @@ class AppointmentController extends Controller
                 'description' => $request->description,
             ]);
         return response()->json(
-            Pets_appointments::find($id),
+            PetAppointment::find($id),
             JsonResponse::HTTP_OK
         );
     }
