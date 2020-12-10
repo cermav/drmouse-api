@@ -85,7 +85,11 @@ class AppointmentController extends Controller
                 ->first()->owners_id === Auth::User()->id
         ) {
             $object = json_decode(json_encode($input), false);
-            $appointment = $this->createAppointment($object, $pet_id);
+            $appointment = $this->createAppointment(
+                $object,
+                $pet_id,
+                $owners_id
+            );
             //add input to database
             $appointment->save();
             //respond
@@ -96,7 +100,7 @@ class AppointmentController extends Controller
     }
     //create Appointment for POST add appointment
     //done
-    public function createAppointment(object $data, int $pet_id)
+    public function createAppointment(object $data, int $pet_id, int $owners_id)
     {
         $date = DateTime::createFromFormat('j. n. Y', $data->date);
         try {
@@ -104,6 +108,7 @@ class AppointmentController extends Controller
                 'pet_id' => $pet_id,
                 'date' => $date,
                 'description' => $data->description,
+                'owners_id' => $owners_id,
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
