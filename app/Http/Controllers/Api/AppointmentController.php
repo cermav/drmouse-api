@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Pets;
-use App\Pets_appointments;
+use App\Models\Doctor;
+use App\Models\DoctorsLog;
 use App\Models\Member;
-use App\DoctorsLog;
+use App\Models\Pet;
+use App\Models\PetAppointment;
+use App\Models\ScoreItem;
+use App\Models\User;
 use App\Http\Controllers\HelperController;
-use App\ScoreItem;
 use App\Types\DoctorStatus;
-use App\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Doctor;
 use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +37,7 @@ class AppointmentController extends Controller
                 ->where('id', $pet_id)
                 ->first()->owners_id
         ) {
-            $appointment = DB::table('pets_appointments')
+            $appointment = DB::table('pet_appointments')
                 ->where('pet_id', $pet_id)
                 ->get();
             return response()->json($appointment);
@@ -132,7 +132,7 @@ class AppointmentController extends Controller
             return response()->json("non-existent pet or appointment", 404);
         }
 
-        DB::table('pets_appointments')
+        DB::table('pet_appointments')
             ->where('id', $id)
             ->where('pet_id', $pet_id)
             ->delete();
@@ -150,7 +150,7 @@ class AppointmentController extends Controller
             ->FirstOrFail();
         $input = $this->validateRegistration($request, $id);
         $date = DateTime::createFromFormat('d.m.Y', $request->date);
-        pets_appointments::where('id', $id)
+        pet_appointments::where('id', $id)
             ->where('pet_id', $pet_id)
             ->update([
                 'date' => $date,
