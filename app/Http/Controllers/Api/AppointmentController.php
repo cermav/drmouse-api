@@ -37,9 +37,7 @@ class AppointmentController extends Controller
                 ->where('id', $pet_id)
                 ->first()->owners_id
         ) {
-            $appointment = DB::table('pet_appointments')
-                ->where('pet_id', $pet_id)
-                ->get();
+            $appointment = PetAppointment::where('pet_id', $pet_id)->get();
             return response()->json($appointment);
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -138,8 +136,7 @@ class AppointmentController extends Controller
             return response()->json("non-existent pet or appointment", 404);
         }
 
-        DB::table('pet_appointments')
-            ->where('id', $id)
+        PetAppointment::where('id', $id)
             ->where('pet_id', $pet_id)
             ->delete();
         return response()->json("Deleted", JsonResponse::HTTP_OK);
@@ -156,7 +153,7 @@ class AppointmentController extends Controller
             ->FirstOrFail();
         $input = $this->validateRegistration($request, $id);
         $date = DateTime::createFromFormat('j. n. Y', $request->date);
-        pet_appointments::where('id', $id)
+        PetAppointment::where('id', $id)
             ->where('pet_id', $pet_id)
             ->update([
                 'date' => $date,
