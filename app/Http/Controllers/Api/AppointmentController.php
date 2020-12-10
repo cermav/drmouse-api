@@ -98,7 +98,7 @@ class AppointmentController extends Controller
     //done
     public function createAppointment(object $data, int $pet_id)
     {
-        $date = DateTime::createFromFormat('d.m.Y', $data->date);
+        $date = DateTime::createFromFormat('j. n. Y', $data->date);
         try {
             return PetAppointment::create([
                 'pet_id' => $pet_id,
@@ -149,7 +149,7 @@ class AppointmentController extends Controller
             ->where('id', $id)
             ->FirstOrFail();
         $input = $this->validateRegistration($request, $id);
-        $date = DateTime::createFromFormat('d.m.Y', $request->date);
+        $date = DateTime::createFromFormat('j. n. Y', $request->date);
         pet_appointments::where('id', $id)
             ->where('pet_id', $pet_id)
             ->update([
