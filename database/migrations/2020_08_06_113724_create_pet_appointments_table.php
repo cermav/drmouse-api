@@ -19,6 +19,14 @@ class CreatePetAppointmentsTable extends Migration
             $table->integer('pet_id');
             $table->date('date');
             $table->string('description');
+            $table
+                ->timestamp('created_at')
+                ->nullable(true)
+                ->default(null);
+            $table
+                ->timestamp('updated_at')
+                ->nullable(true)
+                ->default(null);
         });
     }
 
