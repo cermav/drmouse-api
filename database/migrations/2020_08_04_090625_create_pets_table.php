@@ -24,8 +24,8 @@ class CreatePetsTable extends Migration
             $table->integer('chip_number')->default(null);
             $table->string('background');
             $table->string('avatar');
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamp('created_at')->default(null);
+            $table->timestamp('updated_at')->default(null);
         });
     }
 
