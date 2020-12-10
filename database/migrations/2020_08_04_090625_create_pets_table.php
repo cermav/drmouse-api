@@ -21,11 +21,20 @@ class CreatePetsTable extends Migration
             $table->string('kind');
             $table->string('breed');
             $table->integer('gender_state_id')->default(1);
-            $table->integer('chip_number')->default(null);
+            $table
+                ->integer('chip_number')
+                ->nullable(true)
+                ->default(null);
             $table->string('background');
             $table->string('avatar');
-            $table->timestamp('created_at')->default(null);
-            $table->timestamp('updated_at')->default(null);
+            $table
+                ->timestamp('created_at')
+                ->nullable(true)
+                ->default(null);
+            $table
+                ->timestamp('updated_at')
+                ->nullable(true)
+                ->default(null);
         });
     }
 
