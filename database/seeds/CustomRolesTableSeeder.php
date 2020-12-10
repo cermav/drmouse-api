@@ -12,9 +12,11 @@ class CustomRolesTableSeeder extends Seeder
     {
         $role = Role::firstOrNew(['name' => 'doctor']);
         if (!$role->exists) {
-            $role->fill([
+            $role
+                ->fill([
                     'display_name' => 'Doctor',
-                ])->save();
+                ])
+                ->save();
         }
     }
 }

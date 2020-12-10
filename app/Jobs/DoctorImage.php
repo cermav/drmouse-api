@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Doctor;
+use App\Models\Doctor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -13,8 +13,21 @@ class DoctorImage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $defaultImagesOld = ['profileDoctor01.png', 'profileDoctor02.png', 'profileDoctor03.png', 'profileDoctor04.png'];
-    private $defaultImages = ['default_001.jpg', 'default_002.jpg', 'default_003.jpg', 'default_004.jpg', 'default_004.jpg', 'default_006.jpg', 'default_007.jpg'];
+    private $defaultImagesOld = [
+        'profileDoctor01.png',
+        'profileDoctor02.png',
+        'profileDoctor03.png',
+        'profileDoctor04.png',
+    ];
+    private $defaultImages = [
+        'default_001.jpg',
+        'default_002.jpg',
+        'default_003.jpg',
+        'default_004.jpg',
+        'default_004.jpg',
+        'default_006.jpg',
+        'default_007.jpg',
+    ];
 
     /**
      * Create a new job instance.
@@ -33,14 +46,15 @@ class DoctorImage implements ShouldQueue
      */
     public function handle()
     {
-
         // go throught all doctors
         foreach (Doctor::all() as $doctor) {
-
-            if (!$this->imageExists($doctor) || $this->isDefaultImage($doctor->user->avatar)) {
+            if (
+                !$this->imageExists($doctor) ||
+                $this->isDefaultImage($doctor->user->avatar)
+            ) {
                 // update doctor
                 $doctor->user->update([
-                    'avatar' => $this->getDefaultImage()
+                    'avatar' => $this->getDefaultImage(),
                 ]);
             }
         }
@@ -49,8 +63,8 @@ class DoctorImage implements ShouldQueue
     private function isDefaultImage(string $avatar)
     {
         if (
-            empty($avatar) || $avatar == "users/default.png"
-            ||
+            empty($avatar) ||
+            $avatar == "users/default.png" ||
             in_array($avatar, $this->defaultImagesOld)
         ) {
             return true;
@@ -67,8 +81,9 @@ class DoctorImage implements ShouldQueue
     private function imageExists(Doctor $doctor)
     {
         try {
-
-            $imageLink = 'https://api.drmouse.cz/storage/profile/' . $doctor->user->avatar;
+            $imageLink =
+                'https://api.drmouse.cz/storage/profile/' .
+                $doctor->user->avatar;
 
             // Open file
             $handle = @fopen($imageLink, 'r');
@@ -80,8 +95,7 @@ class DoctorImage implements ShouldQueue
                 fclose($handle);
                 return true;
             }
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             dd($ex);
         }
     }

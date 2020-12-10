@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -49,5 +49,4 @@ class ActivationDoctorEmail extends Notification
             ->subject('Aktivace účtu')
             ->view('emails.activation', ['password' => $this->password]);
     }
-
 }

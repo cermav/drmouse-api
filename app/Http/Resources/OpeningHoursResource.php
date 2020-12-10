@@ -21,7 +21,7 @@ class OpeningHoursResource extends JsonResource
             'state_id' => $this->openingHoursState->id,
             'state' => $this->openingHoursState->name,
             'open_at' => $this->open_at,
-            'close_at' => $this->close_at
+            'close_at' => $this->close_at,
         ];
     }
 }

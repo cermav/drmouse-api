@@ -13,18 +13,16 @@ class CreatePetsTable extends Migration
      */
     public function up()
     {
-        Schema::create('Pets', function (Blueprint $table) {
+        Schema::create('pets', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('owners_id');
-            $table->timestamps();
             $table->string('pet_name');
             $table->date('birth_date');
             $table->string('kind');
             $table->string('breed');
-            $table->string('gender');
-            $table->integer('chip_number');
-            $table->string('bg');
-            $table->integer('profile_completedness')->default('1');
+            $table->integer('gender_state_id')->default(1);
+            $table->integer('chip_number')->default(null);
+            $table->string('background');
             $table->string('avatar');
         });
     }

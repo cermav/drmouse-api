@@ -31,15 +31,25 @@ class DoctorSeeder extends Seeder
             -- AND slug = 'mvdr-zdenek-andreas'
         ");
         foreach ($rows as $row) {
-
             // create user
-            $user = new App\User();
+            $user = new App\Models\User();
             $user->role_id = 2;
             $user->password = Hash::make('Furier8');
-            $user->email = (empty($row->email) || \App\User::where('email', '=', $row->email)->exists()) ? $row->slug . '_' . \Illuminate\Support\Str::random(8) . '@drmouse.cz' : $row->email;
+            $user->email =
+                empty($row->email) ||
+                \App\Models\User::where('email', '=', $row->email)->exists()
+                    ? $row->slug .
+                        '_' .
+                        \Illuminate\Support\Str::random(8) .
+                        '@drmouse.cz'
+                    : $row->email;
             // $user->email = empty($row->email) ? $row->slug . '_' . \Illuminate\Support\Str::random(8) . '@drmouse.cz' : $row->email;
             $user->name = $row->name;
-            $user->avatar = str_replace("https://www.drmouse.cz/new/wp-content/themes/DrMouse2/img/", "", $row->photo_url);
+            $user->avatar = str_replace(
+                "https://www.drmouse.cz/new/wp-content/themes/DrMouse2/img/",
+                "",
+                $row->photo_url
+            );
             $user->save();
 
             // create doctor record
@@ -57,11 +67,8 @@ class DoctorSeeder extends Seeder
             // migrate images
             $this->createPhotos($user->id, $row->id);
 
-
-//            dd($doctor);
-
+            //            dd($doctor);
         }
-
     }
 
     /***
@@ -74,7 +81,9 @@ class DoctorSeeder extends Seeder
         DB::table('doctors_properties')->delete();
         DB::table('doctors_services')->delete();
         DB::table('doctors')->delete();
-        DB::table('users')->where('role_id', '=', 2)->delete();
+        DB::table('users')
+            ->where('role_id', '=', 2)
+            ->delete();
     }
 
     /***
@@ -83,7 +92,7 @@ class DoctorSeeder extends Seeder
      * @param stdClass $data
      * @return \App\Doctor
      */
-    private function createDoctor(int $userId, stdClass $data) : \App\Doctor
+    private function createDoctor(int $userId, stdClass $data): \App\Doctor
     {
         return App\Doctor::create([
             'user_id' => $userId,
@@ -109,7 +118,7 @@ class DoctorSeeder extends Seeder
             'profile_completedness' => $data->profile_completedness,
             'created_at' => $this->convertDate($data->date_create),
             'updated_at' => $this->convertDate($data->date_modified),
-            'search_name' => $data->name
+            'search_name' => $data->name,
         ]);
     }
 
@@ -119,11 +128,15 @@ class DoctorSeeder extends Seeder
      * @param string $slug
      * @return string
      */
-    private function getSlug(int $userId, string $slug) : string
+    private function getSlug(int $userId, string $slug): string
     {
         $index = 0;
         $new_slug = $slug;
-        while ( \App\Doctor::where('slug', '=', $new_slug)->where('user_id', '!=', $userId)->exists() ) {
+        while (
+            \App\Doctor::where('slug', '=', $new_slug)
+                ->where('user_id', '!=', $userId)
+                ->exists()
+        ) {
             $new_slug = $slug . '-' . ++$index;
         }
         return $new_slug;
@@ -134,7 +147,7 @@ class DoctorSeeder extends Seeder
      * @param string $dateString
      * @return string
      */
-    private function convertDate(string $dateString) : string
+    private function convertDate(string $dateString): string
     {
         if ($dateString == '0000-00-00 00:00:00') {
             return date('Y-m-d H:i:s');
@@ -149,22 +162,29 @@ class DoctorSeeder extends Seeder
      */
     private function createService(int $userId, int $originalDoctorId)
     {
-        foreach (DB::select("SELECT service_id, price FROM drmouse_old.doctor_price WHERE doctor_id = " . $originalDoctorId) as $item) {
-            if (in_array($item->service_id, [0, 49])) continue; // skip incorrect values
+        foreach (
+            DB::select(
+                "SELECT service_id, price FROM drmouse_old.doctor_price WHERE doctor_id = " .
+                    $originalDoctorId
+            )
+            as $item
+        ) {
+            if (in_array($item->service_id, [0, 49])) {
+                continue;
+            } // skip incorrect values
             try {
                 \App\Models\DoctorsService::create([
                     'user_id' => $userId,
-                    'service_id' => $this->mapService(intval($item->service_id)),
-                    'price' => $item->price
+                    'service_id' => $this->mapService(
+                        intval($item->service_id)
+                    ),
+                    'price' => $item->price,
                 ]);
-            }
-            catch (Throwable $tr) {
+            } catch (Throwable $tr) {
                 dd($item);
             }
-
         }
     }
-
 
     /***
      * Migrate properities
@@ -173,17 +193,20 @@ class DoctorSeeder extends Seeder
      */
     private function createProperties(int $userId, int $originalDoctorId)
     {
-        foreach (DB::select("SELECT cat_val_id FROM drmouse_old.doctor_info WHERE doctor_id = " . $originalDoctorId) as $item) {
-
-            if ( \App\Property::where('id', '=',  $item->cat_val_id)->exists() )
-            {
+        foreach (
+            DB::select(
+                "SELECT cat_val_id FROM drmouse_old.doctor_info WHERE doctor_id = " .
+                    $originalDoctorId
+            )
+            as $item
+        ) {
+            if (\App\Property::where('id', '=', $item->cat_val_id)->exists()) {
                 try {
                     \App\Models\DoctorsProperty::create([
                         'user_id' => $userId,
-                        'property_id' => $item->cat_val_id
+                        'property_id' => $item->cat_val_id,
                     ]);
-                }
-                catch (Throwable $tr) {
+                } catch (Throwable $tr) {
                     dd($item);
                 }
             }
@@ -197,19 +220,28 @@ class DoctorSeeder extends Seeder
      */
     private function createOpeningHours(int $userId, int $originalDoctorId)
     {
-        foreach (DB::select("SELECT weekday_index, opening_hour, closing_hour, is_non_stop, is_closed FROM drmouse_old.doctor_workshift WHERE doctor_id = " . $originalDoctorId) as $item) {
-
+        foreach (
+            DB::select(
+                "SELECT weekday_index, opening_hour, closing_hour, is_non_stop, is_closed FROM drmouse_old.doctor_workshift WHERE doctor_id = " .
+                    $originalDoctorId
+            )
+            as $item
+        ) {
             // arrange weekday
             $weekdayId = $item->weekday_index + 1;
 
-            if ( \App\Weekday::where('id', '=',  $weekdayId)->exists() )
-            {
+            if (\App\Weekday::where('id', '=', $weekdayId)->exists()) {
                 \App\Models\OpeningHour::create([
-                    'weekday_id' => ($item->weekday_index + 1),
+                    'weekday_id' => $item->weekday_index + 1,
                     'user_id' => $userId,
-                    'opening_hours_state_id' => ($item->is_non_stop == 1 ? OpeningHoursState::NONSTOP : ( $item->is_closed == 1 ? OpeningHoursState::CLOSED : OpeningHoursState::OPEN )),
+                    'opening_hours_state_id' =>
+                        $item->is_non_stop == 1
+                            ? OpeningHoursState::NONSTOP
+                            : ($item->is_closed == 1
+                                ? OpeningHoursState::CLOSED
+                                : OpeningHoursState::OPEN),
                     'open_at' => $item->opening_hour,
-                    'close_at' => $item->closing_hour
+                    'close_at' => $item->closing_hour,
                 ]);
             }
         }
@@ -222,25 +254,44 @@ class DoctorSeeder extends Seeder
      */
     private function createPhotos(int $userId, int $originalDoctorId)
     {
-        foreach (DB::select("SELECT image_url, position FROM drmouse_old.doctor_gallery WHERE doctor_id = " . $originalDoctorId) as $item) {
-
+        foreach (
+            DB::select(
+                "SELECT image_url, position FROM drmouse_old.doctor_gallery WHERE doctor_id = " .
+                    $originalDoctorId
+            )
+            as $item
+        ) {
             try {
-
                 // get relative path to image
-                $path = str_replace('https://www.drmouse.cz/wp-content/uploads/', '', $item->image_url);
-                $path = str_replace('https://www.drmouse.cz/new/wp-content/uploads/', '', $path);
+                $path = str_replace(
+                    'https://www.drmouse.cz/wp-content/uploads/',
+                    '',
+                    $item->image_url
+                );
+                $path = str_replace(
+                    'https://www.drmouse.cz/new/wp-content/uploads/',
+                    '',
+                    $path
+                );
 
                 // save file to disk
-                Storage::disk('public')->put($path, file_get_contents($item->image_url));
+                Storage::disk('public')->put(
+                    $path,
+                    file_get_contents($item->image_url)
+                );
 
                 \App\Models\Photo::create([
                     'user_id' => $userId,
                     'path' => $path,
-                    'position' => $item->position
+                    'position' => $item->position,
                 ]);
-            }
-            catch (Exception $ex) {
-               error_log("Import image error (" . $ex->getMessage() . ") - " . $item->image_url);
+            } catch (Exception $ex) {
+                error_log(
+                    "Import image error (" .
+                        $ex->getMessage() .
+                        ") - " .
+                        $item->image_url
+                );
             }
         }
     }
@@ -250,13 +301,17 @@ class DoctorSeeder extends Seeder
      * @param int $statusId
      * @return int
      */
-    private function mapStatus(int $statusId) : int
+    private function mapStatus(int $statusId): int
     {
-        switch($statusId) {
-            case 1: return \App\Types\DoctorStatus::DRAFT;
-            case 2: return \App\Types\DoctorStatus::PUBLISHED;
-            case 3: return \App\Types\DoctorStatus::UNPUBLISHED;
-            case -999: return \App\Types\DoctorStatus::DELETED;
+        switch ($statusId) {
+            case 1:
+                return \App\Types\DoctorStatus::DRAFT;
+            case 2:
+                return \App\Types\DoctorStatus::PUBLISHED;
+            case 3:
+                return \App\Types\DoctorStatus::UNPUBLISHED;
+            case -999:
+                return \App\Types\DoctorStatus::DELETED;
         }
         return \App\Types\DoctorStatus::NEW;
     }
@@ -266,14 +321,27 @@ class DoctorSeeder extends Seeder
      * @param int $serviceId
      * @return int
      */
-    private function mapService(int $serviceId) : int
+    private function mapService(int $serviceId): int
     {
         $mapping = [
-            9 => 5, 10 => 6, 36 => 7, 37 => 8, 38 => 9,
-            41 => 10, 45 => 11, 46 => 12, 47 => 13, 48 => 14,
-            50 => 15, 51 => 16, 52 => 16, 53 => 12, 72 => 1
+            9 => 5,
+            10 => 6,
+            36 => 7,
+            37 => 8,
+            38 => 9,
+            41 => 10,
+            45 => 11,
+            46 => 12,
+            47 => 13,
+            48 => 14,
+            50 => 15,
+            51 => 16,
+            52 => 16,
+            53 => 12,
+            72 => 1,
         ];
-        return array_key_exists($serviceId, $mapping) ? $mapping[$serviceId] : $serviceId;
+        return array_key_exists($serviceId, $mapping)
+            ? $mapping[$serviceId]
+            : $serviceId;
     }
-
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\ScoreItem;
+use App\Models\ScoreItem;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MemberResource extends JsonResource
@@ -16,7 +16,6 @@ class MemberResource extends JsonResource
     public function toArray($request)
     {
         return [
-
             'id' => $this->user->id,
             'name' => $this->user->name,
             'email' => $this->user->email,
@@ -29,7 +28,7 @@ class MemberResource extends JsonResource
             'gdpr' => [
                 'agreed' => $this->gdpr_agreed,
                 'date' => $this->gdpr_agreed_date,
-                'ip_address' => $this->gdpr_agreed_ip
+                'ip_address' => $this->gdpr_agreed_ip,
             ],
 
             'created_at' => $this->user->created_at,

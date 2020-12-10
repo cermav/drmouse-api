@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\ScoreItem;
+use App\Models\ScoreItem;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class DoctorResource extends JsonResource
@@ -16,14 +16,24 @@ class DoctorResource extends JsonResource
     public function toArray($request)
     {
         $openingHours = $this->user->openingHours;
-        $all_properties = $this->user->properties()->where('is_approved', 1)->orderBy('name', 'desc')->get();
-        $services = $this->user->services()->where('is_approved', 1)->get();
+        $all_properties = $this->user
+            ->properties()
+            ->where('is_approved', 1)
+            ->orderBy('name', 'desc')
+            ->get();
+        $services = $this->user
+            ->services()
+            ->where('is_approved', 1)
+            ->get();
         $photos = $this->user->photos;
 
         // split properties
         $properties = [];
         foreach ($all_properties as $item) {
-            $properties[$item->property_category_id][] = (object) ['id' => $item->id, 'name' => $item->name];
+            $properties[$item->property_category_id][] = (object) [
+                'id' => $item->id,
+                'name' => $item->name,
+            ];
         }
 
         // count score
@@ -38,7 +48,6 @@ class DoctorResource extends JsonResource
         }
 
         return [
-
             'id' => $this->user->id,
             'state_id' => $this->state_id,
             'name' => $this->user->name,
@@ -51,9 +60,9 @@ class DoctorResource extends JsonResource
             'speaks_english' => $this->speaks_english,
             'completeness' => $this->profile_completedness,
 
-            'score' => (object)[
+            'score' => (object) [
                 'total' => $score_sum / $score_count,
-                'detail' => $score_detail
+                'detail' => $score_detail,
             ],
             'open' => $this->open,
 
@@ -83,15 +92,21 @@ class DoctorResource extends JsonResource
             'gallery' => PhotoResource::collection($photos),
 
             'properties' => [
-                'equipment' => array_key_exists(1, $properties) ? $properties[1] : [],
-                'expertise' => array_key_exists(2, $properties) ? $properties[2] : [],
-                'specialization' => array_key_exists(3, $properties) ? $properties[3] : []
+                'equipment' => array_key_exists(1, $properties)
+                    ? $properties[1]
+                    : [],
+                'expertise' => array_key_exists(2, $properties)
+                    ? $properties[2]
+                    : [],
+                'specialization' => array_key_exists(3, $properties)
+                    ? $properties[3]
+                    : [],
             ],
 
             'gdpr' => [
                 'agreed' => $this->gdpr_agreed,
                 'date' => $this->gdpr_agreed_date,
-                'ip_address' => $this->gdpr_agreed_ip
+                'ip_address' => $this->gdpr_agreed_ip,
             ],
 
             'created_at' => $this->user->created_at,

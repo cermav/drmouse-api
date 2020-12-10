@@ -5,7 +5,7 @@ namespace App\Http\Resources\Mobile;
 use App\Http\Resources\OpeningHoursResource;
 use App\Http\Resources\PhotoResource;
 use App\Http\Resources\ServiceResource;
-use App\ScoreItem;
+use App\Models\ScoreItem;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class DoctorResource extends JsonResource
@@ -19,8 +19,14 @@ class DoctorResource extends JsonResource
     public function toArray($request)
     {
         $openingHours = $this->user->openingHours->pluck('id');
-        $all_properties = $this->user->properties()->where('is_approved', 1)->get();
-        $services = $this->user->services()->where('is_approved', 1)->get();
+        $all_properties = $this->user
+            ->properties()
+            ->where('is_approved', 1)
+            ->get();
+        $services = $this->user
+            ->services()
+            ->where('is_approved', 1)
+            ->get();
         $photos = $this->user->photos->pluck('path');
 
         // split properties
@@ -30,7 +36,6 @@ class DoctorResource extends JsonResource
         }
 
         return [
-
             'id' => $this->user->id,
             'name' => $this->user->name,
             'email' => $this->user->email,
@@ -57,7 +62,7 @@ class DoctorResource extends JsonResource
 
             'staff_info' => [
                 'doctors_count' => $this->working_doctors_count,
-                'doctors_names' => nl2br( $this->working_doctors_names ),
+                'doctors_names' => nl2br($this->working_doctors_names),
                 'nurses_count' => $this->nurses_count,
                 'others_count' => $this->other_workers_count,
             ],
@@ -67,9 +72,15 @@ class DoctorResource extends JsonResource
             'gallery' => $photos,
 
             'properties' => [
-                'equipment' => array_key_exists(1, $properties) ? $properties[1] : [],
-                'expertise' => array_key_exists(2, $properties) ? $properties[2] : [],
-                'specialization' => array_key_exists(3, $properties) ? $properties[3] : []
+                'equipment' => array_key_exists(1, $properties)
+                    ? $properties[1]
+                    : [],
+                'expertise' => array_key_exists(2, $properties)
+                    ? $properties[2]
+                    : [],
+                'specialization' => array_key_exists(3, $properties)
+                    ? $properties[3]
+                    : [],
             ],
         ];
     }

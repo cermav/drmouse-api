@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -46,7 +46,9 @@ class ResetPasswordEmail extends Notification
     {
         return (new MailMessage())
             ->subject('Obnovení hesla')
-            ->view('emails.reset-password', ['reset_link' => $this->resetUrl($notifiable)]);
+            ->view('emails.reset-password', [
+                'reset_link' => $this->resetUrl($notifiable),
+            ]);
     }
 
     /**
@@ -62,14 +64,19 @@ class ResetPasswordEmail extends Notification
 
         // prepare signed link
         $link = URL::temporarySignedRoute(
-            'reset.password', Carbon::now()->addMinutes(60), [
+            'reset.password',
+            Carbon::now()->addMinutes(60),
+            [
                 'email' => $user->email,
-                'token' => app(PasswordBroker::class)->createToken($user)
+                'token' => app(PasswordBroker::class)->createToken($user),
             ]
         );
 
         // prepare remote link
-        $remoteLink = config('frontend.url') . 'reset-password?link=' . base64_encode($link);
+        $remoteLink =
+            config('frontend.url') .
+            'reset-password?link=' .
+            base64_encode($link);
 
         return $remoteLink;
     }
