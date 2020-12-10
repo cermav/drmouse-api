@@ -85,6 +85,7 @@ class AppointmentController extends Controller
                 ->first()->owners_id === Auth::User()->id
         ) {
             $object = json_decode(json_encode($input), false);
+
             $appointment = $this->createAppointment(
                 $object,
                 $pet_id,
@@ -205,7 +206,7 @@ class AppointmentController extends Controller
     }
     public function AuthPet(int $pet_id)
     {
-        $requestUser = Pets::Find($pet_id);
+        $requestUser = Pet::Find($pet_id);
         $loggedUser = Auth::User();
 
         if (

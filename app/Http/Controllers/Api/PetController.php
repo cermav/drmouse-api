@@ -41,7 +41,7 @@ class PetController extends Controller
     {
         $loggedUser = Auth::User();
         if ($loggedUser->role_id === UserRole::ADMINISTRATOR) {
-            $Pets = Pets::all();
+            $Pets = Pet::all();
             return response()->json($Pets);
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);

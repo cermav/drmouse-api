@@ -26,9 +26,9 @@ Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
 Route::post('doctors', 'Api\DoctorController@store');
 Route::post('doctor-suggestion', 'Api\DoctorSuggestionController@store');
 
-Route::get('pets', 'Api\PetsController@showall');
-Route::get('pets/{id}', 'Api\PetsController@showById');
-Route::post('pets', 'Api\PetsController@store');
+Route::get('pets', 'Api\PetController@showall');
+Route::get('pets/{id}', 'Api\PetController@showById');
+Route::post('pets', 'Api\PetController@store');
 
 Route::post('members', 'Api\MemberController@store');
 

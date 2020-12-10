@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Vaccines;
-use App\Pets;
-use App\Pets_appointments;
+use App\Models\Pet;
+use App\Models\PetAppointment;
 use App\Models\Member;
 use App\DoctorsLog;
 use App\Http\Controllers\HelperController;
@@ -65,7 +65,7 @@ class VaccineController extends Controller
     public function store(Request $request, $pet_id)
     {
         // validate input
-        Pets::FindOrFail($pet_id);
+        Pet::FindOrFail($pet_id);
         $input = $this->validateRegistration($request);
         if (
             DB::table('pets')
@@ -100,11 +100,7 @@ class VaccineController extends Controller
     public function remove(int $pet_id, int $vac_id)
     {
         try {
-            $this->AuthUser(
-                DB::table('Pets')
-                    ->where('id', $pet_id)
-                    ->first()->owners_id
-            );
+            $this->AuthUser(Pet::where('id', $pet_id)->first()->owners_id);
         } catch (\Exception $e) {
             return response()->json("non-existent pet or vaccine", 404);
         }
@@ -120,11 +116,7 @@ class VaccineController extends Controller
     public function update(Request $request, int $pet_id, int $id)
     {
         try {
-            $this->AuthUser(
-                DB::table('Pets')
-                    ->where('id', $pet_id)
-                    ->first()->owners_id
-            );
+            $this->AuthUser(Pet::where('id', $pet_id)->first()->owners_id);
         } catch (\Exception $e) {
             return response()->json("non-existent pet or vaccine", 404);
         }
@@ -141,7 +133,7 @@ class VaccineController extends Controller
             ],
         ];
         return response()->json(
-            Pets_appointments::find($id),
+            PetAppointment::find($id),
             JsonResponse::HTTP_OK
         );
 
