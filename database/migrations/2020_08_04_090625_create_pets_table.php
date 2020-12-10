@@ -22,7 +22,7 @@ class CreatePetsTable extends Migration
             $table->string('breed');
             $table->integer('gender_state_id')->default(1);
             $table
-                ->integer('chip_number')
+                ->string('chip_number')
                 ->nullable(true)
                 ->default(null);
             $table
