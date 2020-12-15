@@ -8,6 +8,7 @@ use App\Models\Pet;
 use App\Models\Member;
 use App\Models\DoctorsLog;
 use App\Models\ScoreItem;
+use App\Models\User;
 use App\Models\Doctor;
 use App\Http\Controllers\HelperController;
 use App\Types\DoctorStatus;
