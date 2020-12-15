@@ -22,7 +22,6 @@ class Member extends Model
         'slug',
         'gdpr_agreed',
         'gdpr_agreed_date',
-        'last_pet',
     ];
 
     /**
