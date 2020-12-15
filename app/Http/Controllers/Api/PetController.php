@@ -63,7 +63,7 @@ class PetController extends Controller
         $this->AuthUser($pet->first()->owners_id);
         //set new latest pet on visit
         DB::table('users')
-            ->where('user_id', $pet->first()->owners_id)
+            ->where('id', $pet->first()->owners_id)
             ->update(['last_pet' => $id]);
 
         return response()->json($pet->first());
@@ -72,7 +72,7 @@ class PetController extends Controller
     {
         return response()->json(
             DB::table('users')
-                ->where('user_id', Auth::user()->id)
+                ->where('id', Auth::user()->id)
                 ->first()->last_pet
         );
     }
@@ -135,7 +135,7 @@ class PetController extends Controller
             ->where('owners_id', $user_id)
             ->delete();
         $last = Pet::where('owners_id', $user_id)->first()->id;
-        User::where('user_id', $user_id)->update([
+        User::where('id', $user_id)->update([
             'last_pet' => $last,
         ]);
         return response()->json("Deleted", JsonResponse::HTTP_OK);
