@@ -5,7 +5,6 @@ namespace app\Http\Controllers\API;
 use Illuminate\Http\Request;
 use JWTAuth;
 use App\Models\Pet;
-use App\Models\Member;
 use App\Models\User;
 use App\Models\DoctorsLog;
 use App\Models\ScoreItem;
@@ -63,7 +62,7 @@ class PetController extends Controller
         //authorize owners_id vs logged in user
         $this->AuthUser($pet->first()->owners_id);
         //set new latest pet on visit
-        DB::table('members')
+        DB::table('users')
             ->where('user_id', $pet->first()->owners_id)
             ->update(['last_pet' => $id]);
 
@@ -72,7 +71,7 @@ class PetController extends Controller
     public function latest()
     {
         return response()->json(
-            DB::table('members')
+            DB::table('users')
                 ->where('user_id', Auth::user()->id)
                 ->first()->last_pet
         );
@@ -121,7 +120,7 @@ class PetController extends Controller
             }
         }
         //set new pet as latest
-        DB::table('members')
+        DB::table('users')
             ->where('id', Auth::user()->id)
             ->update(['last_pet' => $temp]);
 
@@ -136,7 +135,7 @@ class PetController extends Controller
             ->where('owners_id', $user_id)
             ->delete();
         $last = Pet::where('owners_id', $user_id)->first()->id;
-        Member::where('user_id', $user_id)->update([
+        User::where('user_id', $user_id)->update([
             'last_pet' => $last,
         ]);
         return response()->json("Deleted", JsonResponse::HTTP_OK);
