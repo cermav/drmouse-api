@@ -70,11 +70,19 @@ class PetController extends Controller
     }
     public function latest()
     {
-        return response()->json(
-            DB::table('users')
-                ->where('id', Auth::user()->id)
-                ->first()->last_pet
-        );
+        $last_pet = User::where('id', Auth::user()->id)->first()->last_pet;
+        $list = Pet::where('owners_id', Auth::user()->id)
+            ->pluck('id')
+            ->toArray();
+        $temp = $list[0];
+        foreach ($list as $id) {
+            if ($last_pet == $id) {
+                return response()->json($last_pet);
+            } elseif ($id > $temp) {
+                $temp = $id;
+            }
+        }
+        return response()->json($temp);
     }
     //create pet for POST pet
     public function createpet(object $data)
