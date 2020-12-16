@@ -109,22 +109,13 @@ class PetController extends Controller
         $pet->save();
 
         //get created pet id
-        $ids = DB::table('pets')
-            ->where('owners_id', Auth::user()->id)
-            ->pluck('id')
-            ->toArray();
-        $temp = $ids[0];
-        foreach ($ids as $id) {
-            if ($id > $temp) {
-                $temp = $id;
-            }
-        }
+        $highestPetId = $this->highestPetId();
         //set new pet as latest
         DB::table('users')
             ->where('id', Auth::user()->id)
-            ->update(['last_pet' => $temp]);
+            ->update(['last_pet' => $highestPetId]);
 
-        return response()->json($temp, JsonResponse::HTTP_CREATED);
+        return response()->json($highestPetId, JsonResponse::HTTP_CREATED);
     }
     // DEL remove pet
     public function remove(int $id)
@@ -134,11 +125,11 @@ class PetController extends Controller
         Pet::where('id', $id)
             ->where('owners_id', $user_id)
             ->delete();
-        $last = Pet::where('owners_id', $user_id)->first()->id;
+        $highestPetId = highestPetId();
         User::where('id', $user_id)->update([
-            'last_pet' => $last,
+            'last_pet' => $highestPetId,
         ]);
-        return response()->json($last, JsonResponse::HTTP_OK);
+        return response()->json($highestPetId, JsonResponse::HTTP_OK);
     }
     // PUT Update pet
     //done and working
@@ -358,5 +349,19 @@ class PetController extends Controller
             ->where('vet_id', $vet_id)
             ->delete();
         return response()->json("Deleted", JsonResponse::HTTP_OK);
+    }
+    public function highestPetId()
+    {
+        $ids = DB::table('pets')
+            ->where('owners_id', Auth::user()->id)
+            ->pluck('id')
+            ->toArray();
+        $temp = $ids[0];
+        foreach ($ids as $id) {
+            if ($id > $temp) {
+                $temp = $id;
+            }
+            return $temp;
+        }
     }
 }
