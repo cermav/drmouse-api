@@ -138,7 +138,7 @@ class PetController extends Controller
         User::where('id', $user_id)->update([
             'last_pet' => $last,
         ]);
-        return response()->json("Deleted", JsonResponse::HTTP_OK);
+        return response()->json($last, JsonResponse::HTTP_OK);
     }
     // PUT Update pet
     //done and working
