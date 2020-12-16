@@ -124,7 +124,7 @@ class PetController extends Controller
             ->where('id', Auth::user()->id)
             ->update(['last_pet' => $temp]);
 
-        return response()->json($pet, JsonResponse::HTTP_CREATED);
+        return response()->json($temp, JsonResponse::HTTP_CREATED);
     }
     // DEL remove pet
     public function remove(int $id)
