@@ -93,6 +93,9 @@ class PetController extends Controller
             }
             return response()->json($temp);
         } catch (\Exception $ex) {
+            User::where('id', $user_id)->update([
+                'last_pet' => 0,
+            ]);
             return response()->json(
                 ['error' => ['location' => $ex->getMessage()]],
                 JsonResponse::HTTP_NOT_FOUND
@@ -173,6 +176,9 @@ class PetController extends Controller
             ]);
             return response()->json($temp, JsonResponse::HTTP_OK);
         } catch (\Exception $ex) {
+            User::where('id', $user_id)->update([
+                'last_pet' => 0,
+            ]);
             return response()->json(
                 ['error' => ['location' => $ex->getMessage()]],
                 JsonResponse::HTTP_NOT_FOUND
