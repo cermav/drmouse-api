@@ -58,15 +58,23 @@ class PetController extends Controller
     public function detail($id)
     {
         // get pet by id
-        $pet = DB::table('pets')->where('id', $id);
-        //authorize owners_id vs logged in user
-        $this->AuthUser($pet->first()->owners_id);
-        //set new latest pet on visit
-        DB::table('users')
-            ->where('id', $pet->first()->owners_id)
-            ->update(['last_pet' => $id]);
+        try {
+            $pet = DB::table('pets')->where('id', $id);
+            DB::table('users')
+                ->where('id', $pet->first()->owners_id)
+                ->update(['last_pet' => $id]);
 
-        return response()->json($pet->first());
+            return response()->json($pet->first());
+            $this->AuthUser($pet->first()->owners_id);
+        } catch (\Exception $ex) {
+            return response()->json(
+                ['error' => ['location' => $ex->getMessage()]],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        //set new latest pet on visit
+        //authorize owners_id vs logged in user
     }
     public function latest()
     {
