@@ -71,18 +71,25 @@ class PetController extends Controller
     public function latest()
     {
         $last_pet = User::where('id', Auth::user()->id)->first()->last_pet;
-        $list = Pet::where('owners_id', Auth::user()->id)
-            ->pluck('id')
-            ->toArray();
-        $temp = $list[0];
-        foreach ($list as $id) {
-            if ($last_pet == $id) {
-                return response()->json($last_pet);
-            } elseif ($id > $temp) {
-                $temp = $id;
+        try {
+            $list = Pet::where('owners_id', Auth::user()->id)
+                ->pluck('id')
+                ->toArray();
+            $temp = $list[0];
+            foreach ($list as $id) {
+                if ($last_pet == $id) {
+                    return response()->json($last_pet);
+                } elseif ($id > $temp) {
+                    $temp = $id;
+                }
             }
+            return response()->json($temp);
+        } catch (\Exception $ex) {
+            return response()->json(
+                ['error' => ['location' => $ex->getMessage()]],
+                JsonResponse::HTTP_NOT_FOUND
+            );
         }
-        return response()->json($temp);
     }
     //create pet for POST pet
     public function createpet(object $data)
@@ -142,20 +149,27 @@ class PetController extends Controller
         Pet::where('id', $id)
             ->where('owners_id', $user_id)
             ->delete();
-        $ids = DB::table('pets')
-            ->where('owners_id', Auth::user()->id)
-            ->pluck('id')
-            ->toArray();
-        $temp = $ids[0];
-        foreach ($ids as $id) {
-            if ($id > $temp) {
-                $temp = $id;
+        try {
+            $ids = DB::table('pets')
+                ->where('owners_id', Auth::user()->id)
+                ->pluck('id')
+                ->toArray();
+            $temp = $ids[0];
+            foreach ($ids as $id) {
+                if ($id > $temp) {
+                    $temp = $id;
+                }
             }
+            User::where('id', $user_id)->update([
+                'last_pet' => $temp,
+            ]);
+            return response()->json($temp, JsonResponse::HTTP_OK);
+        } catch (\Exception $ex) {
+            return response()->json(
+                ['error' => ['location' => $ex->getMessage()]],
+                JsonResponse::HTTP_NOT_FOUND
+            );
         }
-        User::where('id', $user_id)->update([
-            'last_pet' => $temp,
-        ]);
-        return response()->json($temp, JsonResponse::HTTP_OK);
     }
     // PUT Update pet
     //done and working
