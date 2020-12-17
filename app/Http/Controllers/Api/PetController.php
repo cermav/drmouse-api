@@ -93,7 +93,7 @@ class PetController extends Controller
             }
             return response()->json($temp);
         } catch (\Exception $ex) {
-            User::where('id', $user_id)->update([
+            User::where('id', Auth::User())->update([
                 'last_pet' => 0,
             ]);
             return response()->json(
@@ -176,7 +176,7 @@ class PetController extends Controller
             ]);
             return response()->json($temp, JsonResponse::HTTP_OK);
         } catch (\Exception $ex) {
-            User::where('id', $user_id)->update([
+            User::where('id', Auth::User())->update([
                 'last_pet' => 0,
             ]);
             return response()->json(
