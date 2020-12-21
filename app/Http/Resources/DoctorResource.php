@@ -20,7 +20,9 @@ class DoctorResource extends JsonResource
             ->properties()
             ->where('is_approved', 1)
             ->orderBy('name', 'desc')
-            ->get();
+            ->get()
+            ->flatten()
+            ->unique();
         $services = $this->user
             ->services()
             ->where('is_approved', 1)
@@ -46,7 +48,6 @@ class DoctorResource extends JsonResource
             $score_sum += $this->$variable;
             $score_count++;
         }
-
         return [
             'id' => $this->user->id,
             'state_id' => $this->state_id,
@@ -91,7 +92,6 @@ class DoctorResource extends JsonResource
             'services' => ServiceResource::collection($services),
 
             'gallery' => PhotoResource::collection($photos),
-
             'properties' => [
                 'equipment' => array_key_exists(1, $properties)
                     ? $properties[1]
@@ -103,7 +103,6 @@ class DoctorResource extends JsonResource
                     ? $properties[3]
                     : [],
             ],
-
             'gdpr' => [
                 'agreed' => $this->gdpr_agreed,
                 'date' => $this->gdpr_agreed_date,
