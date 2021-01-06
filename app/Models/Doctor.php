@@ -23,7 +23,6 @@ class Doctor extends Model
         'search_name',
         'phone',
         'second_phone',
-        'second_phone',
         'website',
         'street',
         'city',
