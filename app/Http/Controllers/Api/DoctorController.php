@@ -144,7 +144,7 @@ class DoctorController extends Controller
             'rank' => 'total_score',
             'dist' => 'distance',
             'rel' => 'relevance',
-            'eng' => 'speaks_english',
+            'eng' => 'speaks_english' == 1,
         ];
         if (
             $request->has('order') &&
