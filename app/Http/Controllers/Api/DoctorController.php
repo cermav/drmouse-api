@@ -144,7 +144,7 @@ class DoctorController extends Controller
             'rank' => 'total_score',
             'dist' => 'distance',
             'rel' => 'relevance',
-            'eng' => 'speaks_english' == 1,
+            'eng' => 'speaks_english',
         ];
         if (
             $request->has('order') &&
@@ -156,7 +156,7 @@ class DoctorController extends Controller
                     ? 'desc'
                     : 'asc';
             // some exception
-            if (in_array($request->input('order'), ['rank', 'rel'])) {
+            if (in_array($request->input('order'), ['rank', 'rel', 'eng'])) {
                 $direction = 'desc';
             }
             $doctors
