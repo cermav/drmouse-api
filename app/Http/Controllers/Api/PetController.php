@@ -59,8 +59,8 @@ class PetController extends Controller
     {
         // get pet by id
         $pet = DB::table('pets')->where('id', $id);
-        $this->AuthUser($pet->first()->owners_id);
         try {
+            $this->AuthUser($pet->first()->owners_id);
             DB::table('users')
                 ->where('id', $pet->first()->owners_id)
                 ->update(['last_pet' => $id]);
@@ -328,7 +328,10 @@ class PetController extends Controller
             return;
         } else {
             // return unauthorized
-            return response()->json(401, JsonResponse::HTTP_UNAUTHORIZED);
+
+            throw new HttpResponseException(
+                response()->json(401, JsonResponse::HTTP_UNAUTHORIZED)
+            );
         }
     }
     public function avatar(Request $request, int $pet_id)
