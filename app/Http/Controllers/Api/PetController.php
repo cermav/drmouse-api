@@ -58,6 +58,7 @@ class PetController extends Controller
     public function detail($id)
     {
         // get pet by id
+        $this->AuthUser($pet->first()->owners_id);
         try {
             $pet = DB::table('pets')->where('id', $id);
             DB::table('users')
@@ -65,7 +66,6 @@ class PetController extends Controller
                 ->update(['last_pet' => $id]);
 
             return response()->json($pet->first());
-            $this->AuthUser($pet->first()->owners_id);
         } catch (\Exception $ex) {
             return response()->json(
                 ['error' => ['location' => $ex->getMessage()]],
