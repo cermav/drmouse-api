@@ -58,9 +58,9 @@ class PetController extends Controller
     public function detail($id)
     {
         // get pet by id
+        $pet = DB::table('pets')->where('id', $id);
         $this->AuthUser($pet->first()->owners_id);
         try {
-            $pet = DB::table('pets')->where('id', $id);
             DB::table('users')
                 ->where('id', $pet->first()->owners_id)
                 ->update(['last_pet' => $id]);
