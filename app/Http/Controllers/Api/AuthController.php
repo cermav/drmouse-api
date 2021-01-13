@@ -33,15 +33,23 @@ class AuthController extends Controller
 
         // attempt to verify the credentials
         $user = User::where('email', $credentials['email'])->first();
-        if (
-            $user == null ||
-            !Hash::check($credentials['password'], $user->password) ||
-            $user->email_verified_at === null
-        ) {
+        if ($user == null) {
             return response()->json(
-                ['error' => 'We cant find an account with this credentials.'],
+                ['error' => 'Nenalezen uživatel se zadaným e-mailem.'],
+                404
+            );
+        }
+        if ($user->email_verified_at === null) {
+            return response()->json(
+                [
+                    'error' =>
+                        'Váš účet není aktivovaný, odkaz pro aktivaci najdete v mailu.',
+                ],
                 401
             );
+        }
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return response()->json(['error' => 'Nesprávné heslo.'], 401);
         }
 
         try {
