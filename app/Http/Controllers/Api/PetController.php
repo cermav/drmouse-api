@@ -328,7 +328,7 @@ class PetController extends Controller
             return;
         } else {
             // return unauthorized
-            throw new AuthenticationException();
+            return response()->json(401, JsonResponse::UNAUTHORIZED);
         }
     }
     public function avatar(Request $request, int $pet_id)
