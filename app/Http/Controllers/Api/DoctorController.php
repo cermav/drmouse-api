@@ -163,7 +163,6 @@ class DoctorController extends Controller
                 ->orderBy($order_fields[$request->input('order')], $direction)
                 ->orderBy('name', 'ASC');
         }
-
         $doctors->paginate($this->pageLimit);
 
         return $doctors->paginate($this->pageLimit);
@@ -461,6 +460,23 @@ class DoctorController extends Controller
         }
     }
 
+    public function search()
+    {
+        return DB::table('doctors')
+            ->select([
+                'search_name',
+                'working_doctors_names',
+                'city',
+                'street',
+                'user_id',
+                'id',
+            ])
+            ->whereIn('state_id', [
+                DoctorStatus::PUBLISHED,
+                DoctorStatus::ACTIVE,
+            ])
+            ->get();
+    }
     /**
      * Validate Input
      * @param Request $request

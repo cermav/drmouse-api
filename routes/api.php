@@ -23,6 +23,7 @@ Route::get('doctors', 'Api\DoctorController@index');
 Route::get('all-doctors', 'Api\DoctorController@showAll');
 Route::get('doctors/{id}', 'Api\DoctorController@show');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
+Route::get('doctors-search', 'Api\DoctorController@search');
 Route::post('doctors', 'Api\DoctorController@store');
 Route::post('doctor-suggestion', 'Api\DoctorSuggestionController@store');
 
@@ -118,17 +119,25 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         'pets/{pet_id}/appointment/{term_id}/remove',
         'Api\AppointmentController@remove'
     );
-    //favorite vets TODO
-    /*
-    Route::get('pets/{pet_id}/fav-vets', 'Api\PetController@getVets');
-    Route::post('pets/{pet_id}/fav-vets/{vet_id}', 'Api\PetController@addVet');
+    // favorite vets
+    Route::get(
+        'vets/{user_id}/favorite_vets',
+        'Api\PetController@getFavoriteVets'
+    );
+    Route::post(
+        'vets/{user_id}/favorite_vets/{vet_id}',
+        'Api\PetController@addFavoriteVet'
+    );
     Route::delete(
-        'pets/{pet_id}/fav-vets/{vet_id}',
-        'Api\PetController@deleteVet'
+        'vets/{user_id}/favorite_vets/{vet_id}',
+        'Api\PetController@deleteFavoriteVet'
     );
     // Vaccines
     Route::get('pets/{pet_id}/vaccines', 'Api\VaccineController@index');
-    Route::get('pets/{pet_id}/vaccines/{vac_id}', 'Api\VaccineController@detail');
+    Route::get(
+        'pets/{pet_id}/vaccines/{vac_id}',
+        'Api\VaccineController@detail'
+    );
     Route::get('all-vaccines', 'Api\VaccineController@showAll');
     Route::post('pets/{pet_id}/vaccines', 'Api\VaccineController@store');
     Route::put(
@@ -139,7 +148,6 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         'pets/{pet_id}/vaccines/{vac_id}',
         'Api\VaccineController@remove'
     );
-*/
     // score
     Route::delete('score/{id}', 'Api\ScoreController@delete');
 });

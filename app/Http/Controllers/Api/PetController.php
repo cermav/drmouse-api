@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\DoctorsLog;
 use App\Models\ScoreItem;
 use App\Models\Doctor;
+use App\Models\FavoriteVet;
 use App\Http\Controllers\HelperController;
 use App\Types\DoctorStatus;
 use App\Types\UserRole;
@@ -17,6 +18,7 @@ use App\Utils\ImageHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\DoctorController;
 use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
+use App\Http\Resources\OpeningHoursResource;
 use DateTime;
 
 class PetController extends Controller
@@ -365,38 +368,6 @@ class PetController extends Controller
             JsonResponse::HTTP_OK
         );
     }
-    // favorite vets
-    public function addVet(int $pet_id, int $vet_id)
-    {
-        $this->AuthPet($pet_id);
-        $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
-
-        favorite_vets::where('owners_id', $owners_id)
-            ->where('vet_id', $vet_id)
-            ->firstOrCreate([
-                'owners_id' => $owners_id,
-                'vet_id' => $vet_id,
-            ]);
-        return response()->json(
-            favorite_vets::where('owners_id', $owners_id)
-                ->where('vet_id', $vet_id)
-                ->first(),
-            JsonResponse::HTTP_OK
-        );
-    }
-    public function getVet(int $pet_id)
-    {
-        $this->AuthPet($pet_id);
-
-        return response()->json(
-            DB::table('favorite_vets')
-                ->where(
-                    'owners_id',
-                    Pet::where('id', $pet_id)->first()->owners_id
-                )
-                ->get()
-        );
-    }
     public function deleteVet(int $pet_id, int $vet_id)
     {
         $this->AuthPet($pet_id);
@@ -406,5 +377,158 @@ class PetController extends Controller
             ->where('vet_id', $vet_id)
             ->delete();
         return response()->json("Deleted", JsonResponse::HTTP_OK);
+    }
+
+    //favorite vets of owner functions
+
+    public function getFavoriteVets(int $user_id)
+    {
+        $loggedUser = Auth::User();
+        if (
+            $loggedUser->id === $user_id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            $vets = DB::table('favorite_vets')
+                ->where('user_id', $user_id)
+                ->pluck('vet_id')
+                ->toArray();
+            $request = new \Illuminate\Http\Request();
+            $request->replace(['' => '']);
+            $doctors = DB::table('doctors')
+                ->select(
+                    'users.id',
+                    'name',
+                    'slug',
+                    'street',
+                    'city',
+                    'country',
+                    'post_code',
+                    'latitude',
+                    'longitude',
+                    'avatar',
+                    //OpeningHoursResource::collection($this->user->openingHours),
+                    // DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties"),
+                    DB::raw("IFNULL((
+                        SELECT true
+                        FROM opening_hours
+                        WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                          AND (
+                            (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                            OR
+                            opening_hours_state_id = 3
+                          )
+                        LIMIT 1)
+                      , false) AS open "),
+                    DB::raw(
+                        "(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score "
+                    )
+                )
+                ->selectRaw(
+                    "(SELECT ST_Distance_Sphere(point(?, ?), point(longitude, latitude)) ) AS distance",
+                    [
+                        $request->has('long')
+                            ? floatval($request->input('long'))
+                            : 15.7,
+                        $request->has('lat')
+                            ? floatval($request->input('lat'))
+                            : 49.8,
+                    ]
+                )
+                ->join('users', 'doctors.user_id', '=', 'users.id')
+                ->whereIn('doctors.state_id', [
+                    DoctorStatus::PUBLISHED,
+                    DoctorStatus::ACTIVE,
+                ])
+                ->wherein('users.id', $vets)
+                ->get();
+
+            //copy SHOW
+            /*
+            $scoreQuery = [];
+            foreach (ScoreItem::get() as $item) {
+                $scoreQuery[] = "(
+                        SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
+                        FROM score_details 
+                        WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
+                            AND score_item_id = {$item->id}
+                    ) AS total_score_{$item->id} ";
+            }
+            $doctor = Doctor::where('user_id', $user_id)
+                ->select(
+                    'doctors.*',
+                    DB::raw(implode(", ", $scoreQuery)),
+                    DB::raw("IFNULL((
+                    SELECT true
+                    FROM opening_hours
+                    WHERE user_id = doctors.user_id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                    LIMIT 1)
+                  , false) AS open ")
+                )
+                ->whereIn('state_id', [
+                    DoctorStatus::NEW,
+                    DoctorStatus::UNPUBLISHED,
+                    DoctorStatus::INCOMPLETE,
+                    DoctorStatus::PUBLISHED,
+                    DoctorStatus::ACTIVE,
+                ])
+                ->get();
+            if (sizeof($doctor) > 0) {
+                //   return DoctorResource::collection($doctor)->first();
+            }
+            */
+            return response()->json($doctors);
+        }
+    }
+    public function addFavoriteVet(int $user_id, int $vet_id)
+    {
+        $loggedUser = Auth::User();
+        if (
+            $loggedUser->id === $user_id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            $exists = DB::table('favorite_vets')
+                ->where('user_id', $user_id)
+                ->where('vet_id', $vet_id)
+                ->first();
+            if ($exists) {
+                return response()->json(
+                    ['error' => 'This relation already exists.'],
+                    409
+                );
+            } else {
+                FavoriteVet::create([
+                    'user_id' => $user_id,
+                    'vet_id' => $vet_id,
+                ]);
+                return response()->json(
+                    'favorite vet created.',
+                    JsonResponse::HTTP_CREATED
+                );
+            }
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
+
+    public function deleteFavoriteVet(int $user_id, int $vet_id)
+    {
+        $loggedUser = Auth::User();
+        if (
+            $loggedUser->id === $user_id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            DB::table('favorite_vets')
+                ->where('user_id', $user_id)
+                ->where('vet_id', $vet_id)
+                ->delete();
+            return response()->json("Deleted", JsonResponse::HTTP_OK);
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
     }
 }
