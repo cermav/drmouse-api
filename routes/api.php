@@ -122,30 +122,30 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     // favorite vets
     Route::get(
         'vets/{user_id}/favorite_vets',
-        'Api\PetController@getFavoriteVets'
+        'Api\PetController@user_has_doctors'
     );
     Route::post(
         'vets/{user_id}/favorite_vets/{vet_id}',
-        'Api\PetController@addFavoriteVet'
+        'Api\PetController@add_favorite_doctor'
     );
     Route::delete(
         'vets/{user_id}/favorite_vets/{vet_id}',
-        'Api\PetController@deleteFavoriteVet'
+        'Api\PetController@remove_favorite_doctor'
     );
     // Vaccines
-    Route::get('pets/{pet_id}/vaccines', 'Api\VaccineController@index');
+    Route::get('vaccine/{pet_id}/vaccines', 'Api\VaccineController@index');
     Route::get(
-        'pets/{pet_id}/vaccines/{vac_id}',
+        'vaccine/{pet_id}/vaccines/{vaccine_id}',
         'Api\VaccineController@detail'
     );
     Route::get('all-vaccines', 'Api\VaccineController@showAll');
-    Route::post('pets/{pet_id}/vaccines', 'Api\VaccineController@store');
+    Route::post('vaccine/{pet_id}/store', 'Api\VaccineController@store');
     Route::put(
-        'pets/{pet_id}/vaccines/{vac_id}',
+        'vaccine/{pet_id}/vaccines/{vac_id}',
         'Api\VaccineController@update'
     );
     Route::delete(
-        'pets/{pet_id}/vaccines/{vac_id}',
+        'vaccine/{pet_id}/vaccines/{vac_id}',
         'Api\VaccineController@remove'
     );
     // score

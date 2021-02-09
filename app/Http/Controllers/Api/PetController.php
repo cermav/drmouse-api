@@ -38,7 +38,7 @@ class PetController extends Controller
      * @return \Illuminate\Http\Response
      */
     //GET all Pets as administrator
-    //done and working
+
     public function showAll()
     {
         $loggedUser = Auth::User();
@@ -127,7 +127,7 @@ class PetController extends Controller
      * @return \Illuminate\Http\Response
      */
     // POST pet
-    //done and working
+
     public function store(Request $request)
     {
         // validate input
@@ -189,7 +189,7 @@ class PetController extends Controller
         }
     }
     // PUT Update pet
-    //done and working
+
     public function update(Request $request, int $id)
     {
         $this->AuthPet($id);
@@ -223,7 +223,7 @@ class PetController extends Controller
         ]);
 
         return response()->json(Pet::find($id), JsonResponse::HTTP_OK);
-    } //done and working
+    }
     protected function saveAvatar($pet_id, $data)
     {
         // get pet info
@@ -282,7 +282,7 @@ class PetController extends Controller
         // get data from json
         $input = json_decode($request->getContent());
         // prepare validator
-        //done and working
+
         $validator = Validator::make((array) $input, [
             //'owners_id' => 'required',
             'pet_name' => 'required',
@@ -302,8 +302,8 @@ class PetController extends Controller
         }
 
         return $input;
-    } //done and working
-    public function AuthPet(int $pet_id)
+    }
+    public static function AuthPet(int $pet_id)
     {
         $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
         $loggedUser = Auth::User();
@@ -317,8 +317,8 @@ class PetController extends Controller
             // return unauthorized
             throw new AuthenticationException();
         }
-    } //done and working
-    public function AuthUser(int $id)
+    }
+    public static function AuthUser(int $id)
     {
         $requestUser = User::Find($id);
         $loggedUser = Auth::User();
@@ -368,29 +368,15 @@ class PetController extends Controller
             JsonResponse::HTTP_OK
         );
     }
-    public function deleteVet(int $pet_id, int $vet_id)
-    {
-        $this->AuthPet($pet_id);
-        $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
-        DB::table('favorite_vets')
-            ->where('owners_id', $owners_id)
-            ->where('vet_id', $vet_id)
-            ->delete();
-        return response()->json("Deleted", JsonResponse::HTTP_OK);
-    }
-
-    //favorite vets of owner functions
-
-    public function getFavoriteVets(int $user_id)
+    public function user_has_doctors(int $user_id)
     {
         $loggedUser = Auth::User();
         if (
             $loggedUser->id === $user_id ||
             $loggedUser->role_id === UserRole::ADMINISTRATOR
         ) {
-            $vets = DB::table('favorite_vets')
-                ->where('user_id', $user_id)
-                ->pluck('vet_id')
+            $vets = FavoriteVet::where('user_id', $user_id)
+                ->pluck('doctor_id')
                 ->toArray();
             $request = new \Illuminate\Http\Request();
             $request->replace(['' => '']);
@@ -441,59 +427,19 @@ class PetController extends Controller
                 ])
                 ->wherein('users.id', $vets)
                 ->get();
-
-            //copy SHOW
-            /*
-            $scoreQuery = [];
-            foreach (ScoreItem::get() as $item) {
-                $scoreQuery[] = "(
-                        SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
-                        FROM score_details 
-                        WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
-                            AND score_item_id = {$item->id}
-                    ) AS total_score_{$item->id} ";
-            }
-            $doctor = Doctor::where('user_id', $user_id)
-                ->select(
-                    'doctors.*',
-                    DB::raw(implode(", ", $scoreQuery)),
-                    DB::raw("IFNULL((
-                    SELECT true
-                    FROM opening_hours
-                    WHERE user_id = doctors.user_id AND weekday_id = (WEEKDAY(NOW()) + 1)
-                      AND (
-                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
-                        OR
-                        opening_hours_state_id = 3
-                      )
-                    LIMIT 1)
-                  , false) AS open ")
-                )
-                ->whereIn('state_id', [
-                    DoctorStatus::NEW,
-                    DoctorStatus::UNPUBLISHED,
-                    DoctorStatus::INCOMPLETE,
-                    DoctorStatus::PUBLISHED,
-                    DoctorStatus::ACTIVE,
-                ])
-                ->get();
-            if (sizeof($doctor) > 0) {
-                //   return DoctorResource::collection($doctor)->first();
-            }
-            */
             return response()->json($doctors);
         }
     }
-    public function addFavoriteVet(int $user_id, int $vet_id)
+    public function add_favorite_doctor(int $user_id, int $doctor_id)
     {
         $loggedUser = Auth::User();
         if (
             $loggedUser->id === $user_id ||
             $loggedUser->role_id === UserRole::ADMINISTRATOR
         ) {
-            $exists = DB::table('favorite_vets')
+            $exists = DB::table('user_favorite_doctors')
                 ->where('user_id', $user_id)
-                ->where('vet_id', $vet_id)
+                ->where('doctor_id', $doctor_id)
                 ->first();
             if ($exists) {
                 return response()->json(
@@ -503,7 +449,7 @@ class PetController extends Controller
             } else {
                 FavoriteVet::create([
                     'user_id' => $user_id,
-                    'vet_id' => $vet_id,
+                    'doctor_id' => $doctor_id,
                 ]);
                 return response()->json(
                     'favorite vet created.',
@@ -515,16 +461,16 @@ class PetController extends Controller
         }
     }
 
-    public function deleteFavoriteVet(int $user_id, int $vet_id)
+    public function remove_favorite_doctor(int $user_id, int $doctor_id)
     {
         $loggedUser = Auth::User();
         if (
             $loggedUser->id === $user_id ||
             $loggedUser->role_id === UserRole::ADMINISTRATOR
         ) {
-            DB::table('favorite_vets')
+            DB::table('user_favorite_doctors')
                 ->where('user_id', $user_id)
-                ->where('vet_id', $vet_id)
+                ->where('doctor_id', $doctor_id)
                 ->delete();
             return response()->json("Deleted", JsonResponse::HTTP_OK);
         } else {

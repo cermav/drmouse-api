@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFavoriteVetsTable extends Migration
+class UserFavoriteDoctors extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateFavoriteVetsTable extends Migration
      */
     public function up()
     {
-        Schema::create('favorite_vets', function (Blueprint $table) {
+        Schema::create('user_favorite_doctors', function (Blueprint $table) {
             $table->integer('user_id');
-            $table->integer('vet_id');
-            $table->timestamp('created_at')->nullable(true);
-            $table->timestamp('updated_at')->nullable(true);
+            $table->integer('doctor_id');
+            $table->primary(['user_id', 'doctor_id']);
         });
     }
 
@@ -28,6 +27,6 @@ class CreateFavoriteVetsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('favorite_vets');
+        Schema::dropIfExists('user_favorite_doctors');
     }
 }
