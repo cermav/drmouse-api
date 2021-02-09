@@ -99,7 +99,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     );
     // Appointments
     Route::get(
-        'pets/{pet_id}/appointments/list',
+        'pets/{pet_id}/appointments-list',
         'Api\AppointmentController@index'
     );
     Route::get('pets/appointments-all', 'Api\AppointmentController@showAll');
