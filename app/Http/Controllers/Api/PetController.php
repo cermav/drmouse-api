@@ -82,6 +82,9 @@ class PetController extends Controller
     public function latest()
     {
         $last_pet = User::where('id', Auth::user()->id)->first()->last_pet;
+        if ($last_pet === 0) {
+            return response()->json($last_pet);
+        }
         try {
             $list = Pet::where('owners_id', Auth::user()->id)
                 ->pluck('id')
