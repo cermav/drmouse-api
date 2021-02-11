@@ -99,11 +99,11 @@ class PetController extends Controller
             }
             return response()->json($temp);
         } catch (\Exception $ex) {
-            User::where('id', Auth::User())->update([
+            User::where('id', Auth::User()->id)->update([
                 'last_pet' => 0,
             ]);
             return response()->json(
-                ['error' => ['location' => $ex->getMessage()]],
+                ['error' => ["No existing pet found"]],
                 JsonResponse::HTTP_NOT_FOUND
             );
         }
