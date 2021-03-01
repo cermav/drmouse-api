@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Vaccine extends Model
 {
-    protected $fillable = ['apply_date', 'valid', 'name', 'price'];
+    protected $table = 'vaccines';
+    protected $fillable = ['id', 'company', 'name'];
+    public $timestamps = false;
 }

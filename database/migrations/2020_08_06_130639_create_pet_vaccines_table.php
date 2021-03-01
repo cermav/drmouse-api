@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateVaccinesTable extends Migration
+class CreatePetVaccinesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,17 @@ class CreateVaccinesTable extends Migration
      */
     public function up()
     {
-        Schema::create('vaccines', function (Blueprint $table) {
+        Schema::create('pet_vaccines', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('owner_id');
             $table->integer('pet_id');
+            $table->string('description');
             $table->date('apply_date');
             $table->integer('valid');
-            $table->string('name');
-            $table->integer('price');
+            $table->integer('color');
+            $table->string('vaccine_name')->default(null);
+            $table->integer('doctor_id')->default(null);
+            $table->integer('price')->default(null);
+            $table->string('notes')->default(null);
         });
     }
 
@@ -31,6 +34,6 @@ class CreateVaccinesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('vaccines');
+        Schema::dropIfExists('pet_vaccines');
     }
 }

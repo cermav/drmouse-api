@@ -17,4 +17,8 @@ class Pet extends Model
         'background',
         'avatar',
     ];
+    public function vaccine()
+    {
+        return $this->hasMany(PetVaccine::class);
+    }
 }

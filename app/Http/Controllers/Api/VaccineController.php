@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Vaccines;
+use DateTime;
 use App\Models\Pet;
+use App\Models\Vaccine;
+use App\Models\PetVaccine;
 use App\Models\PetAppointment;
 use App\Models\Member;
-use App\DoctorsLog;
+use App\Models\ScoreItem;
+use App\Models\DoctorsLog;
+use App\Models\User;
+use App\Models\Doctor;
 use App\Http\Controllers\HelperController;
-use App\ScoreItem;
+use App\Http\Controllers\API\PetController;
 use App\Types\DoctorStatus;
-use App\User;
 use App\Types\UserRole;
+use Illuminate\Http\Request;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Doctor;
 use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +37,7 @@ class VaccineController extends Controller
     {
         $loggedUser = Auth::User();
         if ($loggedUser->role_id === UserRole::ADMINISTRATOR) {
-            $vaccines = Vaccine::all();
+            $vaccines = PetVaccine::all();
             return response()->json($vaccines);
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -42,36 +45,53 @@ class VaccineController extends Controller
     }
     //GET vaccines from pet ID
     //TODO Authentication
-    //done
-    public function index($id)
+    public function list()
     {
-        $vaccine = DB::table('vaccines')
-            ->where('pet_id', $id)
+        return response()->json(Vaccine::all());
+    }
+    public function index($pet_id)
+    {
+        PetController::AuthPet($pet_id);
+        $vaccine = Pet::find($pet_id)
+            ->vaccine()
+            ->join('doctors', 'doctor_id', '=', 'doctors.user_id')
+            ->join('users', 'doctor_id', '=', 'users.id')
+            ->join('vaccines', 'vaccine_id', '=', 'vaccines.id')
+            ->select(
+                'pet_vaccines.*',
+                'doctors.search_name',
+                'doctors.city',
+                'doctors.street',
+                'users.avatar',
+                'vaccines.name',
+                'vaccines.company',
+            )
             ->get();
-
         return response()->json($vaccine);
     }
-    //done
-    public function detail($pet_id, $vac_id)
+
+    public function detail(int $user_id, int $pet_id)
     {
-        $vaccine = DB::table('vaccines')
-            ->where('pet_id', $pet_id)
-            ->where('id', $vac_id)
-            ->get();
-        return response()->json($vaccine);
+        PetController::AuthUser($user_id);
+        $vaccines = Pet::find($pet_id)
+            ->vaccine()
+            ->first();
+        return response()->json($vaccines);
     }
     // POST add vaccine by pet_id
-    //done
     public function store(Request $request, $pet_id)
     {
         // validate input
+        //PetController::AuthPet($pet_id);
         Pet::FindOrFail($pet_id);
         $input = $this->validateRegistration($request);
         if (
             DB::table('pets')
                 ->where('id', $pet_id)
-                ->first()->owners_id === Auth::User()->id
+                ->first()->owners_id === Auth::User()->id &&
+            $input->pet_id == $pet_id
         ) {
+            $input = $this->validateRegistration($request);
             $vaccine = $this->AddVaccine($input, $pet_id);
 
             $vaccine->save();
@@ -86,12 +106,31 @@ class VaccineController extends Controller
     //done
     public function AddVaccine(object $data, $pet_id)
     {
-        return Vaccines::create([
-            'apply_date' => $data->apply_date,
-            'pet_id' => $pet_id,
+        $validator = Validator::make((array) $data, [
+            'description' => 'required|string|max:50',
+            'apply_date' => 'required',
+            'pet_id' => 'required|integer',
+            'doctor_id' => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            throw new HttpResponseException(
+                response()->json(
+                    ['errors' => $validator->errors()],
+                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                )
+            );
+        }
+        $date = DateTime::createFromFormat('j. n. Y', $data->apply_date);
+        return PetVaccine::create([
+            'description' => $data->description,
+            'apply_date' => $date,
             'valid' => $data->valid,
-            'name' => $data->name,
+            'pet_id' => $pet_id,
+            'doctor_id' => $data->doctor_id,
             'price' => $data->price,
+            'vaccine_id' => $data->vaccine_id,
+            'notes' => $data->notes,
+            'color' => rand(0, 7)
         ]);
     }
     // DEL remove appointment
@@ -104,7 +143,7 @@ class VaccineController extends Controller
         } catch (\Exception $e) {
             return response()->json("non-existent pet or vaccine", 404);
         }
-        DB::table('Vaccines')
+        DB::table('pet_vaccines')
             ->where('id', $vac_id)
             ->where('pet_id', $pet_id)
             ->delete();
@@ -113,7 +152,8 @@ class VaccineController extends Controller
     // PUT Update appointment
     //TODO Authentication
     //done
-    public function update(Request $request, int $pet_id, int $id)
+    //Request $request
+    public function update(object $data, int $pet_id, int $id)
     {
         try {
             $this->AuthUser(Pet::where('id', $pet_id)->first()->owners_id);
@@ -123,17 +163,21 @@ class VaccineController extends Controller
         Vaccines::where('pet_id', $pet_id)
             ->where('id', $id)
             ->FirstOrFail();
-        $input = $this->validateRegistration($request, $id);
-        $data = [
-            'Vaccines' => [
-                'apply_date' => $request->apply_date,
-                'valid' => $request->valid,
-                'name' => $request->name,
-                'price' => $request->price,
-            ],
-        ];
+        //$input = $this->validateRegistration($request, $id);
+        PetVaccine::where('id', $id)->where('pet_id',$pet_id)->update([
+            'description' => $data->description,
+            'apply_date' => $date,
+            'valid' => $data->valid,
+            'pet_id' => $pet_id,
+            'doctor_id' => $data->doctor_id,
+            'price' => $data->price,
+            'vaccine_id' => $data->vaccine_id,
+            'notes' => $data->notes,
+            'city' => $data->city,
+            'street' => $data->street
+        ]);
         return response()->json(
-            PetAppointment::find($id),
+            200,
             JsonResponse::HTTP_OK
         );
 
@@ -149,8 +193,7 @@ class VaccineController extends Controller
         // prepare validator
         $validator = Validator::make((array) $input, [
             'apply_date' => 'required',
-            'valid' => 'required',
-            'name' => 'required',
+            'description' => 'required',
         ]);
 
         if ($validator->fails()) {

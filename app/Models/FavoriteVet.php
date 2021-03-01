@@ -12,7 +12,6 @@ class FavoriteVet extends Model
 
     function users()
     {
-        echo "users";
         return $this->belongsToMany(User::class);
     }
     function doctors()
