@@ -152,14 +152,15 @@ class VaccineController extends Controller
     //TODO Authentication
     //done
     //Request $request
-    public function update(object $data, int $pet_id, int $id)
+    public function update(Request $request, int $pet_id, int $id)
     {
+        $data = json_decode($request->getContent());
         try {
             $this->AuthUser(Pet::where('id', $pet_id)->first()->owners_id);
         } catch (\Exception $e) {
             return response()->json("non-existent pet or vaccine", 404);
         }
-        Vaccines::where('pet_id', $pet_id)
+        Vaccine::where('pet_id', $pet_id)
             ->where('id', $id)
             ->FirstOrFail();
         //$input = $this->validateRegistration($request, $id);
