@@ -160,9 +160,7 @@ class VaccineController extends Controller
         } catch (\Exception $e) {
             return response()->json("non-existent pet or vaccine", 404);
         }
-        Vaccine::where('pet_id', $pet_id)
-            ->where('id', $id)
-            ->FirstOrFail();
+        $date = DateTime::createFromFormat('j. n. Y', $data->apply_date);
         //$input = $this->validateRegistration($request, $id);
         PetVaccine::where('id', $id)->where('pet_id',$pet_id)->update([
             'description' => $data->description,
@@ -171,14 +169,9 @@ class VaccineController extends Controller
             'pet_id' => $pet_id,
             'doctor_id' => $data->doctor_id,
             'price' => $data->price,
-            'vaccine_id' => $data->vaccine_id,
             'notes' => $data->notes,
-            'city' => $data->city,
-            'street' => $data->street
         ]);
-        return response()->json(
-            200,
-            JsonResponse::HTTP_OK
+        return response()->json(JsonResponse::HTTP_OK, 200
         );
 
         //} //else {
