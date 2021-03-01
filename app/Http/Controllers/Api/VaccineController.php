@@ -13,7 +13,6 @@ use App\Models\DoctorsLog;
 use App\Models\User;
 use App\Models\Doctor;
 use App\Http\Controllers\HelperController;
-use App\Http\Controllers\API\PetController;
 use App\Types\DoctorStatus;
 use App\Types\UserRole;
 use Illuminate\Http\Request;
@@ -51,7 +50,7 @@ class VaccineController extends Controller
     }
     public function index($pet_id)
     {
-        PetController::AuthPet($pet_id);
+        $this->AuthPet($pet_id);
         $vaccine = Pet::find($pet_id)
             ->vaccine()
             ->join('doctors', 'doctor_id', '=', 'doctors.user_id')
@@ -214,6 +213,21 @@ class VaccineController extends Controller
 
         if (
             $requestUser->id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            //logged user is authorized
+            return;
+        } else {
+            // return unauthorized
+            throw new AuthenticationException();
+        }
+    }
+    public static function AuthPet(int $pet_id)
+    {
+        $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
+        $loggedUser = Auth::User();
+        if (
+            $owners_id === $loggedUser->id ||
             $loggedUser->role_id === UserRole::ADMINISTRATOR
         ) {
             //logged user is authorized
