@@ -51,11 +51,11 @@ class VaccineController extends Controller
     public function index($pet_id)
     {
         $this->AuthPet($pet_id);
-        $vaccine = Pet::find($pet_id)
+        $vaccines = Pet::find($pet_id)
             ->vaccine()
-            ->join('doctors', 'doctor_id', '=', 'doctors.user_id')
-            ->join('users', 'doctor_id', '=', 'users.id')
-            ->join('vaccines', 'vaccine_id', '=', 'vaccines.id')
+            ->leftJoin('doctors', 'doctor_id', '=', 'doctors.user_id')
+            ->leftJoin('users', 'doctor_id', '=', 'users.id')
+            ->leftJoin('vaccines', 'vaccine_id', '=', 'vaccines.id')
             ->select(
                 'pet_vaccines.*',
                 'doctors.search_name',
@@ -66,7 +66,7 @@ class VaccineController extends Controller
                 'vaccines.company',
             )
             ->get();
-        return response()->json($vaccine);
+        return response()->json($vaccines);
     }
 
     public function detail(int $user_id, int $pet_id)
