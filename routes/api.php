@@ -144,11 +144,11 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::get('all-vaccines', 'Api\VaccineController@showAll');
     Route::post('vaccine/{pet_id}/store', 'Api\VaccineController@store');
     Route::put(
-        'vaccine/{pet_id}/vaccines/{vac_id}/update',
+        'vaccine/{pet_id}/update/{vac_id}',
         'Api\VaccineController@update'
     );
     Route::delete(
-        'vaccine/{pet_id}/vaccines/{vac_id}/remove',
+        'vaccine/{pet_id}/remove/{vac_id}',
         'Api\VaccineController@remove'
     );
     // score

@@ -109,7 +109,6 @@ class VaccineController extends Controller
             'description' => 'required|string|max:50',
             'apply_date' => 'required',
             'pet_id' => 'required|integer',
-            'doctor_id' => 'required|integer',
         ]);
         if ($validator->fails()) {
             throw new HttpResponseException(

@@ -20,10 +20,11 @@ class CreatePetVaccinesTable extends Migration
             $table->date('apply_date');
             $table->integer('valid');
             $table->integer('color');
-            $table->string('vaccine_name')->default(null);
-            $table->integer('doctor_id')->default(null);
-            $table->integer('price')->default(null);
-            $table->string('notes')->default(null);
+            $table->integer('vaccine_id')->nullable(true)->default(null);
+            $table->string('vaccine_name')->nullable(true)->default(null);
+            $table->integer('doctor_id')->nullable(true)->default(null);
+            $table->integer('price')->nullable(true)->default(null);
+            $table->string('notes')->nullable(true)->default(null);
         });
     }
 
