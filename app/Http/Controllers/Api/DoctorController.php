@@ -174,6 +174,15 @@ class DoctorController extends Controller
      */
     public function showAll()
     {
+        $scoreQuery = [];
+        foreach (ScoreItem::get() as $item) {
+            $scoreQuery[] = "(
+                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
+                FROM score_details 
+                WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
+                    AND score_item_id = {$item->id}
+            ) AS total_score ";
+        }
         // prepare basic select
         $doctors = DB::table('doctors')
             ->select(
@@ -186,6 +195,7 @@ class DoctorController extends Controller
                 'post_code',
                 'latitude',
                 'longitude',
+                DB::raw(implode(", ", $scoreQuery)),
                 DB::raw("IFNULL((
                     SELECT true
                     FROM opening_hours
