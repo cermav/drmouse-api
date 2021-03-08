@@ -178,6 +178,7 @@ class DoctorController extends Controller
         $doctors = DB::table('doctors')
             ->select(
                 'users.id',
+                'users.avatar',
                 'name',
                 'slug',
                 'street',
