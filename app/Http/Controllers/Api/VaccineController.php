@@ -106,7 +106,7 @@ class VaccineController extends Controller
     public function AddVaccine(object $data, $pet_id)
     {
         $validator = Validator::make((array) $data, [
-            'description' => 'required|string|max:50',
+            'description' => 'required|string|max:100',
             'apply_date' => 'required',
             'pet_id' => 'required|integer',
         ]);
@@ -163,6 +163,7 @@ class VaccineController extends Controller
         //$input = $this->validateRegistration($request, $id);
         PetVaccine::where('id', $id)->where('pet_id',$pet_id)->update([
             'description' => $data->description,
+            'vaccine_id' => $data->vaccine_id,
             'apply_date' => $date,
             'valid' => $data->valid,
             'pet_id' => $pet_id,
