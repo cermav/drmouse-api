@@ -132,8 +132,6 @@ class VaccineController extends Controller
         ]);
     }
     // DEL remove appointment
-    //TODO Authentication
-    //done
     public function remove(int $pet_id, int $vac_id)
     {
         try {
@@ -148,9 +146,6 @@ class VaccineController extends Controller
         return response()->json("Deleted", JsonResponse::HTTP_OK);
     }
     // PUT Update appointment
-    //TODO Authentication
-    //done
-    //Request $request
     public function update(Request $request, int $pet_id, int $id)
     {
         $data = json_decode($request->getContent());
@@ -160,7 +155,7 @@ class VaccineController extends Controller
             return response()->json("non-existent pet or vaccine", 404);
         }
         $date = DateTime::createFromFormat('j. n. Y', $data->apply_date);
-        //$input = $this->validateRegistration($request, $id);
+
         PetVaccine::where('id', $id)->where('pet_id',$pet_id)->update([
             'description' => $data->description,
             'vaccine_id' => $data->vaccine_id,
@@ -173,11 +168,6 @@ class VaccineController extends Controller
         ]);
         return response()->json(JsonResponse::HTTP_OK, 200
         );
-
-        //} //else {
-        // return unauthorized
-        //throw new AuthenticationException();
-        //}
     }
     protected function validateRegistration(Request $request)
     {
