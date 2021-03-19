@@ -7,6 +7,7 @@ use App\Http\Resources\PhotoResource;
 use App\Http\Resources\ServiceResource;
 use App\Models\ScoreItem;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 class DoctorResource extends JsonResource
 {
@@ -35,11 +36,24 @@ class DoctorResource extends JsonResource
             $properties[$item->property_category_id][] = $item->id;
         }
 
+        $scoreQuery = [];
+        foreach (ScoreItem::get() as $item) {
+            $scoreQuery[] = "(
+                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
+                FROM score_details 
+                WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
+                    AND score_item_id = {$item->id}
+            ) AS total_score ";
+        }
+
         return [
+
             'id' => $this->user->id,
             'name' => $this->user->name,
             'email' => $this->user->email,
             'avatar' => $this->user->avatar,
+
+            'total_score' => DB::table('doctors')->select(DB::raw(implode(", ", $scoreQuery)))->where('user_id', $this->user->id)->first()->total_score,
 
             'search_name' => $this->search_name,
             'description' => $this->description,
@@ -81,7 +95,8 @@ class DoctorResource extends JsonResource
                 'specialization' => array_key_exists(3, $properties)
                     ? $properties[3]
                     : [],
-            ],
+                    
+            ]
         ];
     }
 }
