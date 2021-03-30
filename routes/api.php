@@ -108,16 +108,22 @@ Route::group(['middleware' => ['jwt.auth']], function () {
             'Api\AppointmentController@index'
         );
         Route::prefix('/{pet_id}/appointment/')->group(function () {
-            Route::get('{term_id}', 'Api\AppointmentController@detail')->where(
-                'term_id',
-                '[0-9]+'
-            );
+            Route::get('{term_id}', 'Api\AppointmentController@detail')
+            ->where('term_id','[0-9]+');
             Route::put('{term_id}/update', 'Api\AppointmentController@update');
             Route::post('store', 'Api\AppointmentController@store');
-            Route::delete(
-                '{term_id}/remove',
-                'Api\AppointmentController@remove'
-            );
+            Route::delete('{term_id}/remove','Api\AppointmentController@remove');
+        });
+        // Records
+        Route::prefix('/{pet_id}/records')->group(function () {
+            Route::get('', 'Api\PetController@get_records');
+            Route::post('/store', 'Api\PetController@add_record');
+            Route::put('/{record_id}/update', 'Api\PetController@update_record');
+            Route::delete('/{record_id}/remove','Api\PetController@remove_record');
+            Route::get('/{record_id}/files', 'Api\PetController@get_files');
+            Route::get('/{record_id}/download/{file_name}', 'Api\PetController@get_file');
+            Route::delete('/{record_id}/delete/{file_name}','Api\PetController@remove_file');
+            Route::post('/store/{record_id}/files', 'Api\PetController@add_files');
         });
     });
 
