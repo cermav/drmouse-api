@@ -599,7 +599,7 @@ class PetController extends Controller
                                 'record_id' => $record_id,
                                 'file_name' => $file['name']
                             ]);
-                            return response()->json([200, 'uploaded successfully!']);
+                            return response()->json(['status' => 200, 'message' => 'uploaded successfully!']);
                     }
                 }
             }
