@@ -514,7 +514,7 @@ class PetController extends Controller
         $this->AuthPet($pet_id);
             return Record::create([
                 'pet_id' => $pet_id,
-                'date' => $record->date,
+                'date' => $request->date,
                 'description' => $request->description,
                 'notes' => $request->notes,
                 'doctor_id' => $request->doctor_id
