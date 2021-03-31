@@ -550,9 +550,9 @@ class PetController extends Controller
         try {
             $files = RecordFile::where('record_id', $record_id)->get();
             foreach ($files as $file){
-                Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file->file_name);
+                if (Storage::disk('public')->has('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file->file_name)) Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file->file_name);
             }
-            rmdir(storage_path('app/public/pet_records/'.$record_id));
+            if (Storage::disk('public')->has('app/public/pet_records/'.$record_id)) rmdir(storage_path('app/public/pet_records/'.$record_id));
             Record::where('id', $record_id)->delete();
             return response()->json("Record and its files deleted successfully", JsonResponse::HTTP_OK);
         }
