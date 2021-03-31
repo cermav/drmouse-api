@@ -552,7 +552,8 @@ class PetController extends Controller
             foreach ($files as $file){
                 Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file->file_name);
             }
-            Record::where('record_id', $record_id)->delete();
+            Record::where('id', $record_id)->delete();
+            Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $record_id);
             return response()->json("Record and its files deleted successfully", JsonResponse::HTTP_OK);
         }
         catch(\HttpResponseException $ex) {
@@ -614,7 +615,6 @@ class PetController extends Controller
         try {
             Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file_name);
             RecordFile::where('record_id', $record_id)->where('file_name',$file_name)->delete();
-            // REMOVE THE FILE!
             return response()->json("File deleted successfully", JsonResponse::HTTP_OK);
         }
         catch(\HttpResponseException $ex) {
