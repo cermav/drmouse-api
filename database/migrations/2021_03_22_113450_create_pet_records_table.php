@@ -16,7 +16,7 @@ class CreatePetRecordsTable extends Migration
         Schema::create('pet_records', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('pet_id');
-            $table->timestamps();
+            $table->date('date');
             $table->string('description')->nullable(true)->default(null);
             $table->string('notes')->nullable(true)->default(null);
             $table->integer('doctor_id')->nullable(true)->default(null);

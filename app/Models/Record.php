@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Record extends Model
 { 
     protected $table = 'pet_records';
+    public $timestamps = false;
     protected $fillable = [
             'pet_id',
-            'updated_at',
-            'created_at',
+            'date',
+            'notes',
             'description',
             'doctor_id'
 ];

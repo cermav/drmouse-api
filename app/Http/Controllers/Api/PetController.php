@@ -490,12 +490,9 @@ class PetController extends Controller
         $collection = collect([]);
         foreach ($records as $record){
             $files = RecordFile::where('record_id', $record->id)->get();
-            $created_at = DateTime::createFromFormat("Y-m-d H:i:s", $record->created_at);
-            $updated_at = DateTime::createFromFormat("Y-m-d H:i:s", $record->updated_at);
             $recordCollection = collect([
                 'id' => $record->id,
-                'created_at' => $created_at,
-                'updated_at' => $updated_at,
+                'date' => $record->date,
                 'description' => $record->description,
                 'notes' => $record->notes,
                 'doctor_id' => $record->doctor_id,
@@ -517,6 +514,7 @@ class PetController extends Controller
         $this->AuthPet($pet_id);
             return Record::create([
                 'pet_id' => $pet_id,
+                'date' => $record->date,
                 'description' => $request->description,
                 'notes' => $request->notes,
                 'doctor_id' => $request->doctor_id
@@ -535,6 +533,7 @@ class PetController extends Controller
         Record::where('id', $record_id)->update([
             'description' => $request->description,
             'notes' => $request->notes,
+            'date' => $request->date,
             'doctor_id' => $request->doctor_id
         ]);
         return response()->json(Record::where('id', $record_id)->first(), JsonResponse::HTTP_OK);
@@ -614,6 +613,7 @@ class PetController extends Controller
         try {
             Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file_name);
             RecordFile::where('record_id', $record_id)->where('file_name',$file_name)->delete();
+            // REMOVE THE FILE!
             return response()->json("File deleted successfully", JsonResponse::HTTP_OK);
         }
         catch(\HttpResponseException $ex) {
