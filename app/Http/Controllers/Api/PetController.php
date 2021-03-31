@@ -575,7 +575,7 @@ class PetController extends Controller
     {
         try {
             foreach($_FILES as $file){
-                if ($file['size'] > 1000000) throw new HttpResponseException(
+                if ($file['size'] > 10000000) throw new HttpResponseException(
                     response()->json(
                         ['errors' => "Uploaded file exceeds maximum size of 10Mb"]
                     )
