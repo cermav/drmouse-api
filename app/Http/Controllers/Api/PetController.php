@@ -512,9 +512,10 @@ class PetController extends Controller
     {
         try {
         $this->AuthPet($pet_id);
+        $date = DateTime::createFromFormat('j. n. Y', $request->date);
             return Record::create([
                 'pet_id' => $pet_id,
-                'date' => $request->date,
+                'date' => $date,
                 'description' => $request->description,
                 'notes' => $request->notes,
                 'doctor_id' => $request->doctor_id
