@@ -569,7 +569,7 @@ class PetController extends Controller
     }
     public function get_file($pet_id, $record_id, $file_name){
         //return storage::download
-        return Storage::disk('public')->download('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file_name);
+        return response()->download(storage_path('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file_name));
     }
     public function add_files($pet_id, $record_id)
     {
