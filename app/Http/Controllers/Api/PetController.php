@@ -567,10 +567,7 @@ class PetController extends Controller
     {
         return RecordFile::where('record_id', $record_id)->get();
     }
-    public function get_file($pet_id, $record_id, $file_name){
-        //return storage::download
-        return response()->download(storage_path('app/public/pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file_name));
-    }
+
     public function add_files($pet_id, $record_id)
     {
         try {
@@ -595,8 +592,7 @@ class PetController extends Controller
 
                 else {
                         Storage::disk('public')->put(
-                            'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'],
-                            $file);
+                            'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'], file_get_contents($file['tmp_name']));
                             RecordFile::create([
                                 'record_id' => $record_id,
                                 'file_name' => $file['name']
