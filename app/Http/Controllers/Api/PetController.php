@@ -593,9 +593,7 @@ class PetController extends Controller
 
                 else {
                         Storage::disk('public')->put(
-                            //'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'], file_get_contents($file['tmp_name']));
-                            'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'],
-                            $file);
+                            'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'], file_get_contents($file['tmp_name']));
                             RecordFile::create([
                                 'record_id' => $record_id,
                                 'file_name' => $file['name']
