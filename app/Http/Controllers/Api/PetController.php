@@ -598,9 +598,9 @@ class PetController extends Controller
                                 'record_id' => $record_id,
                                 'file_name' => $file['name']
                             ]);
-                            return response()->json(['status' => 200, 'message' => 'uploaded successfully!']);
                     }
                 }
+                return response()->json(['status' => 200, 'message' => 'uploaded successfully!']);
             }
         catch(\HttpResponseException $ex) {
             return response()->json(
