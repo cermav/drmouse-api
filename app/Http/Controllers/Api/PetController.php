@@ -593,7 +593,9 @@ class PetController extends Controller
 
                 else {
                         Storage::disk('public')->put(
-                            'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'], file_get_contents($file['tmp_name']));
+                            //'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'], file_get_contents($file['tmp_name']));
+                            'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'],
+                            $file);
                             RecordFile::create([
                                 'record_id' => $record_id,
                                 'file_name' => $file['name']
@@ -608,7 +610,7 @@ class PetController extends Controller
             );
         }
     }
-    
+
     public function remove_file($record_id, $file_name)
     {
         try {
