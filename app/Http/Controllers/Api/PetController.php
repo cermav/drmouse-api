@@ -563,6 +563,7 @@ class PetController extends Controller
             );
         }
     }
+
     public function get_files(int $pet_id, int $record_id)
     {
         return RecordFile::where('record_id', $record_id)->get();
@@ -607,6 +608,7 @@ class PetController extends Controller
             );
         }
     }
+    
     public function remove_file($record_id, $file_name)
     {
         try {
