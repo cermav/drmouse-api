@@ -17,7 +17,9 @@ class CreateRecordFilesTable extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->integer('record_id');
+            $table->integer('owner_id');
             $table->string('file_name');
+            $table->string('uuid');
         });
     }
 

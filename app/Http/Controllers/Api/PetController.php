@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
 use App\Http\Resources\OpeningHoursResource;
 use DateTime;
-use File;
+use Illuminate\Http\File;
 
 class PetController extends Controller
 {
@@ -318,7 +318,7 @@ class PetController extends Controller
             $loggedUser->role_id === UserRole::ADMINISTRATOR
         ) {
             //logged user is authorized
-            return;
+            return $owners_id;
         } else {
             // return unauthorized
             throw new AuthenticationException();
@@ -485,12 +485,21 @@ class PetController extends Controller
     }
     public function get_records($pet_id)
     {
+        $owners_id = $this->AuthPet($pet_id);
         try {
-        $this->AuthPet($pet_id);
         $records = Record::where('pet_id', $pet_id)->get();
         $collection = collect([]);
         foreach ($records as $record){
             $files = RecordFile::where('record_id', $record->id)->get();
+            $fileData = collect([]);
+        foreach($files as $file)
+        {
+             $fileCollection = collect([
+                'id' => $file->id,
+                'file_name' => $file->file_name,
+            ]);
+            $fileData->push($fileCollection);
+        }
             $recordCollection = collect([
                 'id' => $record->id,
                 'date' => $record->date,
@@ -498,11 +507,12 @@ class PetController extends Controller
                 'notes' => $record->notes,
                 'doctor_id' => $record->doctor_id,
                 'pet_id' => $record->pet_id,
-                'files' => $files
+                'files' => $fileData
             ]);
             $collection->push($recordCollection);
         }
-        return $collection;}
+        return $collection;
+    }
         catch(\HttpResponseException $ex) {
             return response()->json(
                 ['error' => $ex]
@@ -511,6 +521,7 @@ class PetController extends Controller
     }
     public function add_record(int $pet_id, Request $request)
     {
+        $owners_id = $this->AuthPet($pet_id);
         try {
         $this->AuthPet($pet_id);
         $date = DateTime::createFromFormat('j. n. Y', $request->date);
@@ -566,23 +577,48 @@ class PetController extends Controller
 
     public function get_files(int $pet_id, int $record_id)
     {
-        return RecordFile::where('record_id', $record_id)->get();
+        $owner_id = $this->AuthPet($pet_id);
+
+        $files = RecordFile::where('record_id', $record->id)->get();
+        $collection = collect([]);
+        foreach($files as $file)
+        {
+             $fileCollection = collect([
+                'id' => $file->id,
+                'file_name' => $file->file_name,
+            ]);
+            $collection->push($fileCollection);
+        }
+        return $fileCollection;
     }
 
-    public function add_files($pet_id, $record_id)
+    public function add_files($pet_id, $record_id, Request $request)
     {
+        print_r($request->getContent());
+        $owner_id = $this->AuthPet($pet_id);
         try {
-            foreach($_FILES as $file){
-                if ($file['size'] > 10000000) throw new HttpResponseException(
+            Record::findOrFail($record_id);
+         }
+         catch(\HttpResponseException $ex) {
+            return response()->json(
+                ['error' => $ex]
+            );
+        }
+        try {
+        for($i = 0; $request->hasFile('file' . $i); $i++)
+        {
+            $file = $request->file('file' . $i);
+            $size = $file->getSize();
+                if ($size > 10000000) throw new HttpResponseException(
                     response()->json(
-                        ['errors' => "Uploaded file exceeds maximum size of 10Mb"]
+                        ['errors' => "Uploaded file exceeds maximum size of 10Mb"], 422
                     )
                 );
-                $validator = Validator::make($file, [
-                    'file' => 'mimetypes: pdf, docx, jpg, png'
+                $validator = Validator::make((array) $request->getContent(), [
+                    'file'.$i => 'file|mimetypes: pdf, docx, jpg, png'
                     ]);
-
-                if ($validator->fails()){
+                if ($validator->fails())
+                    {
                         throw new HttpResponseException(
                             response()->json(
                                 ['errors' => $validator->errors()],
@@ -592,13 +628,16 @@ class PetController extends Controller
                     }
 
                 else {
-                        Storage::disk('public')->put(
-                            'pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file['name'], file_get_contents($file['tmp_name']));
-                            RecordFile::create([
-                                'record_id' => $record_id,
-                                'file_name' => $file['name']
-                            ]);
+                    $storage_path = "pet_records/" . $owner_id ;
+                        $path = $file->store($storage_path);
+                        $path && RecordFile::create([
+                            'record_id' => $record_id,
+                            'file_name' => $file->getClientOriginalName(),
+                            'uuid' => $path,
+                            'owner_id' => $owner_id
+                        ]);
                     }
+
                 }
                 return response()->json(['status' => 200, 'message' => 'uploaded successfully!']);
             }
@@ -612,7 +651,8 @@ class PetController extends Controller
     public function remove_file($record_id, $file_name)
     {
         try {
-            Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $file_name);
+            $fileUUID = RecordFile::where('record_id', $record_id)->where('file_name',$file_name)->get()->uuid;
+            Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $owner_id . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $fileUUID);
             RecordFile::where('record_id', $record_id)->where('file_name',$file_name)->delete();
             return response()->json("File deleted successfully", JsonResponse::HTTP_OK);
         }

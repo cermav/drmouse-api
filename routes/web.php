@@ -27,6 +27,8 @@ Route::get('/veterinari', 'DoctorController@showAll')->name('doctors');
 Route::get('/veterinari/{slug}/', 'DoctorController@show')->name('doctor');
 
 
+Route::get('/get-file/{file_id}', 'FileController@getFileURI')->middleware('jwt.auth');
+
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
 });

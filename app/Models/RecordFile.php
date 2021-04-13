@@ -11,6 +11,8 @@ class RecordFile extends Model
             'updated_at',
             'created_at',
             'record_id',
-            'file_name'
+            'file_name',
+            'uuid',
+            'owner_id'
 ];
 }
