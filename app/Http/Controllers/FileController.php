@@ -19,8 +19,8 @@ class FileController extends Controller
         );
         if (Auth::User()->id !== RecordFile::find($file_id)->owner_id || Auth::User()->role_id != UserRole::ADMINISTRATOR) {
             return response()->json(
-                ['error' => 'Failed to authorize the request.'],
-                402
+                ['error' => 'Failed to authorize the request.'.Auth::User()->id ." ". RecordFile::find($file_id)->owner_id ],
+                401
             );
         }
         try{
