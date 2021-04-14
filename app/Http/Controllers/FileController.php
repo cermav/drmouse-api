@@ -13,11 +13,13 @@ class FileController extends Controller
 {
     public function getFileURI($file_id)
     {
+        return Auth::User()->id;
         if (!RecordFile::find($file_id)) return response()->json(
             ['error' => 'Failed to authorize the request'],
             401
         );
-        if (Auth::User()->id != RecordFile::find($file_id)->owner_id || Auth::User()->role_id != UserRole::ADMINISTRATOR) {
+        if (Auth::User()->id != RecordFile::find($file_id)->owner_id || Auth::User()->role_id != UserRole::ADMINISTRATOR) 
+        {
             return response()->json(
                 ['error' => 'Failed to authorize the request.'],
                 401
@@ -33,6 +35,5 @@ class FileController extends Controller
             );
         }
         return Storage::download($path);
-
     }
 }
