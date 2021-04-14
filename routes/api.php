@@ -13,6 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::get('/linkstorage', function () {
+    Artisan::call('storage:link');
+});
+
 Auth::routes(['verify' => true]);
 
 /* Api for web */
