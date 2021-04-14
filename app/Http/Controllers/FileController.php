@@ -25,7 +25,7 @@ class FileController extends Controller
         }
         //try catch
         try{
-            $path = RecordFile::where('owner_id', Auth::User()->id)->where('id',$file_id)->first()->uuid;
+            $path = RecordFile::where('owner_id', Auth::User()->id)->where('id',$file_id)->first()->path;
         }
         catch (\Exception $ex) {
             return response()->json(

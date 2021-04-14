@@ -624,14 +624,13 @@ class PetController extends Controller
                             )
                         );
                     }
-
                 else {
-                    $storage_path = "pet_records/" . $owner_id ;
+                        $storage_path = "pet_records/" . $owner_id ;
                         $path = $file->store($storage_path);
                         $path && RecordFile::create([
                             'record_id' => $record_id,
                             'file_name' => $file->getClientOriginalName(),
-                            'uuid' => $path, // prejmenovat
+                            'path' => $path, // prejmenovat
                             'owner_id' => $owner_id
                         ]);
                     }
@@ -651,7 +650,7 @@ class PetController extends Controller
         $owner_id = $this->AuthPet($pet_id);
         
         try {
-            $path = RecordFile::where('record_id', $record_id)->where('id',$file_id)->first()->uuid;
+            $path = RecordFile::where('record_id', $record_id)->where('id',$file_id)->first()->path;
             Storage::delete($path);
             RecordFile::where('record_id', $record_id)->where('id', $file_id)->delete();
             return response()->json("File deleted successfully", JsonResponse::HTTP_OK);
