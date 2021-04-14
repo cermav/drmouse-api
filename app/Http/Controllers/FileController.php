@@ -13,7 +13,9 @@ class FileController extends Controller
 {
     public function getFileURI($file_id)
     {
-        return Auth::User()->id != RecordFile::find($file_id)->owner_id;
+        echo RecordFile::find($file_id)->owner_id;
+        echo Auth::User()->id != RecordFile::find($file_id)->owner_id;
+        return Auth::User()->id;
         if (!RecordFile::find($file_id)) return response()->json(
             ['error' => 'Failed to authorize the request'],
             401
