@@ -626,6 +626,7 @@ class PetController extends Controller
                         );
                     }
                 else {
+                    try{
                         $storage_path = "pet_records/" . $owner_id ;
                         $path = $file->store($storage_path);
                         $path && RecordFile::create([
@@ -634,6 +635,11 @@ class PetController extends Controller
                             'path' => $path, // prejmenovat
                             'owner_id' => $owner_id
                         ]);
+                    }catch(\HttpResponseException $ex) {
+                        return response()->json(
+                            ['error' => $ex]
+                        );
+                    }
                     }
 
                 }

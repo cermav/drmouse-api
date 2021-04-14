@@ -12,7 +12,7 @@ class RecordFile extends Model
             'created_at',
             'record_id',
             'file_name',
-            'uuid',
+            'path',
             'owner_id'
 ];
 }
