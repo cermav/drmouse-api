@@ -17,7 +17,7 @@ class FileController extends Controller
             ['error' => 'Failed to authorize the request'],
             401
         );
-        if (Auth::User()->id !== RecordFile::find($file_id)->owner_id || Auth::User()->role_id != UserRole::ADMINISTRATOR) {
+        if (Auth::User()->id != RecordFile::find($file_id)->owner_id || Auth::User()->role_id != UserRole::ADMINISTRATOR) {
             return response()->json(
                 ['error' => 'Failed to authorize the request.'],
                 401
