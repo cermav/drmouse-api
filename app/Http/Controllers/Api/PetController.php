@@ -511,7 +511,8 @@ class PetController extends Controller
             ]);
             $collection->push($recordCollection);
         }
-        return $collection;
+        //return $collection;
+        return response()->json($collection, JsonResponse::HTTP_OK);
     }
         catch(\HttpResponseException $ex) {
             return response()->json(
@@ -593,6 +594,7 @@ class PetController extends Controller
 
     public function add_files($pet_id, $record_id, Request $request)
     {
+        echo"smrdis";
         $owner_id = $this->AuthPet($pet_id);
         try {
             Record::findOrFail($record_id);
