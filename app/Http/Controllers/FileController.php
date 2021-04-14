@@ -23,7 +23,6 @@ class FileController extends Controller
                 401
             );
         }
-        //try catch
         try{
             $path = RecordFile::where('owner_id', Auth::User()->id)->where('id',$file_id)->first()->path;
         }
@@ -34,7 +33,6 @@ class FileController extends Controller
             );
         }
         return Storage::download($path);
-        //return (new Response($file, 200))->header('Content-Type', 'image/jpeg');
 
     }
 }

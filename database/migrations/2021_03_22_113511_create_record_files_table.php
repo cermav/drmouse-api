@@ -19,7 +19,7 @@ class CreateRecordFilesTable extends Migration
             $table->integer('record_id');
             $table->integer('owner_id');
             $table->string('file_name');
-            $table->string('uuid');
+            $table->string('path');
         });
     }
 

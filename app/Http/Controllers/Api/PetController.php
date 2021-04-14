@@ -615,6 +615,7 @@ class PetController extends Controller
                 $validator = Validator::make((array) $request->getContent(), [
                     'file'.$i => 'file|mimetypes: pdf, docx, jpg, png'
                     ]);
+                    var_dump($validator);
                 if ($validator->fails())
                     {
                         throw new HttpResponseException(
@@ -627,6 +628,7 @@ class PetController extends Controller
                 else {
                         $storage_path = "pet_records/" . $owner_id ;
                         $path = $file->store($storage_path);
+                        var_dump($path);
                         $path && RecordFile::create([
                             'record_id' => $record_id,
                             'file_name' => $file->getClientOriginalName(),
