@@ -579,7 +579,7 @@ class PetController extends Controller
     {
         $owner_id = $this->AuthPet($pet_id);
 
-        $files = RecordFile::where('record_id', $record->id)->get();
+        $files = RecordFile::where('record_id', $record_id)->get();
         $collection = collect([]);
         foreach($files as $file)
         {
@@ -589,12 +589,11 @@ class PetController extends Controller
             ]);
             $collection->push($fileCollection);
         }
-        return $fileCollection;
+        return $collection;
     }
 
     public function add_files($pet_id, $record_id, Request $request)
     {
-        print_r($request->getContent());
         $owner_id = $this->AuthPet($pet_id);
         try {
             Record::findOrFail($record_id);
@@ -633,7 +632,7 @@ class PetController extends Controller
                         $path && RecordFile::create([
                             'record_id' => $record_id,
                             'file_name' => $file->getClientOriginalName(),
-                            'uuid' => $path,
+                            'uuid' => $path, // prejmenovat
                             'owner_id' => $owner_id
                         ]);
                     }
@@ -648,12 +647,14 @@ class PetController extends Controller
         }
     }
 
-    public function remove_file($record_id, $file_name)
+    public function remove_file($pet_id, $record_id, $file_id)
     {
+        $owner_id = $this->AuthPet($pet_id);
+        
         try {
-            $fileUUID = RecordFile::where('record_id', $record_id)->where('file_name',$file_name)->get()->uuid;
-            Storage::disk('public')->delete('pet_records' . DIRECTORY_SEPARATOR . $owner_id . DIRECTORY_SEPARATOR . $record_id . DIRECTORY_SEPARATOR . $fileUUID);
-            RecordFile::where('record_id', $record_id)->where('file_name',$file_name)->delete();
+            $path = RecordFile::where('record_id', $record_id)->where('id',$file_id)->first()->uuid;
+            Storage::delete($path);
+            RecordFile::where('record_id', $record_id)->where('id', $file_id)->delete();
             return response()->json("File deleted successfully", JsonResponse::HTTP_OK);
         }
         catch(\HttpResponseException $ex) {

@@ -122,7 +122,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
             Route::delete('/{record_id}/remove','Api\PetController@remove_record');
             Route::get('/{record_id}/files', 'Api\PetController@get_files');
             Route::get('/{record_id}/download/{file_name}', 'Api\PetController@get_file');
-            Route::delete('/{record_id}/delete/{file_name}','Api\PetController@remove_file');
+            Route::delete('/{record_id}/delete/{file_id}','Api\PetController@remove_file');
             Route::post('/store/{record_id}/files', 'Api\PetController@add_files');
         });
     });
