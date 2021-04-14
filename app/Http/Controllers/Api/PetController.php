@@ -594,7 +594,6 @@ class PetController extends Controller
 
     public function add_files($pet_id, $record_id, Request $request)
     {
-        echo"smrdis";
         $owner_id = $this->AuthPet($pet_id);
         try {
             Record::findOrFail($record_id);
@@ -617,7 +616,7 @@ class PetController extends Controller
                 $validator = Validator::make((array) $request->getContent(), [
                     'file'.$i => 'file|mimetypes: pdf, docx, jpg, png'
                     ]);
-                    var_dump($validator);
+                    print_r($validator);
                 if ($validator->fails())
                     {
                         throw new HttpResponseException(
@@ -630,7 +629,7 @@ class PetController extends Controller
                 else {
                         $storage_path = "pet_records/" . $owner_id ;
                         $path = $file->store($storage_path);
-                        var_dump($path);
+                        print_r($path);
                         $path && RecordFile::create([
                             'record_id' => $record_id,
                             'file_name' => $file->getClientOriginalName(),
