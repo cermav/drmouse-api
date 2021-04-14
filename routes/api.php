@@ -12,11 +12,6 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::get('/linkstorage', function () {
-    Artisan::call('storage:link');
-});
-
 Auth::routes(['verify' => true]);
 
 /* Api for web */
