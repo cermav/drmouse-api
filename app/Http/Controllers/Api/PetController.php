@@ -562,7 +562,7 @@ class PetController extends Controller
         try {
             $files = RecordFile::where('record_id', $record_id)->get();
             foreach ($files as $file){
-                remove_file($pet_id, $record_id, $file->id);
+                $this->remove_file($pet_id, $record_id, $file->id);
             }
             Record::where('id', $record_id)->delete();
             return response()->json("Record and its files deleted successfully", JsonResponse::HTTP_OK);
