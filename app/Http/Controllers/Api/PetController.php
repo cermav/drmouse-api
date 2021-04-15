@@ -662,7 +662,9 @@ class PetController extends Controller
         Record::findOrFail($record_id);
         try {
             $file = RecordFile::findOrFail($file_id)->where('owner_id', $owner_id)->where('record_id', $record_id)->first();
+            var_dump($request);
             $data = json_decode($request);
+            var_dump($data);
             RecordFile::where('id', $file->id)->update([
                'file_name' => $data->name,
             ]);
