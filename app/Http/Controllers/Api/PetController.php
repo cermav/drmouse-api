@@ -663,10 +663,10 @@ class PetController extends Controller
         try {
             $file = RecordFile::findOrFail($file_id)->where('owner_id', $owner_id)->where('record_id', $record_id)->first();
             $data = json_decode($request);
-            RecordFile::update([
+            RecordFile::where('id', $file->id)->update([
                'file_name' => $data->name,
             ]);
-            return response()->json($file);
+            return response()->json("File renamed successfully", JsonResponse::HTTP_OK);
         }
         catch(\HttpResponseException $ex) {
             return response()->json(
