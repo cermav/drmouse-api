@@ -604,6 +604,7 @@ class PetController extends Controller
             );
         }
         try {
+        $filesCollection=collect([]);
         for($i = 0; $request->hasFile('file' . $i); $i++)
         {
             $file = $request->file('file' . $i);
@@ -632,9 +633,12 @@ class PetController extends Controller
                         $path && RecordFile::create([
                             'record_id' => $record_id,
                             'file_name' => $file->getClientOriginalName(),
-                            'path' => $path, // prejmenovat
+                            'path' => $path,
                             'owner_id' => $owner_id
                         ]);
+                            $file_id = RecordFile::where('path', $path)->first()->id;
+                            $newFile = collect([$i => $file_id]);
+                            $filesCollection->push($newFile);
                     }catch(\HttpResponseException $ex) {
                         return response()->json(
                             ['error' => $ex]
@@ -643,7 +647,8 @@ class PetController extends Controller
                     }
 
                 }
-                return response()->json(['status' => 200, 'message' => 'uploaded successfully!']);
+                return response()->json(['status' => 200,
+                'files' => $filesCollection]);
             }
         catch(\HttpResponseException $ex) {
             return response()->json(
