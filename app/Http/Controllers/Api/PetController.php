@@ -499,7 +499,7 @@ class PetController extends Controller
         {
              $fileCollection = collect([
                 'id' => $file->id,
-                'file_name' => $file->file_name,
+                'file_name' => $file->file_name . "." . $file->extension
             ]);
             $fileData->push($fileCollection);
         }
@@ -588,7 +588,7 @@ class PetController extends Controller
         {
              $fileCollection = collect([
                 'id' => $file->id,
-                'file_name' => $file->file_name,
+                'file_name' => $file->file_name . "." . $file->extension
             ]);
             $collection->push($fileCollection);
         }
@@ -633,11 +633,15 @@ class PetController extends Controller
                     try{
                         $storage_path = "pet_records/" . $owner_id ;
                         $path = $file->store($storage_path);
+                        $ext = pathinfo($path, PATHINFO_EXTENSION);
+                        $original_name = $file->getClientOriginalName();
+                        if (strpos($original_name, $ext)) $new_name = rtrim($original_name, "." . $ext);
                         $path && RecordFile::create([
                             'record_id' => $record_id,
-                            'file_name' => $file->getClientOriginalName(),
+                            'file_name' => $new_name,
                             'path' => $path,
-                            'owner_id' => $owner_id
+                            'owner_id' => $owner_id,
+                            'extension' => $ext
                         ]);
                             $file_id = RecordFile::where('path', $path)->first()->id;
                             $newFile = collect(['id' => $file_id]);
@@ -664,11 +668,9 @@ class PetController extends Controller
         $owner_id = $this->AuthPet($pet_id);
         Record::findOrFail($record_id);
         try {
-            $file = RecordFile::findOrFail($file_id)->where('owner_id', $owner_id)->where('record_id', $record_id)->first();
-            var_dump($request);
-            $data = json_decode($request);
-            var_dump($data);
-            RecordFile::where('id', $file->id)->update([
+            $file = RecordFile::where('id',$file_id)->where('owner_id', $owner_id)->where('record_id', $record_id)->first();
+            $data = json_decode($request->getContent());
+            RecordFile::where('id', $file->id)->first()->update([
                'file_name' => $data->name,
             ]);
             return response()->json("File renamed successfully", JsonResponse::HTTP_OK);

@@ -13,6 +13,7 @@ class RecordFile extends Model
             'record_id',
             'file_name',
             'path',
-            'owner_id'
+            'owner_id',
+            'extension'
 ];
 }
