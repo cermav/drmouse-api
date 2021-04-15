@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
 use App\Http\Resources\OpeningHoursResource;
 use DateTime;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\File;
 
 class PetController extends Controller
