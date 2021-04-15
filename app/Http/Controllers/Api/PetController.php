@@ -637,7 +637,7 @@ class PetController extends Controller
                             'owner_id' => $owner_id
                         ]);
                             $file_id = RecordFile::where('path', $path)->first()->id;
-                            $newFile = collect([$i => $file_id]);
+                            $newFile = collect(['id' => $file_id]);
                             $filesCollection->push($newFile);
                     }catch(\HttpResponseException $ex) {
                         return response()->json(
