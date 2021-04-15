@@ -322,7 +322,9 @@ class PetController extends Controller
             return $owners_id;
         } else {
             // return unauthorized
-            throw new AuthenticationException();
+            throw new HttpResponseException(
+                response()->json(401, JsonResponse::HTTP_UNAUTHORIZED)
+            );
         }
     }
     public static function AuthUser(int $id)
