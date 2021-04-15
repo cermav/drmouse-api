@@ -662,9 +662,8 @@ class PetController extends Controller
         Record::findOrFail($record_id);
         try {
             $file = RecordFile::findOrFail($file_id)->where('owner_id', $owner_id)->where('record_id', $record_id)->first();
-            $name = json_decode($request);
             RecordFile::where('id', $file->id)->update([
-               'file_name' => $name,
+               'file_name' => $request->name,
             ]);
             return response()->json("File renamed successfully", JsonResponse::HTTP_OK);
         }
