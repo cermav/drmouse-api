@@ -656,11 +656,30 @@ class PetController extends Controller
             );
         }
     }
+    public function rename_file($pet_id, $record_id, $file_id, Request $request)
+    {
+        $owner_id = $this->AuthPet($pet_id);
+        Record::findOrFail($record_id);
+        try {
+            $file = RecordFile::findOrFail($file_id)->where('owner_id', $owner_id)->where('record_id', $record_id)->first();
+            $data = json_decode($request);
+            RecordFile::update([
+               'file_name' => $data->name,
+            ]);
+            return response()->json($file);
+        }
+        catch(\HttpResponseException $ex) {
+            return response()->json(
+                ['error' => $ex]
+            );
+        }
+        
+    }
+
 
     public function remove_file($pet_id, $record_id, $file_id)
     {
         $owner_id = $this->AuthPet($pet_id);
-        
         try {
             $path = RecordFile::where('record_id', $record_id)->where('id',$file_id)->first()->path;
             Storage::delete($path);

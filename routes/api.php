@@ -119,8 +119,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
             Route::post('/store', 'Api\PetController@add_record');
             Route::put('/{record_id}/update', 'Api\PetController@update_record');
             Route::delete('/{record_id}/remove','Api\PetController@remove_record');
+            // Files
             Route::get('/{record_id}/files', 'Api\PetController@get_files');
             Route::get('/{record_id}/download/{file_name}', 'Api\PetController@get_file');
+            Route::put('/{record_id}/file-rename/{file_id}', 'Api\PetController@rename_file');
             Route::delete('/{record_id}/delete/{file_id}','Api\PetController@remove_file');
             Route::post('/store/{record_id}/files', 'Api\PetController@add_files');
         });
