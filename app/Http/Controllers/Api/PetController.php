@@ -595,9 +595,9 @@ class PetController extends Controller
         }
         return $collection;
     }
-
     public function add_files($pet_id, $record_id, Request $request)
     {
+        $payload = $request->all();
         $owner_id = $this->AuthPet($pet_id);
         try {
             Record::findOrFail($record_id);
@@ -611,57 +611,47 @@ class PetController extends Controller
         $filesCollection=collect([]);
         for($i = 0; $request->hasFile('file' . $i); $i++)
         {
+            $validator = Validator::make($payload, [
+                'file'.$i => 'mimes:doc,docx,pdf,txt, jpg, jpeg, png'
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['errors' => "Uploaded file must be of type: doc, docx, pdf, txt, jpg, jpeg, png"], 422);
+            }
             $file = $request->file('file' . $i);
             $size = $file->getSize();
-                if ($size > 10000000) throw new HttpResponseException(
+            if ($size > 10000000) throw new HttpResponseException(
                     response()->json(
                         ['errors' => "Uploaded file exceeds maximum size of 10Mb"], 422
-                    )
-                );
-                $validator = Validator::make((array) $request->getContent(), [
-                    'file'.$i => 'file|mimetypes: pdf, docx, jpg, png'
+                    ));
+            try{
+                $storage_path = "pet_records/" . $owner_id ;
+                $path = $file->store($storage_path);
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                $original_name = $file->getClientOriginalName();
+                if (strpos($original_name, $ext)) $new_name = rtrim($original_name, "." . $ext);
+                    $path && RecordFile::create([
+                        'record_id' => $record_id,
+                        'file_name' => $new_name,
+                        'path' => $path,
+                        'owner_id' => $owner_id,
+                        'extension' => $ext
                     ]);
-                if ($validator->fails())
-                    {
-                        throw new HttpResponseException(
-                            response()->json(
-                                ['errors' => $validator->errors()],
-                                JsonResponse::HTTP_UNPROCESSABLE_ENTITY
-                            )
-                        );
-                    }
-                else {
-                    try{
-                        $storage_path = "pet_records/" . $owner_id ;
-                        $path = $file->store($storage_path);
-                        $ext = pathinfo($path, PATHINFO_EXTENSION);
-                        $original_name = $file->getClientOriginalName();
-                        if (strpos($original_name, $ext)) $new_name = rtrim($original_name, "." . $ext);
-                        $path && RecordFile::create([
-                            'record_id' => $record_id,
-                            'file_name' => $new_name,
-                            'path' => $path,
-                            'owner_id' => $owner_id,
-                            'extension' => $ext
-                        ]);
-                            $file_id = RecordFile::where('path', $path)->first()->id;
-                            $newFile = collect(['id' => $file_id]);
-                            $filesCollection->push($newFile);
-                    }catch(\HttpResponseException $ex) {
-                        return response()->json(
-                            ['error' => $ex]
-                        );
-                    }
-                    }
-
-                }
-                return response()->json(['status' => 200,
-                'files' => $filesCollection]);
-            }
-        catch(\HttpResponseException $ex) {
-            return response()->json(
-                ['error' => $ex]
-            );
+                $file_id = RecordFile::where('path', $path)->first()->id;
+                $newFile = collect(['id' => $file_id]);
+                $filesCollection->push($newFile);
+            }catch(\HttpResponseException $ex) {
+                return response()->json(
+                    ['error' => $ex]
+                );
+             }
+        }
+        return response()->json(['status' => 200,
+        'files' => $filesCollection]);
+     }
+     catch(\HttpResponseException $ex) {
+    return response()->json(
+        ['error' => $ex]
+    );
         }
     }
     public function rename_file($pet_id, $record_id, $file_id, Request $request)
