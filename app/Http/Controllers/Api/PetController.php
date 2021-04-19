@@ -547,10 +547,11 @@ class PetController extends Controller
     {
         try {
         $this->AuthPet($pet_id);
+        $date = DateTime::createFromFormat('j. n. Y', $request->date);
         Record::where('id', $record_id)->update([
             'description' => $request->description,
             'notes' => $request->notes,
-            'date' => $request->date,
+            'date' => $date,
             'doctor_id' => $request->doctor_id
         ]);
         return response()->json(Record::where('id', $record_id)->first(), JsonResponse::HTTP_OK);
