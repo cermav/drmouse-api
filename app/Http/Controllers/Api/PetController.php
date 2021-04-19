@@ -612,7 +612,7 @@ class PetController extends Controller
         for($i = 0; $request->hasFile('file' . $i); $i++)
         {
             $validator = Validator::make($payload, [
-                'file'.$i => 'mimes:doc,docx,pdf,txt, jpg, jpeg, png'
+                'file'.$i => 'mimes:doc,docx,pdf,txt,jpg,jpeg,png'
             ]);
             if ($validator->fails()) {
                 return response()->json(['errors' => "Uploaded file must be of type: doc, docx, pdf, txt, jpg, jpeg, png"], 422);
