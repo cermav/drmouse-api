@@ -561,7 +561,7 @@ class PetController extends Controller
         $payload = $request->all();
         $validator = Validator::make($payload, [
             'description' => 'required',
-            'notes' => 'string|max:500'
+            'notes' => 'max:500'
         ]);
         if ($validator->fails()) {
             return response()->json(
