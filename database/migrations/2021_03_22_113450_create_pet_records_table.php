@@ -17,8 +17,8 @@ class CreatePetRecordsTable extends Migration
             $table->increments('id');
             $table->integer('pet_id');
             $table->date('date');
-            $table->string('description')->nullable(true)->default(null);
-            $table->string('notes')->nullable(true)->default(null);
+            $table->string('description');
+            $table->string('notes', 500)->nullable(true)->default(null);
             $table->integer('doctor_id')->nullable(true)->default(null);
         });
     }
