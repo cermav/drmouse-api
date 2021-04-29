@@ -528,6 +528,17 @@ class PetController extends Controller
         $owners_id = $this->AuthPet($pet_id);
         try {
         $this->AuthPet($pet_id);
+        $payload = $request->all();
+        $validator = Validator::make($payload, [
+            'description' => 'required',
+            'notes' => 'string|max:500'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(
+                ['errors' => $validator->errors()],
+                JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
         $date = DateTime::createFromFormat('j. n. Y', $request->date);
             return Record::create([
                 'pet_id' => $pet_id,
@@ -547,6 +558,17 @@ class PetController extends Controller
     {
         try {
         $this->AuthPet($pet_id);
+        $payload = $request->all();
+        $validator = Validator::make($payload, [
+            'description' => 'required',
+            'notes' => 'string|max:500'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(
+                ['errors' => $validator->errors()],
+                JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
         $date = DateTime::createFromFormat('j. n. Y', $request->date);
         Record::where('id', $record_id)->update([
             'description' => $request->description,
@@ -615,7 +637,7 @@ class PetController extends Controller
                 'file'.$i => 'mimes:doc,docx,pdf,txt,jpg,jpeg,png'
             ]);
             if ($validator->fails()) {
-                return response()->json(['errors' => "Uploaded file must be of type: doc, docx, pdf, txt, jpg, jpeg, png"], 422);
+                return response()->json(['errors' => "Uploaded file must be of type: doc, docx, pdf, txt, jpg, jpeg, png, odt"], 422);
             }
             $file = $request->file('file' . $i);
             $size = $file->getSize();
