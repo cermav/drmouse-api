@@ -58,6 +58,7 @@ class AppointmentController extends Controller
     //done
     public function detail(int $pet_id, int $id)
     {
+        $this->AuthPet($pet_id);
         $appointment = DB::table('PetAppointment')
             ->where('pet_id', $pet_id)
             ->where('id', $id)
@@ -108,6 +109,7 @@ class AppointmentController extends Controller
                 'date' => $date,
                 'description' => $data->description,
                 'owners_id' => $owners_id,
+                'doctor_id' => $data->doctor_id
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
@@ -158,6 +160,7 @@ class AppointmentController extends Controller
             ->update([
                 'date' => $date,
                 'description' => $request->description,
+                'doctor_id' => $request->doctor_id
             ]);
         return response()->json(
             PetAppointment::find($id),

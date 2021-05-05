@@ -14,5 +14,6 @@ class PetAppointment extends Model
         'updated_at',
         'created_at',
         'pet_id',
+        'doctor_id'
     ];
 }
