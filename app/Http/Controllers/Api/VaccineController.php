@@ -65,7 +65,6 @@ class VaccineController extends Controller
                 'users.avatar',
                 'vaccines.name',
                 'vaccines.company',
-                'vaccines.seen'
             )
             ->get();
         return response()->json($vaccines);
