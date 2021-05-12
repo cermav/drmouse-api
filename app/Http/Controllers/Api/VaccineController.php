@@ -46,7 +46,8 @@ class VaccineController extends Controller
     //TODO Authentication
     public function list()
     {
-        return response()->json(Vaccine::all());
+        $loggedUser = Auth::User();
+        if ($loggedUser->role_id === UserRole::ADMINISTRATOR) return response()->json(Vaccine::all());
     }
     public function index($pet_id)
     {
@@ -64,6 +65,7 @@ class VaccineController extends Controller
                 'users.avatar',
                 'vaccines.name',
                 'vaccines.company',
+                'vaccines.seen'
             )
             ->get();
         return response()->json($vaccines);
@@ -216,6 +218,25 @@ class VaccineController extends Controller
         ) {
             //logged user is authorized
             return;
+        } else {
+            // return unauthorized
+            throw new AuthenticationException();
+        }
+    }
+    public static function setSeen(int $pet_id, int $vaccine_id)
+    {
+        $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
+        $loggedUser = Auth::User();
+        if (
+            $owners_id === $loggedUser->id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            //logged user is authorized
+            PetVaccine::where('id', $vaccine_id)->where('pet_id',$pet_id)->update([
+                'seen' => true
+            ]);
+            return response()->json(JsonResponse::HTTP_OK, 200
+            );
         } else {
             // return unauthorized
             throw new AuthenticationException();

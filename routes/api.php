@@ -154,6 +154,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         'vaccine/{pet_id}/update/{vac_id}',
         'Api\VaccineController@update'
     );
+    Route::put(
+        'vaccine/{pet_id}/setSeen/{vac_id}',
+        'Api\VaccineController@setSeen'
+    );
     Route::delete(
         'vaccine/{pet_id}/remove/{vac_id}',
         'Api\VaccineController@remove'
