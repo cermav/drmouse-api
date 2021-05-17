@@ -46,8 +46,7 @@ class VaccineController extends Controller
     //TODO Authentication
     public function list()
     {
-        $loggedUser = Auth::User();
-        if ($loggedUser->role_id === UserRole::ADMINISTRATOR) return response()->json(Vaccine::all());
+        return response()->json(Vaccine::all());
     }
     public function index($pet_id)
     {
