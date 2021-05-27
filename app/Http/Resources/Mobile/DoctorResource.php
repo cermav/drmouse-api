@@ -36,7 +36,7 @@ class DoctorResource extends JsonResource
             $properties[$item->property_category_id][] = $item->id;
         }
 
-        $scoreQuery = [];
+        /*$scoreQuery = [];
         foreach (ScoreItem::get() as $item) {
             $scoreQuery[] = "(
                 SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
@@ -44,6 +44,17 @@ class DoctorResource extends JsonResource
                 WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
                     AND score_item_id = {$item->id}
             ) AS total_score ";
+        }*/
+
+        // count score
+        $score_sum = 0;
+        $score_count = 0;
+        $score_detail = [];
+        foreach (ScoreItem::get() as $item) {
+            $variable = 'total_score_' . $item->id;
+            $score_detail[$item->id] = $this->$variable;
+            $score_sum += $this->$variable;
+            $score_count++;
         }
 
         return [
@@ -53,7 +64,15 @@ class DoctorResource extends JsonResource
             'email' => $this->user->email,
             'avatar' => $this->user->avatar,
 
-            'total_score' => DB::table('doctors')->select(DB::raw(implode(", ", $scoreQuery)))->where('user_id', $this->user->id)->first()->total_score,
+            /*
+            'score' => (object) [
+               'total' => (int)DB::table('doctors')->select(DB::raw(implode(", ", $scoreQuery)))->where('user_id', $this->user->id)->first()->total_score,
+            ],*/
+
+            'score' => (object) [
+                'total' => $score_sum / $score_count,
+                'detail' => $score_detail,
+            ],
 
             'search_name' => $this->search_name,
             'description' => $this->description,
