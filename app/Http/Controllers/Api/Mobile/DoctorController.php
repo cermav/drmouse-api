@@ -3,6 +3,8 @@
 namespace app\Http\Controllers\Api\Mobile;
 
 use App\Models\Doctor;
+use App\Types\DoctorStatus;
+use App\Models\ScoreItem;
 use App\Http\Resources\Mobile\DoctorResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -18,6 +20,7 @@ class DoctorController extends Controller
      */
     public function index(Request $request)
     {
+
         $whereArray = [['state_id', '=', 3]];
 
         // add update condition
@@ -29,6 +32,45 @@ class DoctorController extends Controller
                 $validatedDate['updated'],
             ];
         }
+
+
+        $scoreQuery = [];
+        foreach (ScoreItem::get() as $item) {
+            $scoreQuery[] = "(
+                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
+                FROM score_details 
+                WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
+                    AND score_item_id = {$item->id}
+            ) AS total_score_{$item->id} ";
+        }
+
+        $doctors = Doctor::where($whereArray)
+            ->select(
+                'doctors.*',
+                DB::raw(implode(", ", $scoreQuery)),
+                DB::raw("IFNULL((
+                    SELECT true
+                    FROM opening_hours
+                    WHERE user_id = doctors.user_id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                      AND (
+                        (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                        OR
+                        opening_hours_state_id = 3
+                      )
+                    LIMIT 1)
+                  , false) AS open ")
+            )
+            ->whereIn('state_id', [
+                DoctorStatus::NEW,
+                DoctorStatus::UNPUBLISHED,
+                DoctorStatus::INCOMPLETE,
+                DoctorStatus::PUBLISHED,
+                DoctorStatus::ACTIVE,
+            ])
+            ->get();
+
+        
+        /*
         return DoctorResource::collection(
             Doctor::where($whereArray)
                 ->select(
@@ -38,6 +80,14 @@ class DoctorController extends Controller
                     )
                 )
                 ->get()
+        );
+        */
+        if (sizeof($doctors) > 0) {
+            return DoctorResource::collection($doctors);
+        }
+        return response()->json(
+            ['message' => 'Not Found!'],
+            JsonResponse::HTTP_NOT_FOUND
         );
     }
 

@@ -31,9 +31,18 @@ class DoctorResource extends JsonResource
         $photos = $this->user->photos->pluck('path');
 
         // split properties
+        /*
         $properties = [];
         foreach ($all_properties as $item) {
             $properties[$item->property_category_id][] = $item->id;
+        }*/
+
+        $properties = [];
+        foreach ($all_properties as $item) {
+            $properties[$item->property_category_id][] = (object) [
+                'id' => $item->id,
+                'name' => $item->name,
+            ];
         }
 
         /*$scoreQuery = [];
@@ -63,12 +72,6 @@ class DoctorResource extends JsonResource
             'name' => $this->user->name,
             'email' => $this->user->email,
             'avatar' => $this->user->avatar,
-
-            /*
-            'score' => (object) [
-               'total' => (int)DB::table('doctors')->select(DB::raw(implode(", ", $scoreQuery)))->where('user_id', $this->user->id)->first()->total_score,
-            ],*/
-
             'score' => (object) [
                 'total' => $score_sum / $score_count,
                 'detail' => $score_detail,
