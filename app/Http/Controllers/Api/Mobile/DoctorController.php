@@ -85,9 +85,7 @@ class DoctorController extends Controller
         if (sizeof($doctors) > 0) {
             return DoctorResource::collection($doctors);
         }
-        return response()->json(
-            ['message' => 'Not Found!'],
-            JsonResponse::HTTP_NOT_FOUND
+        return response()->json((array)[]
         );
     }
 
@@ -99,6 +97,19 @@ class DoctorController extends Controller
     public function create()
     {
         //
+/*
+        $validatedDate = $request->validate(['updated' => 'date']);
+        if (array_key_exists('updated', $validatedDate)) {
+            $whereArray[] = [
+                'doctors.updated_at',
+                '>',
+                $validatedDate['updated'],
+            ];
+        }
+    ThisModel::where($whereArray)->create([
+        'foo' => 'bar,
+    ]);
+*/
     }
 
     /**
