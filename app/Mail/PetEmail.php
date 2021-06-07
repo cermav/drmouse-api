@@ -7,7 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class Petnotification extends Mailable
+class PetEmail extends Mailable
 {
     use Queueable, SerializesModels;
 

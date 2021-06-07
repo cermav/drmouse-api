@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Mail\PetNotification;
+use App\Mail\PetEmail;
 
 class PetNotification implements ShouldQueue
 {
@@ -31,7 +31,7 @@ class PetNotification implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to($email)->send(new PetNotification((object) ['data' => 'test']));
+        Mail::to($email)->send(new PetEmail((object) ['data' => 'test']));
     }
 
 }
