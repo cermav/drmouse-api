@@ -4,25 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Models\Doctor;
-use App\Models\DoctorsLog;
-use App\Models\Member;
 use App\Models\Pet;
 use App\Models\PetAppointment;
-use App\Models\ScoreItem;
 use App\Models\User;
-use App\Http\Controllers\HelperController;
-use App\Types\DoctorStatus;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\DoctorResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Larapack\DoctrineSupport\Connections\MySqlConnection;
 use DateTime;
 
 class AppointmentController extends Controller

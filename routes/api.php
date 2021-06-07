@@ -51,6 +51,11 @@ Route::put(
     'auth/activation/{id}',
     'Api\Auth\ActivationController@activate'
 )->name('member.activation');
+
+
+Route::get('test', 'Api\NewsletterUserController@test');
+
+
 Route::get('email/verify/{id}', 'Api\Auth\VerificationController@verify')->name(
     'verification.verify'
 );

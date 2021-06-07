@@ -8,6 +8,8 @@ use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PetNotification;
 
 class NewsletterUserController extends Controller
 {
@@ -17,6 +19,15 @@ class NewsletterUserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    public function test()
+    {
+        //$email = $user->email;
+        $email = "cermav@gmail.com";
+        Mail::to($email)->send(new PetNotification((object) ['data' => 'test']));
+
+        
+    }
     public function store(Request $request)
     {
         $input = json_decode($request->getContent());
