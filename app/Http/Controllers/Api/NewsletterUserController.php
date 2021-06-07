@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\PetNotification;
+use App\Mail\PetEmail;
 use App\Jobs\PetNotification;
 
 class NewsletterUserController extends Controller
@@ -21,12 +21,11 @@ class NewsletterUserController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     $schedule->job(new PetNotification)->everyFiveMinutes();
     public function test()
     {
         //$email = $user->email;
         $email = "cermav@gmail.com";
-        Mail::to($email)->send(new PetNotification((object) ['data' => 'test']));
+        Mail::to($email)->send(new PetEmail((object) ['data' => 'test']));
 
         
     }
