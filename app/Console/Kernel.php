@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-     $schedule->job(PetNotification::handle())->everyTwoMinutes();
+     $schedule->job(new PetNotification()->handle())->everyTwoMinutes();
         // $schedule->command('inspire')
         //          ->hourly();
     }
