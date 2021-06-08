@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use JWTAuth;
+use App\Helpers\JwtDecoderHelper;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Validator, DB, Hash, Mail, Illuminate\Support\Facades\Password;
 
@@ -75,10 +76,8 @@ class AuthController extends Controller
     public function google(Request $request)
     {
         $header = $request->header('Authorization');
-       // $this->validate($request, ['token' => 'required']);
-        //try {
-            //JWTAuth::invalidate($request->input('token'));
-        return response()->json($header);
+        var_dump();
+        return response()->json(JwtDecoderHelper::decode($header));
     }
 
     public function refresh()
