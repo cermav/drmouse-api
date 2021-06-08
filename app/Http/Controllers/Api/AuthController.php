@@ -78,7 +78,7 @@ class AuthController extends Controller
        // $this->validate($request, ['token' => 'required']);
         //try {
             //JWTAuth::invalidate($request->input('token'));
-        return $header;
+        return response()->json($header);
     }
 
     public function refresh()
