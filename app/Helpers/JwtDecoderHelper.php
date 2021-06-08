@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Auth;
 
 class JwtDecoderHelper
 {
-    public static function decode($jwt = null)
+    public static function decode($jwt)
     {
-        $jwt = $jwt ?? \Auth::getToken();
+        //$jwt = $jwt ?? \Auth::getToken();
 
         if ($jwt) {
             $jwt = list($header, $claims, $signature) = explode('.', $jwt);
