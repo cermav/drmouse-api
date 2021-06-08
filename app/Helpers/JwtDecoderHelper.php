@@ -8,10 +8,10 @@ class JwtDecoderHelper
 {
     public static function decode($jwt)
     {
-        //$jwt = $jwt ?? \Auth::getToken();
-
+        $jwt = $jwt ?? \Auth::getToken();
+        
         if ($jwt) {
-            $jwt = list($header, $claims, $signature) = explode('.', $jwt);
+            list($header, $claims, $signature) = explode('.', $jwt);
 
             $header = self::decodeFragment($header);
             $claims = self::decodeFragment($claims);

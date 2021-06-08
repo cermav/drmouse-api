@@ -79,8 +79,7 @@ class AuthController extends Controller
 
         try {
             $header = $request->header('Authorization');
-            var_dump();
-            return response()->json(JwtDecoderHelper::decode($header));
+            return response()->json(['header' => $header, 200]);
         }
             catch(\HttpResponseException $ex) {
                 return response()->json(
