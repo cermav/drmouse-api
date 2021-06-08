@@ -72,6 +72,15 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
+    public function google(Request $request)
+    {
+        $header = $request->header('Authorization');
+       // $this->validate($request, ['token' => 'required']);
+        //try {
+            //JWTAuth::invalidate($request->input('token'));
+        return $header;
+    }
+
     public function refresh()
     {
         return $this->respondWithToken(auth('api')->refresh());

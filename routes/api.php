@@ -40,6 +40,7 @@ Route::post('score', 'Api\ScoreController@store');
 Route::post('vote', 'Api\ScoreVoteController@store');
 
 Route::post('auth/login', 'Api\AuthController@login');
+Route::get('auth/google', 'Api\AuthController@google');
 Route::post('auth/forgot-password', 'Api\Auth\ForgotPasswordController')->name(
     'forgot.password'
 );
