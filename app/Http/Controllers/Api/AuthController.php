@@ -76,7 +76,14 @@ class AuthController extends Controller
 
     public function google(Request $request)
     {
-
+        /*
+        consume 3rd party API response
+        re-confirm received data with 3rd party API
+        check for existing user account
+        create account from consumed data if no account exists
+        // handle missing data
+        respond with Dr.Mouse bearer token
+        */
         try {
             $header = $request->header('Authorization');
             return response()->json(['header' => $header, 200]);
@@ -86,10 +93,64 @@ class AuthController extends Controller
                     ['error' => $ex]
                 );
             }
-
+    }
+    public function facebook(Request $request)
+    {
+        /*
+        consume 3rd party API response
+        re-confirm received data with 3rd party API
+        check for existing user account
+        create account from consumed data if no account exists
+        // handle missing data
+        respond with Dr.Mouse bearer token
+        */
+        try {
+            //$header = $request->header('Authorization');
+            //json_encode($header);
             
+            $data = json_decode($request->getContent(), true);
+            $token_to_inspect = $data['accessToken'];
+        //get App access token
+            $app_token = $this->GetFbAppToken();
+        // verify received token
+        
+        $client = new \GuzzleHttp\Client();
+        $response = $client->get('https://graph.facebook.com/debug_token?input_token=' . $token_to_inspect . '&access_token=' . $app_token);
+        $body = json_decode($response->getBody()->getContents());
+        $valid = $body->data->is_valid;
+
+        if ($valid){
+            $userMail = $data['email'];
+            $user = User::where('email', $userMail)->first();
+            // try to find user, or register new one
+
+            $token = JWTAuth::fromUser($user);
+            return $this->respondWithToken($token);
+        }
+        else return response()->json(
+            ['error' => $ex], 422
+        );
+    }
+            catch(\HttpResponseException $ex) {
+                return response()->json(
+                    ['error' => $ex]
+                );
+            }
     }
 
+
+
+
+
+    private function GetFbAppToken() {
+    $client = new \GuzzleHttp\Client();
+        $App_Id = 503390981088653;
+        $App_Secret = '991146ba1547cc5ed6211edb4ed3a4f0';
+        //$request = $client->post('https://graph.facebook.com/oauth/access_token?client_id=' . $App_Id . '&client_secret=' . $App_Secret . '&grant_type=client_credentials&redirect_uri=https://drmouse.dev.code8.link&fb_exchange_token=' . $user_token);
+        //var_dump($request);
+        //$response = $request->getBody();
+        return '503390981088653|-voUjASnO7dkAAwGHcVrzswAEUM';
+    }
     public function refresh()
     {
         return $this->respondWithToken(auth('api')->refresh());
