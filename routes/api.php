@@ -41,7 +41,7 @@ Route::post('vote', 'Api\ScoreVoteController@store');
 
 Route::post('auth/login', 'Api\AuthController@login');
 Route::get('auth/google', 'Api\AuthController@google');
-Route::get('auth/facebook', 'Api\AuthController@facebook');
+Route::post('auth/facebook', 'Api\AuthController@facebook');
 Route::post('auth/forgot-password', 'Api\Auth\ForgotPasswordController')->name(
     'forgot.password'
 );
