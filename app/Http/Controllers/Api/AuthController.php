@@ -87,8 +87,7 @@ class AuthController extends Controller
 
     $data = json_decode($request->getContent());
     
-    $id_token = $data->qc->id_token;
-    //echo $id_token;
+    $access_token = $data->qc->id_token;
 
     $jwk = JWKFactory::createFromSecret(
         'gMgRiejAi61op900bOoICxQu',       // The shared secret
@@ -98,7 +97,7 @@ class AuthController extends Controller
         ]
     );
 
-    $jwt = Load::jws($id_token)->key($jwk)->run();
+    $jwt = Load::jws($access_token)->key($jwk)->run();
     return response()->json($jwt);
     
     $client = new \GuzzleHttp\Client();
