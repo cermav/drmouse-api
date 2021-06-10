@@ -11,6 +11,7 @@ use App\Helpers\JwtDecoderHelper;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Validator, DB, Hash, Mail, Illuminate\Support\Facades\Password;
+use Google;
 
 class AuthController extends Controller
 {
@@ -76,6 +77,13 @@ class AuthController extends Controller
 
     public function google(Request $request)
     {
+    require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
+    $data = json_decode($request->getContent());
+    $client = new Google\Client();
+    $client->setAuthConfig(dirname($_SERVER['DOCUMENT_ROOT']) . '/client_credentials.json');
+    $client->authenticate($request->getContent());
+    $access_token = $client->getAccessToken();
+    return response()->json($access_token, 200);
         /*
         consume 3rd party API response
         re-confirm received data with 3rd party API
@@ -85,8 +93,9 @@ class AuthController extends Controller
         respond with Dr.Mouse bearer token
         */
         try {
-            $header = $request->header('Authorization');
-            return response()->json(['header' => $header, 200]);
+            $token = $request->header('Authorization');
+            $userMail = $data->profileObj->email;
+            return response()->json(['token' => $token, 'email' => $userMail], 200);
         }
             catch(\HttpResponseException $ex) {
                 return response()->json(
@@ -128,9 +137,9 @@ class AuthController extends Controller
             return $this->respondWithToken($token);
         }
         else return response()->json(
-            ['error' => $ex], 422
+            ['error' => "not valid"], 422
         );
-    }
+        }
             catch(\HttpResponseException $ex) {
                 return response()->json(
                     ['error' => $ex]
@@ -143,9 +152,9 @@ class AuthController extends Controller
 
 
     private function GetFbAppToken() {
-    $client = new \GuzzleHttp\Client();
-        $App_Id = 503390981088653;
-        $App_Secret = '991146ba1547cc5ed6211edb4ed3a4f0';
+        //$client = new \GuzzleHttp\Client();
+        //$App_Id = 503390981088653;
+        //$App_Secret = '991146ba1547cc5ed6211edb4ed3a4f0';
         //$request = $client->post('https://graph.facebook.com/oauth/access_token?client_id=' . $App_Id . '&client_secret=' . $App_Secret . '&grant_type=client_credentials&redirect_uri=https://drmouse.dev.code8.link&fb_exchange_token=' . $user_token);
         //var_dump($request);
         //$response = $request->getBody();
