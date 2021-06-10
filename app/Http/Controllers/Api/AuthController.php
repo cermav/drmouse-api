@@ -13,6 +13,11 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Validator, DB, Hash, Mail, Illuminate\Support\Facades\Password;
 use Google;
 
+use Jose\Component\Core\JWK;
+use Jose\Easy\Build;
+use Jose\Easy\Load;
+use Jose\Component\KeyManagement\JWKFactory;
+
 class AuthController extends Controller
 {
     /**
@@ -78,12 +83,33 @@ class AuthController extends Controller
     public function google(Request $request)
     {
     require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
+
+
     $data = json_decode($request->getContent());
-    $client = new Google\Client();
-    $client->setAuthConfig(dirname($_SERVER['DOCUMENT_ROOT']) . '/client_credentials.json');
-    $client->authenticate($request->getContent());
-    $access_token = $client->getAccessToken();
-    return response()->json($access_token, 200);
+    
+    $id_token = $data->qc->id_token;
+    //echo $id_token;
+
+    $jwk = JWKFactory::createFromSecret(
+        'gMgRiejAi61op900bOoICxQu',       // The shared secret
+        [                      // Optional additional members
+            'alg' => 'RS256',
+            'use' => 'sig'
+        ]
+    );
+
+    $jwt = Load::jws($id_token)->key($jwk)->run();
+    return response()->json($jwt);
+    
+    $client = new \GuzzleHttp\Client();
+    //$client = new Google\Client();
+    //$client->setAuthConfig(dirname($_SERVER['DOCUMENT_ROOT']) . '/client_credentials.json');
+
+    //$response = $client->get('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' . $id_token);
+    
+    //$client->authenticate($request->getContent());
+    //$access_token = $client->getAccessToken();
+    return response()->json($response, 200);
         /*
         consume 3rd party API response
         re-confirm received data with 3rd party API

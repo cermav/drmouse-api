@@ -19,7 +19,10 @@
         "rebing/graphql-laravel": "^3.1",
         "reliese/laravel": "^0.0.13",
         "tcg/voyager": "^1.1",
-        "tymon/jwt-auth": "1.0.*"
+        "tymon/jwt-auth": "1.0.*",
+        "web-token/jwt-easy": "^2.2",
+        "web-token/jwt-key-mgmt": "^2.2",
+        "web-token/jwt-signature-algorithm-rsa": "^2.2"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
