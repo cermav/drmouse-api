@@ -94,6 +94,10 @@ class AuthController extends Controller
     
     $client_id = "1020802082701-snpg5g9rkrgs6nnln90f6g79nh3t3tj1.apps.googleusercontent.com";
     $id_token = $data->qc->id_token;
+
+    $response = $client->get('https://oauth2.googleapis.com/tokeninfo?id_token=' . $id_token);
+    $response = json_decode($response->getBody()->getContents());
+
     $parts = explode('.', $id_token);
 
     $header = base64_decode($parts[0]);
@@ -101,6 +105,7 @@ class AuthController extends Controller
 
     $body = base64_decode($parts[1]);
     $body = json_decode($body);
+
     
     $signature = base64_decode($parts[2]);
 
@@ -123,17 +128,16 @@ class AuthController extends Controller
     ]);
 
     $key->verify($parts[1], $parts[2]) ? $message = "valid signature" : $message = "invalid signature";
-    echo $message;
-    die();
+    return response()->json($message);
     
     //$client = new Google\Client();
     //$client->setAuthConfig(dirname($_SERVER['DOCUMENT_ROOT']) . '/client_credentials.json');
 
     //$response = $client->get('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' . $id_token);
+    return response()->json($response, 200);
     
     //$client->authenticate($request->getContent());
     //$access_token = $client->getAccessToken();
-    return response()->json($response, 200);
         /*
         consume 3rd party API response
         re-confirm received data with 3rd party API

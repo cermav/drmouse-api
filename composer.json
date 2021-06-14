@@ -16,6 +16,7 @@
         "lorisleiva/laravel-deployer": "^0.2.5",
         "mll-lab/laravel-graphql-playground": "^1.1",
         "orangehill/iseed": "^2.6",
+        "phpseclib/phpseclib": "~3.0",
         "rebing/graphql-laravel": "^3.1",
         "reliese/laravel": "^0.0.13",
         "tcg/voyager": "^1.1",
