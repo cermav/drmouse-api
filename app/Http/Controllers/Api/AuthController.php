@@ -18,6 +18,10 @@ use Jose\Easy\Build;
 use Jose\Easy\Load;
 use Jose\Component\KeyManagement\JWKFactory;
 
+use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib3\Math\BigInteger;
+use phpseclib3\Crypt\RSA;
+
 class AuthController extends Controller
 {
     /**
@@ -83,24 +87,45 @@ class AuthController extends Controller
     public function google(Request $request)
     {
     require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
+    $client = new \GuzzleHttp\Client();
 
 
     $data = json_decode($request->getContent());
     
-    $access_token = $data->qc->id_token;
+    $client_id = "1020802082701-snpg5g9rkrgs6nnln90f6g79nh3t3tj1.apps.googleusercontent.com";
+    $id_token = $data->qc->id_token;
+    $parts = explode('.', $id_token);
 
-    $jwk = JWKFactory::createFromSecret(
-        'gMgRiejAi61op900bOoICxQu',       // The shared secret
-        [                      // Optional additional members
-            'alg' => 'RS256',
-            'use' => 'sig'
-        ]
-    );
+    $header = base64_decode($parts[0]);
+    $header = json_decode($header);
 
-    $jwt = Load::jws($access_token)->key($jwk)->run();
-    return response()->json($jwt);
+    $body = base64_decode($parts[1]);
+    $body = json_decode($body);
     
-    $client = new \GuzzleHttp\Client();
+    $signature = base64_decode($parts[2]);
+
+    $keys = json_decode(file_get_contents('https://www.googleapis.com/oauth2/v3/certs'));
+
+    $kid = $keys->keys[1]->kid;
+    $token_kid = $header->kid;
+
+    if ("accounts.google.com" !== $body->iss) return response()->json(['error' => 'invalid token (iss)'], 422);
+    if ($client_id !== $body->aud) return response()->json(['error' => 'invalid token (aud)'], 422);
+    if ($kid !== $token_kid) return response()->json(['error' => 'invalid token (kid)'], 422);
+    
+    $modulus = $keys->keys[1]->n;
+    $exponent = $keys->keys[1]->e;
+    $alg = $keys->keys[1]->alg;
+
+    $key = PublicKeyLoader::load([
+        'e' => new BigInteger($exponent, 16),
+        'n' => new BigInteger($modulus, 16)
+    ]);
+
+    $key->verify($parts[1], $parts[2]) ? $message = "valid signature" : $message = "invalid signature";
+    echo $message;
+    die();
+    
     //$client = new Google\Client();
     //$client->setAuthConfig(dirname($_SERVER['DOCUMENT_ROOT']) . '/client_credentials.json');
 
