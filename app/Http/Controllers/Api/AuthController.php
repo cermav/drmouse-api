@@ -17,6 +17,7 @@ use Jose\Component\Core\JWK;
 use Jose\Easy\Build;
 use Jose\Easy\Load;
 use Jose\Component\KeyManagement\JWKFactory;
+use Jose\Component\Signature\Algorithm\RS256;
 
 use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Math\BigInteger;
@@ -83,20 +84,35 @@ class AuthController extends Controller
         // all good so return the token
         return $this->respondWithToken($token);
     }
-
+    function base64url_encode($data) {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+      }
+      
+      function base64url_decode($data) {
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+      }
     public function google(Request $request)
     {
     require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
     $client = new \GuzzleHttp\Client();
-
+    $google = new Google\Client();
 
     $data = json_decode($request->getContent());
-    
+    $google->authenticate(json_encode($data));
+    $google->setAuthConfig(dirname($_SERVER['DOCUMENT_ROOT']) . '/client_credentials.json');
+
     $client_id = "1020802082701-snpg5g9rkrgs6nnln90f6g79nh3t3tj1.apps.googleusercontent.com";
+    $google->setDeveloperKey($client_id);
+
     $id_token = $data->qc->id_token;
+
+    
+    $ticket = $google->verifyIdToken($id_token);
+    print_r($ticket);
 
     $response = $client->get('https://oauth2.googleapis.com/tokeninfo?id_token=' . $id_token);
     $response = json_decode($response->getBody()->getContents());
+    print_r($response);
 
     $parts = explode('.', $id_token);
 
@@ -105,11 +121,38 @@ class AuthController extends Controller
 
     $body = base64_decode($parts[1]);
     $body = json_decode($body);
-
     
-    $signature = base64_decode($parts[2]);
+    /*
+    echo "echo parts[2]";
+    echo "\r\n";
+    echo $parts[2];
+    echo "\r\n";
+    echo "\r\n";
+    echo "echo base64_encode(parts[2]);";
+    echo "\r\n";
+    echo base64_encode($parts[2]);
+    echo "\r\n";
+    echo "\r\n";
+    echo "echo base64_decode(parts[2]);";
+    echo "\r\n";
+    echo base64_decode($parts[2]);
+    echo "\r\n";
+    echo "\r\n";
+    echo "echo this->base64url_encode(parts[2]);";
+    echo "\r\n";
+    echo $this->base64url_encode($parts[2]);
+    echo "\r\n";
+    echo "\r\n";
+   echo "echo this->base64url_decode(parts[2]);";
+    echo $this->base64url_decode($parts[2]);
+    */
+    //$signature = base64_encode($parts[2]);
+    $signature = $parts[2];
 
     $keys = json_decode(file_get_contents('https://www.googleapis.com/oauth2/v3/certs'));
+
+    $google_key = file_get_contents('https://www.googleapis.com/oauth2/v1/certs');
+
 
     $kid = $keys->keys[1]->kid;
     $token_kid = $header->kid;
@@ -122,12 +165,20 @@ class AuthController extends Controller
     $exponent = $keys->keys[1]->e;
     $alg = $keys->keys[1]->alg;
 
-    $key = PublicKeyLoader::load([
-        'e' => new BigInteger($exponent, 16),
-        'n' => new BigInteger($modulus, 16)
-    ]);
+    $cert ="-----BEGIN CERTIFICATE-----MIIDJjCCAg6gAwIBAgIIVGBFY93ZYokwDQYJKoZIhvcNAQEFBQAwNjE0MDIGA1UEAxMrZmVkZXJhdGVkLXNpZ25vbi5zeXN0ZW0uZ3NlcnZpY2VhY2NvdW50LmNvbTAeFw0yMTA2MTIwNDI5NTVaFw0yMTA2MjgxNjQ0NTVaMDYxNDAyBgNVBAMTK2ZlZGVyYXRlZC1zaWdub24uc3lzdGVtLmdzZXJ2aWNlYWNjb3VudC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDRi52e+K7A11wKhcQzAyUlaHFZimYB5FdDwN/lsJV/nEVUSYvlqb/ZNNZHBF/fi+om6ganJ/dLvMl4m/wjYvK+anDfctF5ESQ5sK3W6nXskbDn930rYx/n0Sec+R3thQaSVTGN7yvEguJOGI90RoXw/mlF575YPaaZBK6DSuo2Uylp1hVoy/dj8cuv3sd6HUAJGh9h+/aGYZKYLqijRI3h3mA/7+CADOD0qjssNVwGDpNYB8kuHfcaky0AjYw+N3pcUmO75H13rwgMIhSj4ITwrSkBmdcZLxpaWf92mNmGUyNeuBjjbdBrhg2yWg9zCRDbSuTxcZgWvQf/0a5YhpZZAgMBAAGjODA2MAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBYGA1UdJQEB/wQMMAoGCCsGAQUFBwMCMA0GCSqGSIb3DQEBBQUAA4IBAQCrfG7K0x6L/Y9Sj/Au3GraEX3lPScu5AuW7tP26iYMf69n4m8Vi/UtkiHbZJeOWQ0HNgevq50ke8MHXOMBoHMfcjEsPyxufWRtIsqNWnNCWgbfSTIhk/NLHbZKnSbW+qysLcDNMrFc1XEaMR7i0XTQE8tNPfV9NJSI+scn6Oq/z6Tjdw+iSbqkw8n8+PfSRl0J8hx6gEQoKFagw1Zt/jAApSW6SWKby4VwFHgTVDbPwdMV4VbseKKx66Lb8qGPqTu8TM70nQlIHUnbXccalXGOaQsycaaNWPGpychl1JxUftwbdaW/dY5NVpGEwXJ2DRAJiNK6jDcSsrjOJI4d7ukb-----END CERTIFICATE-----";
+    $key = PublicKeyLoader::load($cert);
 
-    $key->verify($parts[1], $parts[2]) ? $message = "valid signature" : $message = "invalid signature";
+    $sign = $this->base64url_decode($parts[2]); // inline signature. I'm using SHA512
+    $data = $parts[0] . $parts[1]; // 64 charactor for SHA512. It's raw data, not hashed data
+    $pubkeyid = openssl_pkey_get_public($cert);
+    $ok = openssl_verify(base64_encode($data), base64_encode($parts[2]), $key);
+    if($ok==1) $message = "valid";
+    if($ok==0) $message = "invalid";
+    if($ok==-1) $message = "ugly";
+    echo $message;
+
+
+    $key->verify($parts[1], $signature) ? $message = "valid signature" : $message = "invalid signature";
     return response()->json($message);
     
     //$client = new Google\Client();
