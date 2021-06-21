@@ -5,11 +5,12 @@ namespace app\Http\Controllers\Api;
 use App\Http\Controllers\HelperController;
 use App\Http\Resources\MemberResource;
 use App\Models\Member;
+use App\Models\Doctor;
+use App\Models\User;
 use App\Types\DoctorStatus;
 use App\Types\MemberStatus;
 use App\Types\UserRole;
 use App\Types\UserState;
-use App\Models\User;
 use App\Utils\ImageHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -113,6 +114,33 @@ class MemberController extends Controller
             ['message' => 'Not Found!'],
             JsonResponse::HTTP_NOT_FOUND
         );
+    }
+    public function showByEmail($email)
+    {
+
+        $user = User::where('email', $email)->first();
+        if (!$user){
+            return response()->json(
+                0, 200
+            );
+        }
+        $member = Member::where('user_id', $user->id)->first();
+        $doctor = Doctor::where('user_id', $user->id)->first();
+        if ($member){
+            $gdpr = $member->gdpr_agreed;
+            if ($gdpr == 1) return response()->json(
+                1, 200
+            );
+            }
+        if ($doctor){
+            $gdpr = $doctor->gdpr_agreed;
+            if ($gdpr == 1) return response()->json(
+                1, 200
+            );
+            }
+            return response()->json(
+                0, 200
+            );
     }
 
     /**
