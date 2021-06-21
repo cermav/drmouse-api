@@ -30,6 +30,7 @@ Route::get('pets', 'Api\PetController@showall');
 Route::get('pets/{id}', 'Api\PetController@showById');
 Route::post('pets', 'Api\PetController@store');
 
+Route::get('members/{mail}', 'Api\MemberController@showByEmail');
 Route::post('members', 'Api\MemberController@store');
 
 // score
