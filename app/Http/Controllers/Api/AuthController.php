@@ -2,6 +2,7 @@
 namespace app\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\MemberController;
 use App\Types\DoctorStatus;
 use App\Models\User;
 use App\Models\Member;
@@ -82,7 +83,6 @@ class AuthController extends Controller
     public function google(Request $request)
     {
         $client = new \GuzzleHttp\Client();
-        $request = new \Illuminate\Http\Request();
 
         $data = json_decode($request->getContent());
 
@@ -143,15 +143,32 @@ class AuthController extends Controller
                    'password' => $password
                   ]
               ];
-              
-               $response = $client->request('POST', env('APP_URL') . "/members", $options);
-   
+           $response = $this->sendRegistrationRequest($options);
+            
            $user = User::where('email', $userMail)->first();
            $token = JWTAuth::fromUser($user);
            
            return $this->respondWithToken($token);
 
         }
+    }
+
+    private function sendRegistrationRequest($options)
+    {
+/*
+        $myRequest = new \Illuminate\Http\Request();
+        $myRequest = $myRequest->replace(['Aa' => 'bar']);
+        //$myRequest = $myRequest->add($options);
+        printf($myRequest);
+        die();
+        $myRequest->setMethod('POST');
+        $myRequest->replace($options);
+        printf($myRequest);
+        $response = (new MemberController)->store($myRequest);
+        printf($response);*/
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('POST', env('APP_URL') . "/members", $options);
+        return $response;
     }
     public function facebook(Request $request)
     {
