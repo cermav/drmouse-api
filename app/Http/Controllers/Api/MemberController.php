@@ -309,6 +309,7 @@ class MemberController extends Controller
     protected function createUser(object $data)
     {
         try {
+            printf($data);
             $singleside = $data->singleSide;
             return User::create([
                 'name' => $data->name,
