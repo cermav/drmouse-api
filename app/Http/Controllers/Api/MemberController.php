@@ -153,7 +153,7 @@ class MemberController extends Controller
     {
         // validate input
         $input = $this->validateRegistration($request);
-
+        var_dump($input);
         // Create user
         $user = $this->createUser($input);
 
