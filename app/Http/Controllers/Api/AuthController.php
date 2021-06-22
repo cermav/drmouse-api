@@ -139,12 +139,14 @@ class AuthController extends Controller
                    'name' => "$profile->givenName $profile->familyName", 
                    'email' => $profile->email,
                    'gdpr' => true,
-                   'password' => $password
+                   'password' => $password,
+                   'singleSide' => true
                   ]
               ];
            $this->sendRegistrationRequest($options);
             
            $user = User::where('email', $userMail)->first();
+           // TODO - send activation request on the fly
            $token = JWTAuth::fromUser($user);
            
            return $this->respondWithToken($token);

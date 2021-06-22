@@ -186,7 +186,8 @@ class MemberController extends Controller
         $member->save();
 
         // send registration email
-        $user->sendMemberRegistrationEmailNotification();
+        $singleSide = json_decode($request->getContent());
+        if (!$singleSide->singleSide || $singleSide->singleSide != true) $user->sendMemberRegistrationEmailNotification();
 
         return response()->json($member, JsonResponse::HTTP_CREATED);
     }
