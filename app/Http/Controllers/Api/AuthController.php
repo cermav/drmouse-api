@@ -146,7 +146,6 @@ class AuthController extends Controller
                   ]
               ];
               
-            return response()->json("request ready");
            $this->sendRegistrationRequest($options);
             
            $user = User::where('email', $userMail)->first();
@@ -173,7 +172,6 @@ class AuthController extends Controller
         printf($response);*/
         $client = new \GuzzleHttp\Client();
         echo env('APP_URL') . "/members";
-        return response()->json($client);
         return response()->json($client);
         return $client->request('POST', env('APP_URL') . "/members", $options);
     }
