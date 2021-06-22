@@ -96,11 +96,10 @@ class AuthController extends Controller
         $client_id = env('GOOGLE_APP_ID');
         $google = new Google\Client(['client_id' => $client_id]);
         
-        return response()->json($client_id);
         // get json from received request
         // get id token from request json
         $id_token = $data->tokenId;
-
+        
         //verify ID token
         $payload = $google->verifyIdToken($id_token);
         if ($payload) {
@@ -110,6 +109,7 @@ class AuthController extends Controller
             return response()->json(['error' => 'invalid token'], 401);
         }
         
+        return response()->json($payload);
         $user = User::where('email', $userMail)->first();
         if ($user) {
             if ($user->gdpr_agreed == 0)
