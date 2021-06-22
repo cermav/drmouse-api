@@ -159,7 +159,6 @@ class AuthController extends Controller
 
     private function sendRegistrationRequest($options)
     {
-        return response()->json($options);
 /*
         $myRequest = new \Illuminate\Http\Request();
         $myRequest = $myRequest->replace(['Aa' => 'bar']);
