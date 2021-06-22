@@ -90,13 +90,13 @@ class AuthController extends Controller
         // http request client
         
         // app id - constant
-        return response()->json($data);
         
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
         
         $client_id = env('GOOGLE_APP_ID');
         $google = new Google\Client(['client_id' => $client_id]);
-
+        
+        return response()->json($client_id);
         // get json from received request
         // get id token from request json
         $id_token = $data->tokenId;
