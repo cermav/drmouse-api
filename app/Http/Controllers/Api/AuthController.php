@@ -139,7 +139,7 @@ class AuthController extends Controller
            $options = [
                'json' => [
                    'name' => "$profile->givenName $profile->familyName", 
-                   'email' => "hanka@dogtown.cz",//$profile->email,
+                   'email' => $profile->email,
                    'gdpr' => true,
                    'password' => $password,
                    'singleSide' => true
@@ -160,7 +160,8 @@ class AuthController extends Controller
     private function sendRegistrationRequest($options)
     {
         $client = new \GuzzleHttp\Client();
-        $url = env('APP_URL') . "/members";
+        // NOTE - URL DEPENDS ON .ENV !!
+        $url = env('APP_URL') . "/api/members";
         $response = $client->request('POST', $url, $options);
         return $response;
     }
