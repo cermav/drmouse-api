@@ -310,6 +310,7 @@ class MemberController extends Controller
     {
         try {
             $singleside = $data->singleSide;
+            var_dump($singleSide);
             return User::create([
                 'name' => $data->name,
                 'email' => $data->email,
