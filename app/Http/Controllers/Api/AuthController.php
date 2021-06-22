@@ -171,8 +171,9 @@ class AuthController extends Controller
         $response = (new MemberController)->store($myRequest);
         printf($response);*/
         $client = new \GuzzleHttp\Client();
-        printf(env('APP_URL') . "/members");
-        return $client->request('POST', env('APP_URL') . "/members", $options);
+        $response = $client->request('POST', env('APP_URL') . "/members", $options);
+        echo "wtf";
+        return $response;
     }
     public function facebook(Request $request)
     {
