@@ -146,7 +146,7 @@ class AuthController extends Controller
                   ]
               ];
               
-           $this->sendRegistrationRequest($options);
+           return $this->sendRegistrationRequest($options);
             
            $user = User::where('email', $userMail)->first();
            // TODO - send activation request on the fly
