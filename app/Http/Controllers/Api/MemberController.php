@@ -165,6 +165,7 @@ class MemberController extends Controller
             'slug' => $this->getSlug($input->name),
             'gdpr_agreed' => true,
             'gdpr_agreed_date' => date('Y-m-d H:i:s'),
+            
         ]);
 
         // TODO: predelat
@@ -313,6 +314,7 @@ class MemberController extends Controller
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
                 'role_id' => UserRole::MEMBER,
+                'email_verified_at' => $data->singleSide && $data->singleSide == true ? date('Y-m-d H:i:s') : NULL
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
