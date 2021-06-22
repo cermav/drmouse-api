@@ -2,7 +2,6 @@
 namespace app\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\MemberController;
 use App\Types\DoctorStatus;
 use App\Models\User;
 use App\Models\Member;
@@ -11,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use JWTAuth;
-use App\Helpers\JwtDecoderHelper;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Tymon\JWTAuth\Exceptions\JWTException;
