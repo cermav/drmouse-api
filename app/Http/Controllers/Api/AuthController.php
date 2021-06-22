@@ -80,6 +80,7 @@ class AuthController extends Controller
 
     public function google(Request $request)
     {
+        
         $client = new \GuzzleHttp\Client();
 
         $data = json_decode($request->getContent());
@@ -89,10 +90,10 @@ class AuthController extends Controller
         // http request client
         
         // app id - constant
+        return response()->json($data);
         
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
         
-        //$client_id = env('GOOGLE_APP_ID');
         $client_id = env('GOOGLE_APP_ID');
         $google = new Google\Client(['client_id' => $client_id]);
 
