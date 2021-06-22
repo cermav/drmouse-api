@@ -18,7 +18,8 @@
         "orangehill/iseed": "^2.6",
         "rebing/graphql-laravel": "^3.1",
         "reliese/laravel": "^0.0.13",
-        "tcg/voyager": "^1.1"
+        "tcg/voyager": "^1.1",
+        "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
