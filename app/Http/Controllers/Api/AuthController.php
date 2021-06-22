@@ -143,7 +143,7 @@ class AuthController extends Controller
                    'password' => $password
                   ]
               ];
-           $response = $this->sendRegistrationRequest($options);
+           $this->sendRegistrationRequest($options);
             
            $user = User::where('email', $userMail)->first();
            $token = JWTAuth::fromUser($user);
@@ -167,8 +167,7 @@ class AuthController extends Controller
         $response = (new MemberController)->store($myRequest);
         printf($response);*/
         $client = new \GuzzleHttp\Client();
-        $response = $client->request('POST', env('APP_URL') . "/members", $options);
-        return $response;
+        return $client->request('POST', env('APP_URL') . "/members", $options);
     }
     public function facebook(Request $request)
     {
