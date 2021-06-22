@@ -105,12 +105,13 @@ class AuthController extends Controller
         if ($payload) {
             $userMail = $payload['email'];
             $userid = $payload['sub'];
+            $emailVerified = $payload['email_verified'];
         } else {
             return response()->json(['error' => 'invalid token'], 401);
         }
         
-        return response()->json($payload);
         $user = User::where('email', $userMail)->first();
+        
         if ($user) {
             if ($user->gdpr_agreed == 0)
             {
@@ -132,6 +133,7 @@ class AuthController extends Controller
             return $this->respondWithToken($token);
         }
         else {
+            return response()->json("user not found without failing");
            $profile = $data->profileObj;
 
            $password = bin2hex(random_bytes(16));
