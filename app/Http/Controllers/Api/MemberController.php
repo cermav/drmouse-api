@@ -309,12 +309,13 @@ class MemberController extends Controller
     protected function createUser(object $data)
     {
         try {
+            $singleside = $data->singleSide;
             return User::create([
                 'name' => $data->name,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
                 'role_id' => UserRole::MEMBER,
-                'email_verified_at' => $data->singleSide && $data->singleSide == true ? date('Y-m-d H:i:s') : NULL
+                'email_verified_at' => $singleside == true ? date('Y-m-d H:i:s') : NULL
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
