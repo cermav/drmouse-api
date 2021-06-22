@@ -310,13 +310,14 @@ class MemberController extends Controller
     {
         try {
             $singleside = $data->singleSide;
-            var_dump($singleSide);
+            if ($singleSide == true) $email_verified = date('Y-m-d H:i:s');
+            else $email_verified = null;
             return User::create([
                 'name' => $data->name,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
                 'role_id' => UserRole::MEMBER,
-                'email_verified_at' => $singleside == true ? date('Y-m-d H:i:s') : NULL
+                'email_verified_at' => $email_verified
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
