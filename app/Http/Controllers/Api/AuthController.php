@@ -165,10 +165,10 @@ class AuthController extends Controller
         $response = $client->request('POST', $url, $options);
         return $response;
     }
+
     public function facebook(Request $request)
     {
         try {
-            
             $data = json_decode($request->getContent(), true);
             $token_to_inspect = $data['accessToken'];
         //get App access token
@@ -184,10 +184,47 @@ class AuthController extends Controller
             $userMail = $data['email'];
             $user = User::where('email', $userMail)->first();
             // try to find user, or register new one
-
-            $token = JWTAuth::fromUser($user);
-            return $this->respondWithToken($token);
-        }
+            if ($user) {
+                if ($user->gdpr_agreed == 0)
+                {
+                    $user->update(['gdpr_agreed' => '1']);
+                }
+                $member = Member::where('user_id', $user->id)->first();
+                $doctor = Doctor::where('user_id', $user->id)->first();
+                if ($member && $member->gdpr_agreed == 0)
+                {
+                    $member->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
+                }
+                if ($doctor && $doctor->gdpr_agreed == 0)
+                {
+                    $doctor->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
+                }
+    
+                $token = JWTAuth::fromUser($user);
+                
+                return $this->respondWithToken($token);
+            }
+            else {
+                // change
+               $password = bin2hex(random_bytes(16));
+               $options = [
+                   'json' => [
+                       // cahnge
+                       'name' => $data['name'], 
+                       'email' => $data['email'],
+                       'gdpr' => true,
+                       'password' => $password,
+                       'singleSide' => true
+                      ]
+                  ];
+                  
+               $this->sendRegistrationRequest($options);
+                
+               $user = User::where('email', $data['email'])->first();
+               $token = JWTAuth::fromUser($user);
+               
+               return $this->respondWithToken($token);
+            }}
         else return response()->json(
             ['error' => "not valid"], 422
         );
@@ -198,10 +235,6 @@ class AuthController extends Controller
                 );
             }
     }
-
-
-
-
 
     private function GetFbAppToken() {
         return '503390981088653|-voUjASnO7dkAAwGHcVrzswAEUM';
