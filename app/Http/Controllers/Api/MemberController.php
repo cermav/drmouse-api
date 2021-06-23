@@ -158,15 +158,17 @@ class MemberController extends Controller
         // Create user
         $user = $this->createUser($input);
 
+        $verified = null;
+        if (isset($input->singleSide) && $input->singleSide) $verified = date('Y-m-d H:i:s');
+
         // Create doctor
         $member = Member::create([
             'user_id' => $user->id,
             'state_id' => UserState::NEW,
             'description' => "",
             'slug' => $this->getSlug($input->name),
-            'gdpr_agreed' => true,
-            'gdpr_agreed_date' => date('Y-m-d H:i:s'),
-            
+            'gdpr_agreed' => 1,
+            'gdpr_agreed_date' => date('Y-m-d H:i:s')
         ]);
 
         // TODO: predelat
@@ -189,7 +191,7 @@ class MemberController extends Controller
 
         // send registration email
         $singleSide = json_decode($request->getContent());
-        if (!$singleSide->singleSide || $singleSide->singleSide != true) $user->sendMemberRegistrationEmailNotification();
+        if (!isset($singleSide->singleSide) || isset($singleSide->singleSide) && (!$singleSide->singleSide || $singleSide->singleSide != true)) $user->sendMemberRegistrationEmailNotification();
 
         return response()->json($member, JsonResponse::HTTP_CREATED);
     }
