@@ -153,7 +153,8 @@ class MemberController extends Controller
     {
         // validate input
         $input = $this->validateRegistration($request);
-        var_dump($input);
+        
+
         // Create user
         $user = $this->createUser($input);
 
@@ -309,15 +310,16 @@ class MemberController extends Controller
     protected function createUser(object $data)
     {
         try {
-            $singleside = $data->singleSide;
-            if ($singleSide == true) $email_verified = date('Y-m-d H:i:s');
-            else $email_verified = null;
+            $activated = null;
+            
+            if (isset($data->singleSide) && $data->singleSide) $activated = date('Y-m-d H:i:s');
             return User::create([
                 'name' => $data->name,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
                 'role_id' => UserRole::MEMBER,
-                'email_verified_at' => $email_verified
+                'email_verified_at' => $activated,
+                'activated_at' => $activated
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
