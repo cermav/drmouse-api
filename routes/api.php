@@ -30,7 +30,7 @@ Route::get('pets', 'Api\PetController@showall');
 Route::get('pets/{id}', 'Api\PetController@showById');
 Route::post('pets', 'Api\PetController@store');
 
-Route::get('members/{mail}', 'Api\MemberController@showByEmail');
+Route::get('members/email/{mail}', 'Api\MemberController@showByEmail');
 Route::post('members', 'Api\MemberController@store');
 
 // score
@@ -88,8 +88,8 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::put('gallery/{id}', 'Api\GalleryController@update');
     Route::delete('gallery/{id}', 'Api\GalleryController@delete');
 
-    Route::get('members/{id}', 'Api\MemberController@show');
-    Route::put('members/{id}', 'Api\MemberController@update');
+    Route::get('members/{id}', 'Api\MemberController@show')->where('id', '[0-9]+');
+    Route::put('members/{id}', 'Api\MemberController@update')->where('id', '[0-9]+');
 
     Route::get('all-pets', 'Api\PetController@showAll');
 
