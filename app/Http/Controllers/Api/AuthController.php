@@ -2,10 +2,13 @@
 namespace app\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\MemberController;
 use App\Types\DoctorStatus;
+use App\Types\UserRole;
 use App\Models\User;
 use App\Models\Member;
 use App\Models\Doctor;
+use App\Helpers\RegistrationHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
@@ -80,90 +83,116 @@ class AuthController extends Controller
 
     public function google(Request $request)
     {
-        
-        $client = new \GuzzleHttp\Client();
+        try {
 
-        $data = json_decode($request->getContent());
+            $client = new \GuzzleHttp\Client();
 
-        // google PHP client
-        
-        // http request client
-        
-        // app id - constant
-        
-        require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
-        
-        $client_id = env('GOOGLE_APP_ID');
-        $google = new Google\Client(['client_id' => $client_id]);
-        
-        // get json from received request
-        // get id token from request json
-        $id_token = $data->tokenId;
-        
-        //verify ID token
-        $payload = $google->verifyIdToken($id_token);
-        if ($payload) {
-            $userMail = $payload['email'];
-            $userid = $payload['sub'];
-            $emailVerified = $payload['email_verified'];
-        } else {
-            return response()->json(['error' => 'invalid token'], 401);
-        }
-        
-        $user = User::where('email', $userMail)->first();
-        
-        if ($user) {
-            if ($user->gdpr_agreed == 0)
-            {
-                $user->update(['gdpr_agreed' => '1']);
+            $data = json_decode($request->getContent());
+
+            // google PHP client
+            
+            // http request client
+            
+            // app id - constant
+            
+            require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
+            
+            $client_id = env('GOOGLE_APP_ID');
+            $google = new Google\Client(['client_id' => $client_id]);
+            
+            // get json from received request
+            // get id token from request json
+            $id_token = $data->tokenId;
+            
+            //verify ID token
+            $payload = $google->verifyIdToken($id_token);
+            if ($payload) {
+                $userMail = $payload['email'];
+                $userid = $payload['sub'];
+                $emailVerified = $payload['email_verified'];
+            } else {
+                return response()->json(['error' => 'invalid token'], 401);
             }
-            $member = Member::where('user_id', $user->id)->first();
-            $doctor = Doctor::where('user_id', $user->id)->first();
-            if ($member && $member->gdpr_agreed == 0)
-            {
-                $member->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
+            
+            $user = null;
+            $userByMail = null;
+            $user = User::where('google_id', $userid)->first();
+
+            // user connected with google account
+            if ($user){
+                $token = JWTAuth::fromUser($user);
+            
+                return $this->respondWithToken($token);
             }
-            if ($doctor && $doctor->gdpr_agreed == 0)
-            {
-                $doctor->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
+           
+            // google id not found
+            if (!$user){
+                $userByMail = User::where('email', $userMail)->first();
             }
 
+            if ($userByMail) {
+                $userByMail->update(['google_id' => $userid]);
+                if ($userByMail->gdpr_agreed == 0)
+                {
+                    $userByMail->update(['gdpr_agreed' => '1']);
+                }
+                // předělat - user typ, podle toho hledat member/doctor
+                $roleID = $userByMail->role_id;
+                if ($roleID == UserRole::DOCTOR){
+                    $doctor = Doctor::where('user_id', $userByMail->id)->first();
+                    if ($doctor && $doctor->gdpr_agreed == 0)
+                    {
+                        $doctor->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
+                    }
+                }
+                if ($roleID == UserRole::MEMBER){
+                    $member = Member::where('user_id', $userByMail->id)->first();
+                    if ($member && $member->gdpr_agreed == 0)
+                    {
+                        $member->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
+                    }
+                }
+                
+
+                $token = JWTAuth::fromUser($userByMail);
+                
+                return $this->respondWithToken($token);
+            }
+            // user not registered
+            else {
+            $profile = $data->profileObj;
+
+            $password = bin2hex(random_bytes(16));
+            $options = (object) [
+                    'name' => "$profile->givenName $profile->familyName", 
+                    'email' => $profile->email,
+                    'gdpr' => true,
+                    'password' => $password,
+                    'google_id' => $userid,
+                    'singleSide' => true
+                ];
+                
+            $this->sendRegistrationRequest($options);
+            
+            $user = User::where('google_id', $userid)->first();
+            // TODO - send activation request on the fly
             $token = JWTAuth::fromUser($user);
             
             return $this->respondWithToken($token);
+
+            }
         }
-        else {
-           $profile = $data->profileObj;
-
-           $password = bin2hex(random_bytes(16));
-           $options = [
-               'json' => [
-                   'name' => "$profile->givenName $profile->familyName", 
-                   'email' => $profile->email,
-                   'gdpr' => true,
-                   'password' => $password,
-                   'singleSide' => true
-                  ]
-              ];
-              
-           $this->sendRegistrationRequest($options);
-            
-           $user = User::where('email', $userMail)->first();
-           // TODO - send activation request on the fly
-           $token = JWTAuth::fromUser($user);
-           
-           return $this->respondWithToken($token);
-
+        catch(\HttpResponseException $ex) {
+            return response()->json(
+                ['error' => $ex]
+            );
         }
     }
 
+    //turn back to private
     private function sendRegistrationRequest($options)
     {
-        $client = new \GuzzleHttp\Client();
-        // NOTE - URL DEPENDS ON .ENV !!
-        $url = env('APP_URL') . "/api/members";
-        $response = $client->request('POST', $url, $options);
-        return $response;
+        return (new RegistrationHelper)->store($options);
     }
 
     public function facebook(Request $request)
@@ -182,48 +211,73 @@ class AuthController extends Controller
 
         if ($valid){
             $userMail = $data['email'];
-            $user = User::where('email', $userMail)->first();
-            // try to find user, or register new one
-            if ($user) {
-                if ($user->gdpr_agreed == 0)
-                {
-                    $user->update(['gdpr_agreed' => '1']);
-                }
-                $member = Member::where('user_id', $user->id)->first();
-                $doctor = Doctor::where('user_id', $user->id)->first();
-                if ($member && $member->gdpr_agreed == 0)
-                {
-                    $member->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
-                }
-                if ($doctor && $doctor->gdpr_agreed == 0)
-                {
-                    $doctor->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
-                }
-    
+            $userid = $data['id'];
+            $name = $data['name'];
+
+            $user = null;
+            $userByMail = null;
+            $user = User::where('facebook_id', $userid)->first();
+
+            // user connected with google account
+            if ($user){
                 $token = JWTAuth::fromUser($user);
+            
+                return $this->respondWithToken($token);
+            }
+
+            if (!$user){
+                $userByMail = User::where('email', $userMail)->first();
+            }
+
+            // try to find user, or register new one
+            if ($userByMail) {
+                $userByMail->update(['facebook_id' => $userid]);
+                if ($userByMail->gdpr_agreed == 0)
+                {
+                    $userByMail->update(['gdpr_agreed' => '1']);
+                }
+                // předělat - user typ, podle toho hledat member/doctor
+                $roleID = $userByMail->role_id;
+                if ($roleID == UserRole::DOCTOR){
+                    $doctor = Doctor::where('user_id', $userByMail->id)->first();
+                    if ($doctor && $doctor->gdpr_agreed == 0)
+                    {
+                        $doctor->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
+                    }
+                }
+                if ($roleID == UserRole::MEMBER){
+                    $member = Member::where('user_id', $userByMail->id)->first();
+                    if ($member && $member->gdpr_agreed == 0)
+                    {
+                        $member->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
+                    }
+                }
+                
+
+                $token = JWTAuth::fromUser($userByMail);
                 
                 return $this->respondWithToken($token);
             }
+
+
             else {
                 // change
                $password = bin2hex(random_bytes(16));
-               $options = [
-                   'json' => [
-                       // cahnge
-                       'name' => $data['name'], 
-                       'email' => $data['email'],
-                       'gdpr' => true,
-                       'password' => $password,
-                       'singleSide' => true
-                      ]
-                  ];
+               $options = (object) [
+                'name' => $name,
+                'email' => $userMail,
+                'gdpr' => true,
+                'password' => $password,
+                'facebook_id' => $userid,
+                'singleSide' => true
+            ];
                   
-               $this->sendRegistrationRequest($options);
+            $this->sendRegistrationRequest($options);
                 
-               $user = User::where('email', $data['email'])->first();
-               $token = JWTAuth::fromUser($user);
+            $user = User::where('facebook_id', $userid)->first();
+            $token = JWTAuth::fromUser($user);
                
-               return $this->respondWithToken($token);
+            return $this->respondWithToken($token);
             }}
         else return response()->json(
             ['error' => "not valid"], 422
