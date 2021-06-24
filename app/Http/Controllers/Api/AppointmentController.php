@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use App\Types\UserRole;
 use App\Models\Doctor;
 use App\Models\Pet;
 use App\Models\PetAppointment;
