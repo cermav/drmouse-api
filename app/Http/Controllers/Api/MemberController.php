@@ -117,7 +117,6 @@ class MemberController extends Controller
     }
     public function showByEmail($email)
     {
-
         $user = User::where('email', $email)->first();
         if (!$user){
             return response()->json(
@@ -151,7 +150,10 @@ class MemberController extends Controller
      */
     public function store(Request $request)
     {
+        //return response()->json($request);
         // validate input
+        
+        return response()->json($this->validateRegistration($request));
         $input = $this->validateRegistration($request);
         
 
@@ -250,6 +252,7 @@ class MemberController extends Controller
     {
         // get data from json
         $input = json_decode($request->getContent());
+        return $input;
         // prepare validator
         $validator = Validator::make((array) $input, [
             'name' => 'required|max:255',
@@ -313,15 +316,22 @@ class MemberController extends Controller
     {
         try {
             $activated = null;
-            
+
+            // verify that SSA ID does not already exist
+            $google_id = null;
+            $facebook_id = null;
             if (isset($data->singleSide) && $data->singleSide) $activated = date('Y-m-d H:i:s');
+            if (isset($data->google_id)) $google_id = $data->google_id;
+            if (isset($data->facebook_id)) $facebook_id = $data->facebook_id;
             return User::create([
                 'name' => $data->name,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
                 'role_id' => UserRole::MEMBER,
                 'email_verified_at' => $activated,
-                'activated_at' => $activated
+                'activated_at' => $activated,
+                'google_id' => $google_id,
+                'facebook_id' => $facebook_id
             ]);
         } catch (\Exception $ex) {
             throw new HttpResponseException(
