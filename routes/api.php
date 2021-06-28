@@ -19,6 +19,7 @@ Route::apiResource('properties', 'Api\PropertyController');
 Route::apiResource('services', 'Api\ServiceController');
 
 Route::get('doctors', 'Api\DoctorController@index');
+
 Route::get('all-doctors', 'Api\DoctorController@showAll');
 Route::get('doctors/{id}', 'Api\DoctorController@show');
 Route::get('doctor-by-slug/{slug}', 'Api\DoctorController@showBySlug');
@@ -56,7 +57,7 @@ Route::put(
 )->name('member.activation');
 
 
-Route::get('test', 'Api\NewsletterUserController@test');
+//Route::get('test', 'Api\NewsletterUserController@test');
 
 
 Route::get('email/verify/{id}', 'Api\Auth\VerificationController@verify')->name(
@@ -79,6 +80,12 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         'auth/change-password/{id}',
         'Api\Auth\ChangePasswordController@update'
     );
+        
+    Route::post('auth/google-pair', 'Api\AuthController@googleLink');
+    Route::post('auth/google-unpair', 'Api\AuthController@googleUnlink');
+    
+    Route::post('auth/facebook-pair', 'Api\AuthController@facebookLink');
+    Route::post('auth/facebook-unpair', 'Api\AuthController@facebookUnlink');
 
     // doctor profile
     Route::put('doctors/{id}', 'Api\DoctorController@update');
@@ -182,6 +189,10 @@ Route::group(['prefix' => 'mobile'], function () {
     Route::apiResource('score-category', 'Api\Mobile\ScoreCategoryController');
     Route::apiResource('services', 'Api\Mobile\ServiceController');
     Route::apiResource('opening-hours', 'Api\Mobile\OpeningHoursController');
+    
+    Route::group(['middleware' => ['jwt.auth']], function () {
+        Route::apiResource('vote', 'Api\Mobile\ScoreVoteController');
+    });
 });
 
 // administration
