@@ -15,6 +15,9 @@ class MemberResource extends JsonResource
      */
     public function toArray($request)
     {
+        $google = $this->user->google_id ? true : false;
+        $facebook = $this->user->facebook_id ? true : false;
+
         return [
             'id' => $this->user->id,
             'name' => $this->user->name,
@@ -34,6 +37,10 @@ class MemberResource extends JsonResource
 
             'created_at' => $this->user->created_at,
             'updated_at' => $this->user->updated_at,
+            
+            'google_account' => $google,
+            'facebook_account' => $facebook,
+
         ];
     }
 }
