@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Member;
 use App\Models\Doctor;
 use App\Helpers\RegistrationHelper;
+use App\Helpers\AuthHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
@@ -84,28 +85,7 @@ class AuthController extends Controller
     public function google(Request $request)
     {
         try {
-
-            $client = new \GuzzleHttp\Client();
-
-            $data = json_decode($request->getContent());
-
-            // google PHP client
-            
-            // http request client
-            
-            // app id - constant
-            
-            require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor/autoload.php';
-            
-            $client_id = env('GOOGLE_APP_ID');
-            $google = new Google\Client(['client_id' => $client_id]);
-            
-            // get json from received request
-            // get id token from request json
-            $id_token = $data->tokenId;
-            
-            //verify ID token
-            $payload = $google->verifyIdToken($id_token);
+            $payload = (new AuthHelper)->GoogleAuth($request);
             if ($payload) {
                 $userMail = $payload['email'];
                 $userid = $payload['sub'];
@@ -198,55 +178,35 @@ class AuthController extends Controller
     public function facebook(Request $request)
     {
         try {
-            $data = json_decode($request->getContent(), true);
-            $token_to_inspect = $data['accessToken'];
-        //get App access token
-            $app_token = $this->GetFbAppToken();
-        // verify received token
-        
-        $client = new \GuzzleHttp\Client();
-        $response = $client->get('https://graph.facebook.com/debug_token?input_token=' . $token_to_inspect . '&access_token=' . $app_token);
-        $body = json_decode($response->getBody()->getContents());
-        $valid = $body->data->is_valid;
-
+        $data = json_decode($request->getContent(), true);
+        $valid = (new AuthHelper)->FacebookAuth($request);
         if ($valid){
-            $userMail = $data['email'];
-            $userid = $data['id'];
-            $name = $data['name'];
-
-            $user = null;
-            $userByMail = null;
-            $user = User::where('facebook_id', $userid)->first();
 
             // user connected with google account
-            if ($user){
+            if ($user = User::where('facebook_id', $data['id'])->first()){
                 $token = JWTAuth::fromUser($user);
             
                 return $this->respondWithToken($token);
             }
 
-            if (!$user){
-                $userByMail = User::where('email', $userMail)->first();
-            }
-
             // try to find user, or register new one
-            if ($userByMail) {
-                $userByMail->update(['facebook_id' => $userid]);
-                if ($userByMail->gdpr_agreed == 0)
+            if ($user = User::where('email', $data['email'])->first()) {
+                $user->update(['facebook_id' => $data['id']]);
+                if ($user->gdpr_agreed == 0)
                 {
-                    $userByMail->update(['gdpr_agreed' => '1']);
+                    $user->update(['gdpr_agreed' => '1']);
                 }
                 // předělat - user typ, podle toho hledat member/doctor
-                $roleID = $userByMail->role_id;
+                $roleID = $user->role_id;
                 if ($roleID == UserRole::DOCTOR){
-                    $doctor = Doctor::where('user_id', $userByMail->id)->first();
+                    $doctor = Doctor::where('user_id', $user->id)->first();
                     if ($doctor && $doctor->gdpr_agreed == 0)
                     {
                         $doctor->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
                     }
                 }
                 if ($roleID == UserRole::MEMBER){
-                    $member = Member::where('user_id', $userByMail->id)->first();
+                    $member = Member::where('user_id', $user->id)->first();
                     if ($member && $member->gdpr_agreed == 0)
                     {
                         $member->update(['gdpr_agreed' => 1, 'gdpr_agreed_date' => date('Y-m-d H:i:s')]);
@@ -254,7 +214,7 @@ class AuthController extends Controller
                 }
                 
 
-                $token = JWTAuth::fromUser($userByMail);
+                $token = JWTAuth::fromUser($user);
                 
                 return $this->respondWithToken($token);
             }
@@ -262,19 +222,18 @@ class AuthController extends Controller
 
             else {
                 // change
-               $password = bin2hex(random_bytes(16));
                $options = (object) [
-                'name' => $name,
-                'email' => $userMail,
+                'name' => $data['name'],
+                'email' => $data['email'],
                 'gdpr' => true,
-                'password' => $password,
-                'facebook_id' => $userid,
+                'password' => bin2hex(random_bytes(16)),
+                'facebook_id' => $data['id'],
                 'singleSide' => true
             ];
                   
             $this->sendRegistrationRequest($options);
                 
-            $user = User::where('facebook_id', $userid)->first();
+            $user = User::where('facebook_id', $data['id'])->first();
             $token = JWTAuth::fromUser($user);
                
             return $this->respondWithToken($token);
@@ -289,10 +248,105 @@ class AuthController extends Controller
                 );
             }
     }
-
-    private function GetFbAppToken() {
-        return '503390981088653|-voUjASnO7dkAAwGHcVrzswAEUM';
+    
+    public function googleLink(Request $request)
+    {
+        try {
+        $loggedUser = Auth::User();
+        $payload = (new AuthHelper)->GoogleAuth($request);
+            if ($payload) {
+                $userid = $payload['sub'];
+            } else {
+                return response()->json(['error' => 'invalid token'], 401);
+            }
+            
+            $user = User::where('google_id', $userid)->first();
+            // user connected with google account
+            if ($user && isset($user->google_id)){
+                return response()->json("Ucet je jiz sparovany.", 200);
+            }
+            else User::where('id', $loggedUser->id)->update(['google_id' => $userid]);
+            return response()->json("Ucet uspesne sparovany.", 200);
+        }
+        catch(\HttpResponseException $ex) {
+            return response()->json(
+                ['error' => $ex]
+            );
+        }
     }
+    public function googleUnlink(Request $request)
+    {
+        try {
+        $loggedUser = Auth::User();
+        $payload = (new AuthHelper)->GoogleAuth($request);
+            if ($payload) {
+                $userid = $payload['sub'];
+            } else {
+                return response()->json(['error' => 'invalid token'], 401);
+            }
+            
+            $user = User::where('google_id', $userid)->first();
+            // user connected with google account
+            if ($user && isset($user->google_id)){
+                $user->update(['google_id' => null]);
+                return response()->json("Ucet uspesne sparovany.", 200);
+            }
+            else return response()->json("Tento ucet neni sparovany.", 200);
+        }
+        catch(\HttpResponseException $ex) {
+            return response()->json(
+                ['error' => $ex]
+            );
+        }
+    }
+    public function facebookLink(Request $request)
+    {
+        try {
+        $loggedUser = Auth::User();
+        $data = json_decode($request->getContent(), true);
+        $valid = (new AuthHelper)->FacebookAuth($request);
+        if ($valid){
+            // user connected with google account
+            $user = User::where('facebook_id', $data['id'])->first();
+            if ($user){
+                return response()->json("Ucet je jiz sparovany.", 200);
+            }
+            else User::where('id', $loggedUser->id)->update(['facebook_id' => $data['id']]);
+            return response()->json("Ucet uspesne sparovany.", 200);
+        }
+    }
+            catch(\HttpResponseException $ex) {
+                return response()->json(
+                    ['error' => $ex]
+                );
+            }
+        
+    }
+
+    public function facebookUnlink(Request $request)
+    {
+        try {
+        $loggedUser = Auth::User();
+        $data = json_decode($request->getContent(), true);
+        $valid = (new AuthHelper)->FacebookAuth($request);
+        if ($valid){
+            // user connected with google account
+            $user = User::where('facebook_id', $data['id'])->first();
+            if ($user){
+                $user->update(['facebook_id' => null]);
+                return response()->json("Sparovani uspesne odstraneno.", 200);
+            }
+            else return response()->json("Tento ucet neni sparovany.", 200);
+        }
+    }
+            catch(\HttpResponseException $ex) {
+                return response()->json(
+                    ['error' => $ex]
+                );
+            }
+        
+    }
+
     public function refresh()
     {
         return $this->respondWithToken(auth('api')->refresh());
