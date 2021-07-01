@@ -83,7 +83,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         
     Route::post('auth/google-pair', 'Api\AuthController@googleLink');
     Route::post('auth/google-unpair', 'Api\AuthController@googleUnlink');
-    
+
     Route::post('auth/facebook-pair', 'Api\AuthController@facebookLink');
     Route::post('auth/facebook-unpair', 'Api\AuthController@facebookUnlink');
 
@@ -191,7 +191,7 @@ Route::group(['prefix' => 'mobile'], function () {
     Route::apiResource('opening-hours', 'Api\Mobile\OpeningHoursController');
     
     Route::group(['middleware' => ['jwt.auth']], function () {
-        Route::apiResource('vote', 'Api\Mobile\ScoreVoteController');
+        Route::apiResource('score-vote', 'Api\Mobile\ScoreVoteController');
     });
 });
 
