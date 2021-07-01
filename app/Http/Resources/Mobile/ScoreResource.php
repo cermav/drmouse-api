@@ -19,6 +19,8 @@ class ScoreResource extends JsonResource
             'user_id' => $this->user_id,
             'comment' => $this->comment,
             'details' => ScoreDetailResource::collection($this->details),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }
