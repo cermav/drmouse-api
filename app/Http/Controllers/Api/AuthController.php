@@ -309,7 +309,7 @@ class AuthController extends Controller
             // user connected with google account
             $user = User::where('facebook_id', $data['id'])->first();
             if ($user){
-                return response()->json("Ucet je jiz sparovany.", 200);
+                return response()->json(["message" => "Ucet je jiz sparovany"], HTTP_CONFLICT);
             }
             else User::where('id', $loggedUser->id)->update(['facebook_id' => $data['id']]);
             return response()->json("Ucet uspesne sparovany.", 200);
@@ -336,7 +336,7 @@ class AuthController extends Controller
                 $user->update(['facebook_id' => null]);
                 return response()->json("Sparovani uspesne odstraneno.", 200);
             }
-            else return response()->json("Tento ucet neni sparovany.", 200);
+            else return response()->json(["message" => "Tento ucet neni sparovany"], HTTP_CONFLICT);
         }
     }
             catch(\HttpResponseException $ex) {
