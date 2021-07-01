@@ -31,7 +31,7 @@ Route::get('pets', 'Api\PetController@showall');
 Route::get('pets/{id}', 'Api\PetController@showById');
 Route::post('pets', 'Api\PetController@store');
 
-Route::get('members/email/{mail}', 'Api\MemberController@showByEmail');
+Route::get('members/email/{mail}', 'Api\MemberController@showByEmail')->where('mail', '[A-Za-z0-9.@+-=?!*&]+');
 Route::post('members', 'Api\MemberController@store');
 
 // score
