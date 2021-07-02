@@ -86,20 +86,12 @@ class AuthController extends Controller
     {
         try {
             $payload = (new AuthHelper)->GoogleAuth($request);
-            if ($payload) {
-                $userMail = $payload['email'];
-                $userid = $payload['sub'];
-                $emailVerified = $payload['email_verified'];
-            } else {
+            if (!$payload) {
                 return response()->json(['error' => 'invalid token'], 401);
             }
-            
-            $user = null;
-            $userByMail = null;
-            $user = User::where('google_id', $userid)->first();
 
             // user connected with google account
-            if ($user){
+            if ($user = User::where('google_id', $payload['sub'])->first()){
                 $token = JWTAuth::fromUser($user);
             
                 return $this->respondWithToken($token);
@@ -107,11 +99,11 @@ class AuthController extends Controller
            
             // google id not found
             if (!$user){
-                $userByMail = User::where('email', $userMail)->first();
+                $userByMail = User::where('email', $payload['email'])->first();
             }
 
             if ($userByMail) {
-                $userByMail->update(['google_id' => $userid]);
+                $userByMail->update(['google_id' => $payload['sub']]);
                 if ($userByMail->gdpr_agreed == 0)
                 {
                     $userByMail->update(['gdpr_agreed' => '1']);
@@ -140,7 +132,7 @@ class AuthController extends Controller
             }
             // user not registered
             else {
-            $profile = $data->profileObj;
+            $profile = json_decode($request->getContent())->profileObj;
 
             $password = bin2hex(random_bytes(16));
             $options = (object) [
@@ -148,13 +140,13 @@ class AuthController extends Controller
                     'email' => $profile->email,
                     'gdpr' => true,
                     'password' => $password,
-                    'google_id' => $userid,
+                    'google_id' => $payload['sub'],
                     'singleSide' => true
                 ];
                 
             $this->sendRegistrationRequest($options);
             
-            $user = User::where('google_id', $userid)->first();
+            $user = User::where('google_id', $payload['sub'])->first();
             // TODO - send activation request on the fly
             $token = JWTAuth::fromUser($user);
             
@@ -263,7 +255,7 @@ class AuthController extends Controller
             $user = User::where('google_id', $userid)->first();
             // user connected with google account
             if ($user && isset($user->google_id)){
-                return response()->json(["message" => "Ucet je jiz sparovany"], HTTP_CONFLICT);
+                return response()->json(["message" => "Tento ucet Google je jiz sparovan s jinym uzivatelem."], 409);
             }
             else User::where('id', $loggedUser->id)->update(['google_id' => $userid]);
             return response()->json("Ucet uspesne sparovany.", 200);
@@ -291,7 +283,7 @@ class AuthController extends Controller
                 $user->update(['google_id' => null]);
                 return response()->json("Ucet uspesne sparovany.", 200);
             }
-            else return response()->json(["message" => "Tento ucet neni sparovany"], HTTP_CONFLICT);
+            else return response()->json(["message" => "Tento ucet neni sparovany"], 409);
         }
         catch(\HttpResponseException $ex) {
             return response()->json(
@@ -309,7 +301,7 @@ class AuthController extends Controller
             // user connected with google account
             $user = User::where('facebook_id', $data['id'])->first();
             if ($user){
-                return response()->json(["message" => "Ucet je jiz sparovany"], HTTP_CONFLICT);
+                return response()->json(["message" => "Tento ucet Facebook je jiz sparovan s jinym uzivatelem."], 409);
             }
             else User::where('id', $loggedUser->id)->update(['facebook_id' => $data['id']]);
             return response()->json("Ucet uspesne sparovany.", 200);
@@ -336,7 +328,7 @@ class AuthController extends Controller
                 $user->update(['facebook_id' => null]);
                 return response()->json("Sparovani uspesne odstraneno.", 200);
             }
-            else return response()->json(["message" => "Tento ucet neni sparovany"], HTTP_CONFLICT);
+            else return response()->json(["message" => "Tento ucet neni sparovany"], 409);
         }
     }
             catch(\HttpResponseException $ex) {
