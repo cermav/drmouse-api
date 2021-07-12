@@ -82,10 +82,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     );
         
     Route::post('auth/google-pair', 'Api\AuthController@googleLink');
-    Route::post('auth/google-unpair', 'Api\AuthController@googleUnlink');
+    Route::get('auth/google-unpair', 'Api\AuthController@googleUnlink');
 
     Route::post('auth/facebook-pair', 'Api\AuthController@facebookLink');
-    Route::post('auth/facebook-unpair', 'Api\AuthController@facebookUnlink');
+    Route::get('auth/facebook-unpair', 'Api\AuthController@facebookUnlink');
 
     // doctor profile
     Route::put('doctors/{id}', 'Api\DoctorController@update');

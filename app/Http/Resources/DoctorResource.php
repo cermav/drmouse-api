@@ -37,6 +37,8 @@ class DoctorResource extends JsonResource
                 'name' => $item->name,
             ];
         }
+        $google = $this->user->google_id ? true : false;
+        $facebook = $this->user->facebook_id ? true : false;
 
         // count score
         $score_sum = 0;
@@ -113,6 +115,9 @@ class DoctorResource extends JsonResource
             'updated_at' => $this->user->updated_at,
             'email_verified_at' => $this->user->email_verified_at,
             'activated_at' => $this->user->activated_at,
+            
+            'google_account' => $google,
+            'facebook_account' => $facebook,
         ];
     }
 }

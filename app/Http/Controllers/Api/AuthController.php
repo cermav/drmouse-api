@@ -266,22 +266,14 @@ class AuthController extends Controller
             );
         }
     }
-    public function googleUnlink(Request $request)
+    public function googleUnlink()
     {
         try {
-        $loggedUser = Auth::User();
-        $payload = (new AuthHelper)->GoogleAuth($request);
-            if ($payload) {
-                $userid = $payload['sub'];
-            } else {
-                return response()->json(['error' => 'invalid token'], 401);
-            }
-            
-            $user = User::where('google_id', $userid)->first();
+        
             // user connected with google account
-            if ($user && isset($user->google_id)){
-                $user->update(['google_id' => null]);
-                return response()->json("Ucet uspesne sparovany.", 200);
+            if ($loggedUser = Auth::User()){
+                $loggedUser->update(['google_id' => null]);
+                return response()->json("Sparovani uspesne odstraneno.", 200);
             }
             else return response()->json(["message" => "Tento ucet neni sparovany"], 409);
         }
@@ -315,22 +307,15 @@ class AuthController extends Controller
         
     }
 
-    public function facebookUnlink(Request $request)
+    public function facebookUnlink()
     {
         try {
-        $loggedUser = Auth::User();
-        $data = json_decode($request->getContent(), true);
-        $valid = (new AuthHelper)->FacebookAuth($request);
-        if ($valid){
-            // user connected with google account
-            $user = User::where('facebook_id', $data['id'])->first();
-            if ($user){
-                $user->update(['facebook_id' => null]);
+            if ($loggedUser = Auth::User()){
+                $loggedUser->update(['facebook_id' => null]);
                 return response()->json("Sparovani uspesne odstraneno.", 200);
             }
             else return response()->json(["message" => "Tento ucet neni sparovany"], 409);
         }
-    }
             catch(\HttpResponseException $ex) {
                 return response()->json(
                     ['error' => $ex]
