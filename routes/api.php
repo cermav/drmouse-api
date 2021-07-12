@@ -193,7 +193,7 @@ Route::group(['prefix' => 'mobile'], function () {
     Route::apiResource('auth/login', 'Api\AuthController@login');
     Route::apiResource('auth/google', 'Api\AuthController@google');
     Route::apiResource('auth/facebook', 'Api\AuthController@facebook');
-    Route::apiResource('members', 'Api\Mobile\MemberController@store');
+    Route::apiResource('members', 'Api\Mobile\MemberController');
     
     Route::group(['middleware' => ['jwt.auth']], function () {
         Route::apiResource('score-vote', 'Api\Mobile\ScoreVoteController');

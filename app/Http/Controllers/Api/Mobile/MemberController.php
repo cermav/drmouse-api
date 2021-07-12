@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Http\Controllers\Api;
+namespace app\Http\Controllers\Api\Mobile;
 
 use App\Http\Controllers\HelperController;
 use App\Http\Resources\MemberResource;
