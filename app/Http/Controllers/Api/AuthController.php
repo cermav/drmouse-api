@@ -8,6 +8,15 @@ use App\Types\UserRole;
 use App\Models\User;
 use App\Models\Member;
 use App\Models\Doctor;
+use App\Models\Pet;
+use App\Models\Photo;
+use App\Models\PetVaccine;
+use App\Models\PetAppointment;
+use App\Models\OpeningHour;
+use App\Models\RecordFile;
+use App\Models\Record;
+use App\Models\DoctorsService;
+use App\Models\DoctorsProperty;
 use App\Helpers\RegistrationHelper;
 use App\Helpers\AuthHelper;
 use Illuminate\Http\Request;
@@ -322,6 +331,89 @@ class AuthController extends Controller
                 );
             }
         
+    }
+
+    public function userDataDeletion(){
+        try {
+            if ($loggedUser = Auth::User()){
+                $roleID = $loggedUser->role_id;
+                if ($roleID == UserRole::DOCTOR && $doctor = Doctor::where('user_id', $loggedUser->id)->first())
+                    {
+                    $openingHours = OpeningHour::where('user_id', $loggedUser->id)->get();
+                    foreach ($openingHours as $item){
+                        $item->delete();
+                        echo "deleted openingHour";
+                    }
+                    $doctorServices = DoctorsService::where('user_id', $loggedUser->id)->get();
+                    foreach ($doctorServices as $item){
+                        $item->delete();
+                        echo "deleted doctorServices";
+                    }
+                    $doctorProperties = DoctorsProperty::where('user_id', $loggedUser->id)->get();
+                    foreach ($doctorProperties as $item){
+                        $item->delete();
+                        echo "deleted doctorProperties";
+                    }
+                    $doctor->delete();
+                    echo "deleted doctor";
+                }
+                if ($roleID == UserRole::MEMBER && $member = Member::where('user_id', $loggedUser->id)->first())
+                {
+                    $member->delete();
+                    echo "deleted member";
+                }
+                $pets = Pet::where('owners_id', $loggedUser->id)->get();
+                foreach ($pets as $pet){
+                    $vaccines = PetVaccine::where('pet_id', $pet->id)->get();
+                    foreach ($vaccines as $item){
+                        $item->delete();
+                        echo "deleted vaccines";
+                    }
+                    $appointments = PetAppointment::where('pet_id', $pet->id)->get();
+                    foreach ($appointments as $item){
+                        $item->delete();
+                        echo "deleted appointments";
+                    }
+                    $records = Record::where('pet_id', $pet->id)->get();
+                    foreach ($records as $item){
+                        $item->delete();
+                        echo "deleted records";
+                    }
+                    $pet->delete();
+                    echo "deleted pet";
+                }
+
+                $recordFiles = RecordFile::where('owner_id', $loggedUser->id)->get();
+                // delete the actual files as well !!
+                foreach ($recordFiles as $item){
+                    $item->delete();
+                    echo "deleted recordFiles";
+                }
+                $favorite_doctors = DB::table('user_favorite_doctors')->where('user_id', $loggedUser->id)->get();
+                var_dump($favorite_doctors);
+                foreach ($favorite_doctors as $item){
+                    $item->delete();
+                    echo "deleted favorite_doctors";
+                }
+                $user = User::where('id', $loggedUser->id)->first();
+                $user->delete();
+                echo "deleted user";
+                $photos = Photo::where('user_id', $loggedUser->id)->get();
+                foreach ($photos as $item){
+                    $item->delete();
+                    echo "deleted photos";
+                }
+                return response()->json(
+                    "all user data successfully deleted.", 200
+                );
+                // hodnocení ?
+            }
+        }
+        catch(\HttpResponseException $ex){
+            return response()->json(
+                ['error' => $ex]
+            );
+        }
     }
 
     public function refresh()

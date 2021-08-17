@@ -86,6 +86,8 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 
     Route::post('auth/facebook-pair', 'Api\AuthController@facebookLink');
     Route::get('auth/facebook-unpair', 'Api\AuthController@facebookUnlink');
+    
+    Route::get('auth/user-data-deletion', 'Api\AuthController@userDataDeletion');
 
     // doctor profile
     Route::put('doctors/{id}', 'Api\DoctorController@update');
@@ -189,11 +191,11 @@ Route::group(['prefix' => 'mobile'], function () {
     Route::apiResource('score-category', 'Api\Mobile\ScoreCategoryController');
     Route::apiResource('services', 'Api\Mobile\ServiceController');
     Route::apiResource('opening-hours', 'Api\Mobile\OpeningHoursController');
+    Route::apiResource('members', 'Api\Mobile\MemberController');
 
     Route::apiResource('auth/login', 'Api\AuthController@login');
     Route::apiResource('auth/google', 'Api\AuthController@google');
     Route::apiResource('auth/facebook', 'Api\AuthController@facebook');
-    Route::apiResource('members', 'Api\Mobile\MemberController');
     
     Route::group(['middleware' => ['jwt.auth']], function () {
         Route::apiResource('score-vote', 'Api\Mobile\ScoreVoteController');

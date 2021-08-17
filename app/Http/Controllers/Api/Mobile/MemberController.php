@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\AuthenticationException;
 
 class MemberController extends Controller
 {
@@ -33,10 +34,6 @@ class MemberController extends Controller
      */
     public function index(Request $request)
     {
-        if (Auth::User()->role_id != UserRole::ADMINISTRATOR) {
-            throw new AuthenticationException();
-        }
-
         // prepare basic select
         $members = DB::table('members')
             ->select(
