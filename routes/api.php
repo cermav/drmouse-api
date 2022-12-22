@@ -18,6 +18,9 @@ Auth::routes(['verify' => true]);
 Route::apiResource('properties', 'Api\PropertyController');
 Route::apiResource('services', 'Api\ServiceController');
 
+/**
+* Doctor
+*/
 Route::get('doctors', 'Api\DoctorController@index');
 
 Route::get('all-doctors', 'Api\DoctorController@showAll');
@@ -27,38 +30,42 @@ Route::get('doctors-search', 'Api\DoctorController@search');
 Route::post('doctors', 'Api\DoctorController@store');
 Route::post('doctor-suggestion', 'Api\DoctorSuggestionController@store');
 
+
+/**
+* Pet
+*/
 Route::get('pets', 'Api\PetController@showall');
 Route::get('pets/{id}', 'Api\PetController@showById');
 Route::post('pets', 'Api\PetController@store');
 
+/**
+* Member
+*/
 Route::get('members/email/{mail}', 'Api\MemberController@showByEmail')->where('mail', '[A-Za-z0-9.@+-=?!*&]+');
 Route::post('members', 'Api\MemberController@store');
 
-// score
+/**
+* Score
+*/
 Route::put('score/{id}', 'Api\ScoreController@update'); // should be under auth, but it is not working now
 Route::get('score', 'Api\ScoreController@index');
 Route::get('score/{id}', 'Api\ScoreController@show');
 Route::post('score', 'Api\ScoreController@store');
 Route::post('vote', 'Api\ScoreVoteController@store');
 
+/**
+* Auth
+*/
 Route::post('auth/login', 'Api\AuthController@login');
 Route::post('auth/google', 'Api\AuthController@google');
 Route::post('auth/facebook', 'Api\AuthController@facebook');
 Route::post('auth/forgot-password', 'Api\Auth\ForgotPasswordController')->name(
     'forgot.password'
 );
-Route::post(
-    'auth/reset-password',
-    'Api\Auth\ResetPasswordController@reset'
-)->name('reset.password');
-Route::put(
-    'auth/activation/{id}',
-    'Api\Auth\ActivationController@activate'
-)->name('member.activation');
-
+Route::post('auth/reset-password', 'Api\Auth\ResetPasswordController@reset')->name('reset.password');
+Route::put('auth/activation/{id}', 'Api\Auth\ActivationController@activate')->name('member.activation');
 
 //Route::get('test', 'Api\NewsletterUserController@test');
-
 
 Route::get('email/verify/{id}', 'Api\Auth\VerificationController@verify')->name(
     'verification.verify'
@@ -71,8 +78,13 @@ Route::get(
     'Api\NewsletterUserController@verify'
 )->name('newsletter.verify');
 
+/**
+* Authorized access
+*/
 Route::group(['middleware' => ['jwt.auth']], function () {
-    // auth
+    /**
+    * Auth
+    */
     Route::get('auth/info', 'Api\AuthController@info');
     Route::get('auth/refresh', 'Api\AuthController@refresh');
     Route::get('auth/logout', 'Api\AuthController@logout');
@@ -80,14 +92,20 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         'auth/change-password/{id}',
         'Api\Auth\ChangePasswordController@update'
     );
-        
+
     Route::post('auth/google-pair', 'Api\AuthController@googleLink');
     Route::get('auth/google-unpair', 'Api\AuthController@googleUnlink');
 
     Route::post('auth/facebook-pair', 'Api\AuthController@facebookLink');
     Route::get('auth/facebook-unpair', 'Api\AuthController@facebookUnlink');
-    
+
     Route::get('auth/user-data-deletion', 'Api\AuthController@userDataDeletion');
+
+    /**
+    * Event
+    */
+    Route::get('event/{user_id}', 'Api\EventController@index');
+    Route::post('event/create', 'Api\EventController@create');
 
     // doctor profile
     Route::put('doctors/{id}', 'Api\DoctorController@update');
@@ -196,7 +214,7 @@ Route::group(['prefix' => 'mobile'], function () {
     Route::apiResource('auth/login', 'Api\AuthController@login');
     Route::apiResource('auth/google', 'Api\AuthController@google');
     Route::apiResource('auth/facebook', 'Api\AuthController@facebook');
-    
+
     Route::group(['middleware' => ['jwt.auth']], function () {
         Route::apiResource('score-vote', 'Api\Mobile\ScoreVoteController');
     });
