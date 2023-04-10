@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 
-class Doctor extends Model
-{
+/**
+ * @method static where(string $string, $id)
+ */
+class Doctor extends Model {
     use HasRelationships;
 
     /**
@@ -38,25 +41,30 @@ class Doctor extends Model
         'gdpr_agreed_date',
         'gdpr_agreed_ip',
         'profile_completedness',
+        'ICO',
+        'DIC',
+        'bank_account'
     ];
 
     /*
      * Specify default order
      * Use Doctor::withoutGlobalScope('order')->get() if you don't want to apply default order rules
      */
-    protected static function boot()
-    {
+    protected static function boot() {
         parent::boot();
         static::addGlobalScope('order', function (Builder $builder) {
-            $builder->orderBy('search_name', 'asc');
+            $builder->orderBy('search_name');
         });
     }
 
     /**
      * Get the user that owns the doctor.
      */
-    public function user()
-    {
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function priceCharts(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany(PriceChart::class);
     }
 }

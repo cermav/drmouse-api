@@ -2,25 +2,28 @@
 
 namespace App\Http\Resources;
 
-use App\Models\ScoreItem;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MemberResource extends JsonResource
-{
+/**
+ * @property mixed $user
+ */
+class MemberResource extends JsonResource {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return array
      */
-    public function toArray($request)
-    {
-        $google = $this->user->google_id ? true : false;
-        $facebook = $this->user->facebook_id ? true : false;
+    public function toArray($request): array {
+        $google = (bool)$this->user->google_id;
+        $facebook = (bool)$this->user->facebook_id;
 
         return [
             'id' => $this->user->id,
             'name' => $this->user->name,
+            'firstName' => $this->user->firstName,
+            'lastName' => $this->user->lastName,
             'email' => $this->user->email,
             'avatar' => $this->user->avatar,
             'last_pet' => $this->user->last_pet,
@@ -37,7 +40,7 @@ class MemberResource extends JsonResource
 
             'created_at' => $this->user->created_at,
             'updated_at' => $this->user->updated_at,
-            
+
             'google_account' => $google,
             'facebook_account' => $facebook,
 

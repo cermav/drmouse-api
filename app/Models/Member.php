@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Database\Eloquent\Model;
 
-class Member extends Model
-{
+/**
+ * @method static where(string $string, int $id)
+ */
+class Member extends Model {
     use HasRelationships;
 
     /**
@@ -27,8 +28,7 @@ class Member extends Model
     /**
      * Get the user that owns the doctor.
      */
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

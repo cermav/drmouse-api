@@ -4,13 +4,16 @@ namespace App\Models;
 
 use App\Notifications\RegistartionMemberEmail;
 use App\Notifications\RegistrationDoctorEmail;
-use Illuminate\Notifications\Notifiable;
-use App\Notifications\VerifyEmail;
 use App\Notifications\ResetPasswordEmail;
+use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends \TCG\Voyager\Models\User implements JWTSubject
-{
+/**
+ * @method static Find(int $id)
+ * @method static where(string $string, $id)
+ * @method static create(array $array)
+ */
+class User extends \TCG\Voyager\Models\User implements JWTSubject {
     use Notifiable;
 
     /**
@@ -20,6 +23,8 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      */
     protected $fillable = [
         'name',
+        'firstName',
+        'lastName',
         'email',
         'avatar',
         'password',
@@ -36,29 +41,27 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password',
+                         'remember_token'];
 
     /**
      * Get the doctor record associated with the user.
      */
-    public function doctor()
-    {
+    public function doctor(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne('App\Models\Doctor');
     }
 
     /**
      * Get doctor's opening hours
      */
-    public function openingHours()
-    {
+    public function openingHours(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany('App\Models\OpeningHour');
     }
 
     /**
      * Get doctor's properties
      */
-    public function properties()
-    {
+    public function properties(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
         return $this->belongsToMany(
             'App\Models\Property',
             'doctors_properties'
@@ -68,8 +71,7 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
     /**
      * Get doctor's services
      */
-    public function services()
-    {
+    public function services(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
         return $this->belongsToMany(
             'App\Models\Service',
             'doctors_services'
@@ -79,29 +81,25 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
     /**
      * Get doctor's photos
      */
-    public function photos()
-    {
+    public function photos(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany('App\Models\Photo');
     }
 
     /**
      * Get doctor's score
      */
-    public function scores()
-    {
+    public function scores(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany('App\Models\Score')->orderBy(
             'created_at',
             'desc'
         );
     }
 
-    public function getJWTIdentifier()
-    {
+    public function getJWTIdentifier() {
         return $this->getKey();
     }
 
-    public function getJWTCustomClaims()
-    {
+    public function getJWTCustomClaims(): array {
         return [
             'id' => $this->id,
             'role_id' => $this->role_id,
@@ -116,8 +114,7 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      *
      * @return void
      */
-    public function sendDoctorRegistrationEmailNotification()
-    {
+    public function sendDoctorRegistrationEmailNotification() {
         $this->notify(new RegistrationDoctorEmail()); // my notification
     }
 
@@ -126,16 +123,14 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      *
      * @return void
      */
-    public function sendMemberRegistrationEmailNotification()
-    {
+    public function sendMemberRegistrationEmailNotification() {
         $this->notify(new RegistartionMemberEmail()); // my notification
     }
 
     /**
      * Send a password reset email to the user
      */
-    public function sendPasswordResetNotification($token)
-    {
+    public function sendPasswordResetNotification($token) {
         $this->notify(new ResetPasswordEmail($token));
     }
 }

@@ -2,26 +2,31 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Types\UserRole;
-use App\Models\Doctor;
+use App\Helpers\AuthHelper;
+use App\Http\Controllers\Controller;
 use App\Models\Pet;
 use App\Models\PetAppointment;
-use App\Models\User;
+use App\Types\UserRole;
+use DateTime;
+use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use DateTime;
+use Symfony\Component\HttpFoundation\Response;
 
-class AppointmentController extends Controller
-{
-    //GET appointments list
-    //done
-    public function index($pet_id)
-    {
+/**
+ *
+ */
+class AppointmentController extends Controller {
+    /**
+     * @param $pet_id
+     * @return JsonResponse list of pet appointments
+     */
+    public function index($pet_id): JsonResponse {
         if (
             Auth::user()->id ==
             DB::table('pets')
@@ -34,9 +39,11 @@ class AppointmentController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
-    //done
-    public function showAll()
-    {
+
+    /**
+     * @return JsonResponse
+     */
+    public function showAll(): JsonResponse {
         $loggedUser = Auth::User();
         if ($loggedUser->role_id === UserRole::ADMINISTRATOR) {
             $appointment = PetAppointment::all();
@@ -45,170 +52,156 @@ class AppointmentController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
-    //GET appointment by appointment ID
-    //done
-    public function detail(int $pet_id, int $id)
-    {
-        $this->AuthPet($pet_id);
-        $appointment = DB::table('PetAppointment')
-            ->where('pet_id', $pet_id)
-            ->where('id', $id)
-            ->get();
+
+    /**
+     * @param int $pet_id
+     * @param int $id
+     * @return JsonResponse
+     * @throws AuthenticationException
+     * @throws AuthenticationException
+     */
+    public function detail(int $pet_id, int $id): JsonResponse {
+        $this->authorizeUser($pet_id);
+
+        $appointment = PetAppointment::Find($id)->where('pet_id', $pet_id)->get();
         return response()->json($appointment);
     }
-    // POST add appointment
-    //done
-    public function store(Request $request, int $pet_id)
-    {
-        //get id of pets owner
-        $owners_id = DB::table('pets')
-            ->where('id', $pet_id)
-            ->first()->owners_id;
-        //authorize user vs owner
-        $this->AuthUser($owners_id);
-        //validate input
-        $input = $this->validateRegistration($request);
-        //create input
-        if (
-            DB::table('pets')
-                ->where('id', $pet_id)
-                ->first()->owners_id === Auth::User()->id
-        ) {
-            $object = json_decode(json_encode($input), false);
 
-            $appointment = $this->createAppointment(
-                $object,
-                $pet_id,
-                $owners_id
-            );
-            //add input to database
-            $appointment->save();
-            //respond
-            return response()->json($appointment, JsonResponse::HTTP_CREATED);
-        } else {
-            return response()->json("Unauthorized", 401);
-        }
+    /**
+     * @param Request $request
+     * @param int $pet_id
+     * @return JsonResponse
+     * @throws AuthenticationException
+     */
+    public function store(Request $request, int $pet_id): JsonResponse {
+        $this->authorizeUser($pet_id);
+
+        $input = $this->validateInputData($request);
+
+        $object = json_decode(json_encode($input), false);
+
+        $appointment = $this->createAppointment(
+            $object,
+            $pet_id,
+            Auth::user()->id
+        );
+
+        $appointment->save();
+
+        return response()->json($appointment, Response::HTTP_CREATED);
     }
-    //create Appointment for POST add appointment
-    //done
-    public function createAppointment(object $data, int $pet_id, int $owners_id)
-    {
-        $date = DateTime::createFromFormat('j. n. Y', $data->date);
+
+    /**
+     * @param object $data
+     * @param int $pet_id
+     * @param int $owners_id
+     * @return mixed
+     * @throws AuthenticationException
+     */
+    private
+    function createAppointment(object $data, int $pet_id, int $owners_id) {
+        $this->authorizeUser($pet_id);
         try {
             return PetAppointment::create([
+                'title' => $data->title,
                 'pet_id' => $pet_id,
-                'date' => $date,
-                'description' => $data->description,
+                'date' => DateTime::createFromFormat('j. n. Y', $data->date),
                 'owners_id' => $owners_id,
-                'doctor_id' => $data->doctor_id
+                'doctor_id' => $data->doctor_id,
+                'start' => $data->start,
+                'end' => $data->end,
+                'allDay' => !$data->start && !$data->end
             ]);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             throw new HttpResponseException(
                 response()->json(
                     [
                         'errors' =>
                             "Error creating appointment: " . $ex->getMessage(),
                     ],
-                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                    Response::HTTP_UNPROCESSABLE_ENTITY
                 )
             );
         }
     }
-    // DEL remove appointment
-    //TODO Authentication
-    //done
-    public function remove(int $pet_id, int $id)
-    {
-        try {
-            $this->AuthUser(
-                DB::table('pets')
-                    ->where('id', $pet_id)
-                    ->first()->owners_id
-            );
-        } catch (\Exception $e) {
-            return response()->json("non-existent pet or appointment", 404);
-        }
+
+    /**
+     * @param int $pet_id
+     * @param int $id
+     * @return JsonResponse
+     * @throws AuthenticationException
+     */
+    public
+    function remove(int $pet_id, int $id): JsonResponse {
+        $this->authorizeUser($pet_id);
 
         PetAppointment::where('id', $id)
             ->where('pet_id', $pet_id)
             ->delete();
-        return response()->json("Deleted", JsonResponse::HTTP_OK);
+        return response()->json("Deleted", Response::HTTP_OK);
     }
-    // PUT Update appointment
-    //TODO Authentication
-    //done
-    public function update(Request $request, int $pet_id, int $id)
-    {
-        // verify user
-        $this->AuthPet($pet_id);
-        PetAppointment::where('pet_id', $pet_id)
+
+    /**
+     * @param Request $request
+     * @param int $pet_id
+     * @param int $id
+     * @return JsonResponse
+     * @throws AuthenticationException
+     * @throws AuthenticationException
+     */
+    public
+    function update(Request $request, int $pet_id, int $id): JsonResponse {
+        $this->authorizeUser($pet_id);
+
+        $appointment = PetAppointment::where('pet_id', $pet_id)
             ->where('id', $id)
             ->FirstOrFail();
-        $input = $this->validateRegistration($request, $id);
-        $date = DateTime::createFromFormat('j. n. Y', $request->date);
-        PetAppointment::where('id', $id)
-            ->where('pet_id', $pet_id)
-            ->update([
-                'date' => $date,
-                'description' => $request->description,
-                'doctor_id' => $request->doctor_id
-            ]);
+
+        $this->validateInputData($request);
+
+        $appointment->update([
+            'date' => DateTime::createFromFormat('j. n. Y', $request->date),
+            'title' => $request->title,
+            'doctor_id' => $request->doctor_id
+        ]);
         return response()->json(
             PetAppointment::find($id),
-            JsonResponse::HTTP_OK
+            Response::HTTP_OK
         );
     }
-    protected function validateRegistration(Request $request)
-    {
-        // get data from json
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    private
+    function validateInputData(Request $request) {
         $input = json_decode($request->getContent(), true);
-        // prepare validator
-        $validator = Validator::make((array) $input, [
+
+        $validator = Validator::make((array)$input, [
             'date' => 'required',
-            'description' => 'required',
+            'title' => 'required',
         ]);
 
         if ($validator->fails()) {
             throw new HttpResponseException(
                 response()->json(
                     ['errors' => $validator->errors()],
-                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                    Response::HTTP_UNPROCESSABLE_ENTITY
                 )
             );
         }
 
         return $input;
     }
-    public function AuthUser(int $id)
-    {
-        $requestUser = User::Find($id);
-        $loggedUser = Auth::User();
 
-        if (
-            $requestUser->id === $loggedUser->id ||
-            $loggedUser->role_id === UserRole::ADMINISTRATOR
-        ) {
-            //logged user is authorized
-            return;
-        } else {
-            // return unauthorized
-            throw new AuthenticationException();
-        }
-    }
-    public function AuthPet(int $pet_id)
-    {
-        $requestUser = Pet::Find($pet_id);
-        $loggedUser = Auth::User();
+    /**
+     * @throws AuthenticationException
+     */
+    private function authorizeUser(int $pet_id): Pet {
+        $pet = Pet::findOrFail($pet_id);
+        AuthHelper::authorizeUser($pet->owners_id);
 
-        if (
-            $requestUser->owners_id === $loggedUser->id ||
-            $loggedUser->role_id === UserRole::ADMINISTRATOR
-        ) {
-            //logged user is authorized
-            return;
-        } else {
-            // return unauthorized
-            throw new AuthenticationException();
-        }
+        return $pet;
     }
 }

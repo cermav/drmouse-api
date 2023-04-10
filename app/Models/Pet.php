@@ -4,8 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Pet extends Model
-{
+/**
+ * @method static Find(int $pet_id)
+ * @method static where(string $string, $id)
+ * @method static create(array $array)
+ * @method static findOrFail(int $pet_id)
+ */
+class Pet extends Model {
     protected $fillable = [
         'owners_id',
         'pet_name',
@@ -17,8 +22,8 @@ class Pet extends Model
         'background',
         'avatar',
     ];
-    public function vaccine()
-    {
+
+    public function vaccine(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany(PetVaccine::class);
     }
 }

@@ -2,54 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use DateTime;
+use App\Helpers\AuthHelper;
+use App\Http\Controllers\Controller;
 use App\Models\Pet;
-use App\Models\Vaccine;
 use App\Models\PetVaccine;
-use App\Models\PetAppointment;
-use App\Models\Member;
-use App\Models\ScoreItem;
-use App\Models\DoctorsLog;
 use App\Models\User;
-use App\Models\Doctor;
-use App\Http\Controllers\HelperController;
-use App\Types\DoctorStatus;
+use App\Models\Vaccine;
 use App\Types\UserRole;
-use Illuminate\Http\Request;
+use DateTime;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\DoctorResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-class VaccineController extends Controller
-{
-    //GET all as admin
-    //TODO Authentication
-    //done
-    public function showAll()
-    {
-        $loggedUser = Auth::User();
-        if ($loggedUser->role_id === UserRole::ADMINISTRATOR) {
-            $vaccines = PetVaccine::all();
-            return response()->json($vaccines);
-        } else {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-    }
-    //GET vaccines from pet ID
-    //TODO Authentication
-    public function list()
-    {
-        return response()->json(Vaccine::all());
-    }
-    public function index($pet_id)
-    {
+class VaccineController extends Controller {
+    public function index($pet_id) {
         $this->AuthPet($pet_id);
         $vaccines = Pet::find($pet_id)
             ->vaccine()
@@ -63,24 +33,25 @@ class VaccineController extends Controller
                 'doctors.street',
                 'users.avatar',
                 'vaccines.name',
-                'vaccines.company',
+                'vaccines.company'
             )
             ->get();
         return response()->json($vaccines);
     }
 
-    public function detail(int $user_id, int $pet_id)
-    {
-        PetController::AuthUser($user_id);
+    /**
+     * @throws AuthenticationException
+     */
+    public function detail(int $user_id, int $pet_id) {
+        AuthHelper::authorizeUser($user_id);
+
         $vaccines = Pet::find($pet_id)
             ->vaccine()
             ->first();
         return response()->json($vaccines);
     }
-    // POST add vaccine by pet_id
-    public function store(Request $request, $pet_id)
-    {
-        // validate input
+
+    public function store(Request $request, $pet_id) {
         //PetController::AuthPet($pet_id);
         Pet::FindOrFail($pet_id);
         $input = $this->validateRegistration($request);
@@ -103,9 +74,8 @@ class VaccineController extends Controller
     //create vaccine for POST add vaccine
     //TODO Authentication
     //done
-    public function AddVaccine(object $data, $pet_id)
-    {
-        $validator = Validator::make((array) $data, [
+    public function AddVaccine(object $data, $pet_id) {
+        $validator = Validator::make((array)$data, [
             'description' => 'required|string|max:100',
             'apply_date' => 'required',
             'pet_id' => 'required|integer',
@@ -131,9 +101,9 @@ class VaccineController extends Controller
             'color' => rand(0, 7)
         ]);
     }
+
     // DEL remove appointment
-    public function remove(int $pet_id, int $vac_id)
-    {
+    public function remove(int $pet_id, int $vac_id) {
         try {
             $this->AuthUser(Pet::where('id', $pet_id)->first()->owners_id);
         } catch (\Exception $e) {
@@ -145,9 +115,9 @@ class VaccineController extends Controller
             ->delete();
         return response()->json("Deleted", JsonResponse::HTTP_OK);
     }
+
     // PUT Update appointment
-    public function update(Request $request, int $pet_id, int $id)
-    {
+    public function update(Request $request, int $pet_id, int $id) {
         $data = json_decode($request->getContent());
         try {
             $this->AuthUser(Pet::where('id', $pet_id)->first()->owners_id);
@@ -156,7 +126,7 @@ class VaccineController extends Controller
         }
         $date = DateTime::createFromFormat('j. n. Y', $data->apply_date);
 
-        PetVaccine::where('id', $id)->where('pet_id',$pet_id)->update([
+        PetVaccine::where('id', $id)->where('pet_id', $pet_id)->update([
             'description' => $data->description,
             'vaccine_id' => $data->vaccine_id,
             'apply_date' => $date,
@@ -169,12 +139,12 @@ class VaccineController extends Controller
         return response()->json(JsonResponse::HTTP_OK, 200
         );
     }
-    protected function validateRegistration(Request $request)
-    {
+
+    protected function validateRegistration(Request $request) {
         // get data from json
         $input = json_decode($request->getContent());
         // prepare validator
-        $validator = Validator::make((array) $input, [
+        $validator = Validator::make((array)$input, [
             'apply_date' => 'required',
             'description' => 'required',
         ]);
@@ -190,8 +160,8 @@ class VaccineController extends Controller
 
         return $input;
     }
-    public function AuthUser(int $id)
-    {
+
+    public function AuthUser(int $id) {
         $requestUser = User::Find($id);
         $loggedUser = Auth::User();
 
@@ -206,8 +176,8 @@ class VaccineController extends Controller
             throw new AuthenticationException();
         }
     }
-    public static function AuthPet(int $pet_id)
-    {
+
+    public static function AuthPet(int $pet_id) {
         $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
         $loggedUser = Auth::User();
         if (
@@ -221,8 +191,8 @@ class VaccineController extends Controller
             throw new AuthenticationException();
         }
     }
-    public static function setSeen(int $pet_id, int $vaccine_id)
-    {
+
+    public static function setSeen(int $pet_id, int $vaccine_id) {
         $owners_id = Pet::where('id', $pet_id)->first()->owners_id;
         $loggedUser = Auth::User();
         if (
@@ -230,7 +200,7 @@ class VaccineController extends Controller
             $loggedUser->role_id === UserRole::ADMINISTRATOR
         ) {
             //logged user is authorized
-            PetVaccine::where('id', $vaccine_id)->where('pet_id',$pet_id)->update([
+            PetVaccine::where('id', $vaccine_id)->where('pet_id', $pet_id)->update([
                 'seen' => true
             ]);
             return response()->json(JsonResponse::HTTP_OK, 200

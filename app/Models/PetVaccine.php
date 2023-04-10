@@ -4,8 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PetVaccine extends Model
-{
+class PetVaccine extends Model {
     protected $table = 'pet_vaccines';
     public $timestamps = false;
     protected $fillable = [
@@ -18,15 +17,14 @@ class PetVaccine extends Model
         'doctor_id',
         'notes',
         'color',
-        'city',
-        'street'
+        'seen'
     ];
-    public function pet()
-    {
-        return $this->belongsToMany(Pet::class);
+
+    public function pet(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo(Pet::class);
     }
-    public function vet()
-    {
-        return $this->belongsToMany(Doctor::class);
+
+    public function vet(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo(Doctor::class);
     }
 }

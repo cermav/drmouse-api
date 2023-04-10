@@ -38,6 +38,4 @@ class PetEmail extends Mailable
                 'test' => 'test',
             ]);
     }
-
-
 }

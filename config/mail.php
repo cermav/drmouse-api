@@ -133,6 +133,6 @@ return [
 
     'log_channel' => env('MAIL_LOG_CHANNEL'),
 
-    'service_email' => env('SERVICE_EMAIL', 'burt@code8.cz'),
+    'service_email' => env('SERVICE_EMAIL', '35777@mail.vsfs.cz'),
 
 ];

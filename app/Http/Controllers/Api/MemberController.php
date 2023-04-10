@@ -2,38 +2,42 @@
 
 namespace app\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
 use App\Http\Resources\MemberResource;
-use App\Models\Member;
 use App\Models\Doctor;
+use App\Models\FavoriteVet;
+use App\Models\Member;
 use App\Models\User;
 use App\Types\DoctorStatus;
 use App\Types\MemberStatus;
 use App\Types\UserRole;
 use App\Types\UserState;
 use App\Utils\ImageHandler;
+use Exception;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Auth\AuthenticationException;
+use Symfony\Component\HttpFoundation\Response;
 
-class MemberController extends Controller
-{
+class MemberController extends Controller {
     private $pageLimit = 30;
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return LengthAwarePaginator
+     * @throws AuthenticationException
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator {
         if (Auth::User()->role_id != UserRole::ADMINISTRATOR) {
             throw new AuthenticationException();
         }
@@ -95,11 +99,10 @@ class MemberController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show(int $id): \Illuminate\Http\Response {
         $member = Member::where('user_id', $id)
             ->select('members.*')
             ->whereIn('state_id', [
@@ -113,53 +116,49 @@ class MemberController extends Controller
         }
         return response()->json(
             ['message' => 'Not Found!'],
-            JsonResponse::HTTP_NOT_FOUND
+            Response::HTTP_NOT_FOUND
         );
     }
-    public function showByEmail($email)
-    {
+
+    public function showByEmail($email): JsonResponse {
         $user = User::where('email', $email)->first();
-        if (!$user){
+        if (!$user) {
             return response()->json(
-                0, 200
+                0
             );
         }
         $member = Member::where('user_id', $user->id)->first();
         $doctor = Doctor::where('user_id', $user->id)->first();
-        if ($member){
+        if ($member) {
             $gdpr = $member->gdpr_agreed;
             if ($gdpr == 1) return response()->json(
-                1, 200
+                1
             );
-            }
-        if ($doctor){
+        }
+        if ($doctor) {
             $gdpr = $doctor->gdpr_agreed;
             if ($gdpr == 1) return response()->json(
-                1, 200
+                1
             );
-            }
-            return response()->json(
-                0, 200
-            );
+        }
+        return response()->json(
+            0
+        );
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request): JsonResponse {
         // validate input
         $input = $this->validateRegistration($request);
-        
+
 
         // Create user
         $user = $this->createUser($input);
-
-        $verified = null;
-        if (isset($input->singleSide) && $input->singleSide) $verified = date('Y-m-d H:i:s');
 
         // Create doctor
         $member = Member::create([
@@ -193,18 +192,19 @@ class MemberController extends Controller
         $singleSide = json_decode($request->getContent());
         if (!isset($singleSide->singleSide) || isset($singleSide->singleSide) && (!$singleSide->singleSide || $singleSide->singleSide != true)) $user->sendMemberRegistrationEmailNotification();
 
-        return response()->json($member, JsonResponse::HTTP_CREATED);
+        return response()->json($member, Response::HTTP_CREATED);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     * @throws AuthenticationException
+     * @throws AuthenticationException
      */
-    public function update(Request $request, int $id)
-    {
+    public function update(Request $request, int $id): JsonResponse {
         // verify user
         $requestUser = User::find($id);
         $loggedUser = Auth::User();
@@ -233,11 +233,119 @@ class MemberController extends Controller
 
             return response()->json(
                 MemberResource::make($member),
-                JsonResponse::HTTP_OK
+                Response::HTTP_OK
             );
         } else {
             // return unauthorized
             throw new AuthenticationException();
+        }
+    }
+
+    public function userHasDoctors(int $user_id) {
+        $loggedUser = Auth::User();
+        if (
+            $loggedUser->id === $user_id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            $vets = FavoriteVet::where('user_id', $user_id)
+                ->pluck('doctor_id')
+                ->toArray();
+            $request = new Request();
+            $request->replace(['' => '']);
+            $doctors = DB::table('doctors')
+                ->select(
+                    'users.id',
+                    'name',
+                    'slug',
+                    'street',
+                    'city',
+                    'country',
+                    'post_code',
+                    'latitude',
+                    'longitude',
+                    'avatar',
+                    //OpeningHoursResource::collection($this->user->openingHours),
+                    // DB::raw("(SELECT GROUP_CONCAT(property_id) FROM doctors_properties WHERE user_id = users.id) AS properties"),
+                    DB::raw("IFNULL((
+                        SELECT true
+                        FROM opening_hours
+                        WHERE user_id = users.id AND weekday_id = (WEEKDAY(NOW()) + 1)
+                          AND (
+                            (opening_hours_state_id = 1 AND CAST(NOW() AS time) BETWEEN open_at AND close_at)
+                            OR
+                            opening_hours_state_id = 3
+                          )
+                        LIMIT 1)
+                      , false) AS open "),
+                    DB::raw(
+                        "(SELECT IFNULL( ROUND(((SUM(points)/COUNT(id))/5)*100) , 0) FROM score_details WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)) AS total_score "
+                    )
+                )
+                ->selectRaw(
+                    "(SELECT ST_Distance_Sphere(point(?, ?), point(longitude, latitude)) ) AS distance",
+                    [
+                        $request->has('long')
+                            ? floatval($request->input('long'))
+                            : 15.7,
+                        $request->has('lat')
+                            ? floatval($request->input('lat'))
+                            : 49.8,
+                    ]
+                )
+                ->join('users', 'doctors.user_id', '=', 'users.id')
+                ->whereIn('doctors.state_id', [
+                    DoctorStatus::PUBLISHED,
+                    DoctorStatus::ACTIVE,
+                ])
+                ->wherein('users.id', $vets)
+                ->get();
+            return response()->json($doctors);
+        }
+    }
+
+    public function addFavoriteDoctor(int $user_id, int $doctor_id): JsonResponse {
+        $loggedUser = Auth::User();
+        if (
+            $loggedUser->id === $user_id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            $exists = DB::table('user_favorite_doctors')
+                ->where('user_id', $user_id)
+                ->where('doctor_id', $doctor_id)
+                ->first();
+            if ($exists) {
+                return response()->json(
+                    ['error' => 'This relation already exists.'],
+                    409
+                );
+            } else {
+                FavoriteVet::create([
+                    'user_id' => $user_id,
+                    'doctor_id' => $doctor_id,
+                ]);
+                return response()->json(
+                    'favorite vet created.',
+                    Response::HTTP_CREATED
+                );
+            }
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
+
+    public function removeFavoriteDoctor(int $user_id, int $doctor_id): JsonResponse {
+        $loggedUser = Auth::User();
+        if (
+            $loggedUser->id === $user_id ||
+            $loggedUser->role_id === UserRole::ADMINISTRATOR
+        ) {
+            DB::table('user_favorite_doctors')
+                ->where('user_id', $user_id)
+                ->where('doctor_id', $doctor_id)
+                ->delete();
+            return response()->json("Deleted", Response::HTTP_OK);
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
 
@@ -246,14 +354,13 @@ class MemberController extends Controller
      * @param Request $request
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validateRegistration(Request $request)
-    {
+    protected function validateRegistration(Request $request): \Illuminate\Contracts\Validation\Validator {
         // get data from json
         $input = json_decode($request->getContent());
-        return $input;
         // prepare validator
-        $validator = Validator::make((array) $input, [
-            'name' => 'required|max:255',
+        $validator = Validator::make((array)$input, [
+            'fistName' => 'required|max:255',
+            'lastName' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
             'gdpr' => 'required',
@@ -263,7 +370,7 @@ class MemberController extends Controller
             throw new HttpResponseException(
                 response()->json(
                     ['errors' => $validator->errors()],
-                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                    Response::HTTP_UNPROCESSABLE_ENTITY
                 )
             );
         }
@@ -274,15 +381,16 @@ class MemberController extends Controller
     /**
      * Validate Input
      * @param Request $request
+     * @param int $user_id
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validateProfile(Request $request, int $user_id)
-    {
+    protected function validateProfile(Request $request, int $user_id) {
         // get data from json
         $input = json_decode($request->getContent());
         // prepare validator
-        $validator = Validator::make((array) $input, [
-            'name' => 'required|max:255',
+        $validator = Validator::make((array)$input, [
+            'firstName' => 'required|max:255',
+            'lastName' => 'required|max:255',
             'email' => 'required|email|unique:users,email,' . $user_id . ',id',
         ]);
 
@@ -290,28 +398,27 @@ class MemberController extends Controller
             throw new HttpResponseException(
                 response()->json(
                     ['errors' => $validator->errors()],
-                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                    Response::HTTP_UNPROCESSABLE_ENTITY
                 )
             );
         }
 
-        $data = [
+        return [
             'user' => [
-                'name' => $input->name,
+                'firstName' => $input->firstName,
+                'lastName' => $input->lastName,
                 'email' => $input->email,
             ],
             'avatar' => $input->avatar,
         ];
-        return $data;
     }
 
     /**
      * Create user
-     * @param array $data
+     * @param object $data
      * @return User
      */
-    protected function createUser(object $data)
-    {
+    protected function createUser(object $data): User {
         try {
             $activated = null;
 
@@ -322,7 +429,8 @@ class MemberController extends Controller
             if (isset($data->google_id)) $google_id = $data->google_id;
             if (isset($data->facebook_id)) $facebook_id = $data->facebook_id;
             return User::create([
-                'name' => $data->name,
+                'firstName' => $data->firstName,
+                'lastName' => $data->lastName,
                 'email' => $data->email,
                 'password' => Hash::make(trim($data->password)),
                 'role_id' => UserRole::MEMBER,
@@ -331,18 +439,17 @@ class MemberController extends Controller
                 'google_id' => $google_id,
                 'facebook_id' => $facebook_id
             ]);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             throw new HttpResponseException(
                 response()->json(
                     ['errors' => "Error creating user: " . $ex->getMessage()],
-                    JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+                    Response::HTTP_UNPROCESSABLE_ENTITY
                 )
             );
         }
     }
 
-    protected function saveProfileImage($user_id, $data)
-    {
+    protected function saveProfileImage($user_id, $data): string {
         // get doctor info
         $member = Member::where('user_id', $user_id)->first();
 
@@ -368,8 +475,7 @@ class MemberController extends Controller
      * @param string $name
      * @return string
      */
-    protected function getSlug(string $name)
-    {
+    protected function getSlug(string $name): string {
         $slug = strtolower(
             str_replace(
                 " ",

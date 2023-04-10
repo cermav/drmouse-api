@@ -10,7 +10,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PetEmail;
-use App\Jobs\PetNotification;
 
 class NewsletterUserController extends Controller
 {
@@ -27,7 +26,7 @@ class NewsletterUserController extends Controller
         $email = "cermav@gmail.com";
         Mail::to($email)->send(new PetEmail((object) ['data' => 'test']));
 
-        
+
     }
     public function store(Request $request)
     {

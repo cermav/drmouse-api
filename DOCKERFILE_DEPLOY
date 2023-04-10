@@ -1,0 +1,29 @@
+FROM lorisleiva/laravel-docker:7.1
+
+# set composer related environment variables
+ENV PATH="/composer/vendor/bin:$PATH" \
+    COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_VENDOR_DIR=/var/www/vendor \
+    COMPOSER_HOME=/composer
+
+# install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer --ansi --version --no-interaction
+
+# install application dependencies
+WORKDIR /var/www
+COPY ./composer.json  ./
+#./composer.lock*
+
+RUN composer install --version=2.2.0 --no-scripts --no-autoloader --ansi --no-interaction
+
+COPY . .
+RUN composer config -g -- disable-tls false
+
+RUN composer update --no-scripts
+#    && chown -R :www-data /var/www/app \
+#    && chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
+
+EXPOSE 80
+
+CMD ["/run.sh"]

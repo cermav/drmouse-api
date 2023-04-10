@@ -177,8 +177,8 @@ class DoctorController extends Controller
         $scoreQuery = [];
         foreach (ScoreItem::get() as $item) {
             $scoreQuery[] = "(
-                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
-                FROM score_details 
+                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0)
+                FROM score_details
                 WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
                     AND score_item_id = {$item->id}
             ) AS total_score ";
@@ -233,17 +233,17 @@ class DoctorController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+     * @param int $id
+     * @return JsonResponse
+	 */
+    public function show(int $id)
     {
         // build score query
         $scoreQuery = [];
         foreach (ScoreItem::get() as $item) {
             $scoreQuery[] = "(
-                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
-                FROM score_details 
+                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0)
+                FROM score_details
                 WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
                     AND score_item_id = {$item->id}
             ) AS total_score_{$item->id} ";
@@ -292,8 +292,8 @@ class DoctorController extends Controller
         $scoreQuery = [];
         foreach (ScoreItem::get() as $item) {
             $scoreQuery[] = "(
-                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0) 
-                FROM score_details 
+                SELECT IFNULL( ROUND(((SUM(points) / COUNT(id)) / 5) * 100) , 0)
+                FROM score_details
                 WHERE score_id IN (SELECT id FROM scores WHERE user_id = doctors.user_id)
                     AND score_item_id = {$item->id}
             ) AS total_score_{$item->id} ";
