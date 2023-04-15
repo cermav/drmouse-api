@@ -102,13 +102,13 @@ class MemberController extends Controller {
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show(int $id): \Illuminate\Http\Response {
+    public function show(int $id) {
         $member = Member::where('user_id', $id)
             ->select('members.*')
             ->whereIn('state_id', [
                 MemberStatus::NEW,
                 MemberStatus::VALID,
-                MemberStatus::BLOCKED,
+                MemberStatus::BLOCKED
             ])
             ->get();
         if (sizeof($member) > 0) {
@@ -418,7 +418,7 @@ class MemberController extends Controller {
      * @param object $data
      * @return User
      */
-    protected function createUser(object $data): User {
+    protected function createUser($data): User {        
         try {
             $activated = null;
 

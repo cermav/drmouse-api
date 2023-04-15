@@ -57,7 +57,7 @@ class CalendarController extends Controller {
         return response()->json($appointment, Response::HTTP_CREATED);
     }
 
-    private function createAppointmentMember(object $data, int $member_id) {
+    private function createAppointmentMember($data, int $member_id) {
         $owner = User::find($member_id);
 
         try {
@@ -106,7 +106,7 @@ class CalendarController extends Controller {
         }
     }
 
-    public function createAppointmentDoctor(object $data, int $doctor_id) {
+    public function createAppointmentDoctor($data, int $doctor_id) {
         $this->authorizeDoctor($doctor_id);
 
         $mail = $data->mail;
@@ -262,7 +262,7 @@ class CalendarController extends Controller {
     /**
      * @throws AuthenticationException
      */
-    protected function authorizeRequestDoctor(object $event) {
+    protected function authorizeRequestDoctor($event) {
         $user = Auth::User();
 
         if ($event->assigned_to === $user->id || $event->doctor_id === $user->id) return;

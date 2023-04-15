@@ -74,7 +74,7 @@ class VaccineController extends Controller {
     //create vaccine for POST add vaccine
     //TODO Authentication
     //done
-    public function AddVaccine(object $data, $pet_id) {
+    public function AddVaccine($data, $pet_id) {
         $validator = Validator::make((array)$data, [
             'description' => 'required|string|max:100',
             'apply_date' => 'required',

@@ -70,7 +70,7 @@ class AuthHelper {
         return $input;
     }
 
-    protected function createUser(object $data) {
+    protected function createUser($data) {
         try {
             $activated = null;
 

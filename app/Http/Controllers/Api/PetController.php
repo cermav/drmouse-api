@@ -94,7 +94,7 @@ class PetController extends Controller {
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse {
+    public function store(Request $request) {
         $input = $this->validatePet($request);
 
         $pet = $this->createPet($input);
@@ -194,7 +194,7 @@ class PetController extends Controller {
         return $fileName;
     }
 
-    private function createPet(object $data) {
+    private function createPet($data) {
         return Pet::create([
             'owners_id' => Auth::user()->id,
             'pet_name' => $data->pet_name,

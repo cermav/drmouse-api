@@ -92,14 +92,13 @@ class AppointmentController extends Controller {
     }
 
     /**
-     * @param object $data
      * @param int $pet_id
      * @param int $owners_id
      * @return mixed
      * @throws AuthenticationException
      */
     private
-    function createAppointment(object $data, int $pet_id, int $owners_id) {
+    function createAppointment($data, int $pet_id, int $owners_id) {
         $this->authorizeUser($pet_id);
         try {
             return PetAppointment::create([

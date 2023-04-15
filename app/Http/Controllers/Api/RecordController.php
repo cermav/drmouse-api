@@ -54,7 +54,7 @@ class RecordController extends Controller {
 
     public function delete(Request $request) {}
 
-    public function createRecord(object $data, int $doctor_id, int $event_id) {
+    public function createRecord($data, int $doctor_id, int $event_id) {
         try {
             $event = PetAppointment::findOrFail($event_id);
 
@@ -312,7 +312,7 @@ class RecordController extends Controller {
         return $loggedUser->id;
     }
 
-    private function createInvoiceItems(object $data, Record $record, int $doctor_id) {
+    private function createInvoiceItems($data, Record $record, int $doctor_id) {
         foreach ($data->billing_items as $item) {
             $chart = PriceChart::findOrFail($item->id);
 

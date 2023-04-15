@@ -585,7 +585,7 @@ class DoctorController extends Controller
      * @param Request $request
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validateAddress(object $address)
+    protected function validateAddress($address)
     {
         // prepare validator
         $validator = Validator::make((array) $address, [
@@ -612,7 +612,7 @@ class DoctorController extends Controller
      * @param Request $request
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validateStaffInfo(object $staffInfo)
+    protected function validateStaffInfo($staffInfo)
     {
         // prepare validator
         $validator = Validator::make((array) $staffInfo, [
@@ -678,7 +678,7 @@ class DoctorController extends Controller
      * @param array $data
      * @return User
      */
-    protected function createUser(object $data)
+    protected function createUser($data)
     {
         try {
             return User::create([
